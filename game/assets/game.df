@@ -1,0 +1,10 @@
+
+gamedir		"../game/"
+assetsdir	"../game/assets/"
+controller	"AController"
+
+graphic
+{
+	screensize	{ 1024 768 }
+	font		"sewer.ttf"
+}

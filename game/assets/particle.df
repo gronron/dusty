@@ -1,0 +1,69 @@
+player
+{
+	attractor	0
+	spawnrate	160.0f
+	cmin		{ 0.0f 0.1f 0.8f }
+	cmax		{ 0.0f 0.4f 1.0f }
+	fade		{ 0.2f 0.33f }
+	speed		{ 64.0f 128.0f }
+}
+
+feeder
+{
+	attractor	0
+	spawnrate	120.0f
+	cmin		{ 0.8f 0.0f 0.0f }
+	cmax		{ 1.0f 0.3f 0.1f }
+	fade		{ 0.2f 0.33f }
+	speed		{ 64.0f 128.0f }
+}
+
+projectile
+{
+	attractor	0
+	spawnrate	80.0f
+	cmin		{ 0.1f 0.8f 0.1f }
+	cmax		{ 0.3f 1.0f 0.3f }
+	fade		{ 0.2f 0.33f }
+	speed		{ 64.0f 128.0f }
+}
+
+bonus
+{
+	attractor	0
+	spawnrate	80.0f
+	cmin		{ 0.85f 0.85f 0.0f }
+	cmax		{ 1.0f 1.0f 0.1f }
+	fade		{ 0.5f 1.0f }
+	speed		{ 24.0f 48.0f }
+}
+
+exit
+{
+	attractor	1
+	spawnrate	160.0f
+	cmin		{ 0.15f 0.4f 0.8f }
+	cmax		{ 0.20f 0.6f 1.0f }
+	fade		{ 1.0f 1.5f }
+	speed		{ 24.0f 48.0f }
+}
+
+explosion
+{
+	attractor	1
+	number		70
+	cmin		{ 0.8f 0.0f 0.0f }
+	cmax		{ 1.0f 0.3f 0.1f }
+	fade		{ 0.15f 0.25f }
+	speed		{ 128.0f 256.0f }
+}
+
+damage
+{
+	attractor	0
+	number		20
+	cmin		{ 0.0f 0.0f 0.2f }
+	cmax		{ 0.0f 0.0f 0.3f }
+	fade		{ 1.0f 2.0f }
+	speed		{ 32.0f 64.0f }
+}
