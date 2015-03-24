@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\libsrc">
+      <UniqueIdentifier>{2eb2da32-2edb-4afd-9fbd-799df5c0d1fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsrc">
+      <UniqueIdentifier>{cea030ba-5beb-40a7-81d9-51cd72c4a0de}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\engine\actor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\actormanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\configmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\messagequeue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\networkengine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\networkproto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\replication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\physic\physicengine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\stream\winsock_init.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\stream\udpstream.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\time\time.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\thread\thread.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\stream\tcpstream.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\stream\selector.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\random\prbg.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\endian\packet.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\thread\mutex.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\random\mt19937.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\endian\endian.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\df\df_node.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\thread\conditionvariable.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\engine\actor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\actormanager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\configmanager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\factory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\client.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\messagequeue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\networkengine.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\networkproto.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\replication.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\server.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\physic\physicengine.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\math\vec_util.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\math\vec.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\stream\udpstream.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\time\time.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\thread\thread.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\stream\tcpstream.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\stream\stream.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\stream\socket.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\stream\selector.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\random\prbg.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\endian\packet.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\thread\mutex.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\random\mt19937.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\endian\endian.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\df\df_parser.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\df\df_node.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\thread\conditionvariable.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

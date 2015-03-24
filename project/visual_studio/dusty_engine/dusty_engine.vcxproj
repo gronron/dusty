@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9B587A27-35EC-414E-84EA-A0D8CCE51075}</ProjectGuid>
+    <RootNamespace>dusty_engine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\engine\actor.cpp" />
+    <ClCompile Include="..\..\..\engine\actormanager.cpp" />
+    <ClCompile Include="..\..\..\engine\configmanager.cpp" />
+    <ClCompile Include="..\..\..\engine\factory.cpp" />
+    <ClCompile Include="..\..\..\libsrc\df\df_node.cpp" />
+    <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp" />
+    <ClCompile Include="..\..\..\libsrc\endian\endian.cpp" />
+    <ClCompile Include="..\..\..\libsrc\endian\packet.cpp" />
+    <ClCompile Include="..\..\..\libsrc\random\mt19937.cpp" />
+    <ClCompile Include="..\..\..\libsrc\random\prbg.cpp" />
+    <ClCompile Include="..\..\..\libsrc\stream\selector.cpp" />
+    <ClCompile Include="..\..\..\libsrc\stream\tcpstream.cpp" />
+    <ClCompile Include="..\..\..\libsrc\stream\udpstream.cpp" />
+    <ClCompile Include="..\..\..\libsrc\stream\winsock_init.cpp" />
+    <ClCompile Include="..\..\..\libsrc\thread\conditionvariable.cpp" />
+    <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp" />
+    <ClCompile Include="..\..\..\libsrc\thread\mutex.cpp" />
+    <ClCompile Include="..\..\..\libsrc\thread\thread.cpp" />
+    <ClCompile Include="..\..\..\libsrc\time\time.cpp" />
+    <ClCompile Include="..\..\..\network\client.cpp" />
+    <ClCompile Include="..\..\..\network\messagequeue.cpp" />
+    <ClCompile Include="..\..\..\network\networkengine.cpp" />
+    <ClCompile Include="..\..\..\network\networkproto.cpp" />
+    <ClCompile Include="..\..\..\network\replication.cpp" />
+    <ClCompile Include="..\..\..\network\server.cpp" />
+    <ClCompile Include="..\..\..\physic\physicengine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\engine\actor.hpp" />
+    <ClInclude Include="..\..\..\engine\actormanager.hpp" />
+    <ClInclude Include="..\..\..\engine\configmanager.hpp" />
+    <ClInclude Include="..\..\..\engine\factory.hpp" />
+    <ClInclude Include="..\..\..\libsrc\df\df_node.hpp" />
+    <ClInclude Include="..\..\..\libsrc\df\df_parser.hpp" />
+    <ClInclude Include="..\..\..\libsrc\endian\endian.hpp" />
+    <ClInclude Include="..\..\..\libsrc\endian\packet.hpp" />
+    <ClInclude Include="..\..\..\libsrc\math\vec.hpp" />
+    <ClInclude Include="..\..\..\libsrc\math\vec_util.hpp" />
+    <ClInclude Include="..\..\..\libsrc\random\mt19937.hpp" />
+    <ClInclude Include="..\..\..\libsrc\random\prbg.hpp" />
+    <ClInclude Include="..\..\..\libsrc\stream\selector.hpp" />
+    <ClInclude Include="..\..\..\libsrc\stream\socket.hpp" />
+    <ClInclude Include="..\..\..\libsrc\stream\stream.hpp" />
+    <ClInclude Include="..\..\..\libsrc\stream\tcpstream.hpp" />
+    <ClInclude Include="..\..\..\libsrc\stream\udpstream.hpp" />
+    <ClInclude Include="..\..\..\libsrc\thread\conditionvariable.hpp" />
+    <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp" />
+    <ClInclude Include="..\..\..\libsrc\thread\mutex.hpp" />
+    <ClInclude Include="..\..\..\libsrc\thread\thread.hpp" />
+    <ClInclude Include="..\..\..\libsrc\time\time.hpp" />
+    <ClInclude Include="..\..\..\network\client.hpp" />
+    <ClInclude Include="..\..\..\network\messagequeue.hpp" />
+    <ClInclude Include="..\..\..\network\networkengine.hpp" />
+    <ClInclude Include="..\..\..\network\networkproto.hpp" />
+    <ClInclude Include="..\..\..\network\replication.hpp" />
+    <ClInclude Include="..\..\..\network\server.hpp" />
+    <ClInclude Include="..\..\..\physic\physicengine.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
