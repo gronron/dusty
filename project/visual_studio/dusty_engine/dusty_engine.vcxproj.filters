@@ -99,6 +99,15 @@
     <ClCompile Include="..\..\..\libsrc\thread\conditionvariable.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\ui\console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ui\controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ui\eventmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\actor.hpp">
@@ -187,6 +196,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\thread\conditionvariable.hpp">
       <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ui\console.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ui\controller.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ui\eventmanager.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
