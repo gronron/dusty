@@ -83,7 +83,7 @@ void				Physicengine::_insertion_sort()
 	unsigned int	j;
 	Proxy			a;
 
-	for (unsigned int j = 1; j < _prxnbr; ++j)
+	for (j = 1; j < _prxnbr; ++j)
 	{
 		a = _sortedprx[j];
 		for (i = j; i && _sortedprx[i - 1].bot[_faxis] > a.bot[_faxis]; --i)
@@ -133,9 +133,11 @@ void				Physicengine::_collide2(float delta, Boundingbox *x, Boundingbox *y)
 	
 	u = (-x->spd + sqrt(d)) / (2.0f * x->acc);
 	v = (-x->spd - sqrt(d)) / (2.0f * x->acc);
-	w
+
 	for (unsigned int i = 0; i < 3; ++i)
 	{
+		float	t = -1.0f;
+
 		if (d[i] > 0.0f)
 		{
 		
@@ -146,8 +148,6 @@ void				Physicengine::_collide2(float delta, Boundingbox *x, Boundingbox *y)
 			t = v[i];
 		if (t >= 0.0f && _reaction(x, y, t, i))
 			break;
-			
-		float t = -1.0f;
 	}
 }
 

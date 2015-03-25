@@ -43,7 +43,7 @@ Prbg::Prbg(float c)
 		chance = c;
 		inverter = false;
 	}
-	a = MT().genrand_real1(0, 2.0 - chance);
+	counter = MT().genrand_real1(0, 2.0 - chance);
 }
 
 Prbg::~Prbg()
@@ -63,7 +63,7 @@ void	Prbg::operator()(float c)
 		chance = c;
 		inverter = false;
 	}
-	a = MT().genrand_real1(0, 2.0 - chance);
+	counter = MT().genrand_real1(0, 2.0 - chance);
 }
 
 bool	Prbg::pick()

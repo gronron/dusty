@@ -49,8 +49,7 @@ void	Conditionvariable::sleep(Mutex &mtx)
 
 void	Conditionvariable::sleep(Mutex &mtx, double const timeout)
 {
-	
-	SleepConditionVariableCS(&_condvar, &mtx._mtx, timeout * 1000.0);
+	SleepConditionVariableCS(&_condvar, &mtx._mtx, (int)(timeout * 1000.0));
 }
 
 void	Conditionvariable::wake()

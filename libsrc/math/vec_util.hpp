@@ -40,7 +40,7 @@ inline vec<T, (U > V ? V : U)>	min(vec<T, U> const &x, vec<T, V> const &y)
 	vec<T, (U > V ? V : U)>	a;
 
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a[i] = x.ar[i] > y.ar[i] ? y.ar[i] : x.ar[i];
+		a.ar[i] = x.ar[i] > y.ar[i] ? y.ar[i] : x.ar[i];
 	return (a);
 }
 
@@ -50,7 +50,7 @@ inline vec<T, (U > V ? V : U)>	max(vec<T, U> const &x, vec<T, V> const &y)
 	vec<T, (U > V ? V : U)>	a;
 
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a[i] = x.ar[i] < y.ar[i] ? y.ar[i] : x.ar[i];
+		a.ar[i] = x.ar[i] < y.ar[i] ? y.ar[i] : x.ar[i];
 	return (a);
 }
 
@@ -60,7 +60,7 @@ inline vec<T, U>	abs(vec<T, U> const &x)
 	vec<T, U>	a;
 
 	for (unsigned int i = 0; i < U; ++i)
-		a[i] = x.ar[i] < 0 ? -x.ar[i] : x.ar[i];
+		a.ar[i] = x.ar[i] < 0 ? -x.ar[i] : x.ar[i];
 	return (a);
 }
 
@@ -99,10 +99,20 @@ inline vec<T, 3>		cross(vec<T, 3> const &x, vec<T, 3> const &y)
 {
 	vec<T, 3>	a;
 
-	a = x.ar[0] * y.ar[1] - x.ar[1] * y.ar[0];
-	a = x.ar[1] * y.ar[2] - x.ar[2] * y.ar[1];
-	a = x.ar[2] * y.ar[0] - x.ar[0] * y.ar[2];
+	a.ar[0] = x.ar[0] * y.ar[1] - x.ar[1] * y.ar[0];
+	a.ar[1] = x.ar[1] * y.ar[2] - x.ar[2] * y.ar[1];
+	a.ar[2] = x.ar[2] * y.ar[0] - x.ar[0] * y.ar[2];
 	return (a);
+}
+
+template<class T, unsigned int U>
+inline float		sqrt(vec<T, U> const &x)
+{
+	vec<T, U>	a;
+
+	for (unsigned int i = 0; i < U; ++i)
+		a.ar[i] = sqrt(x.ar[i]);
+	return (sqrt(a));
 }
 
 namespace Sgl

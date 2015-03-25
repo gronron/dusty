@@ -44,7 +44,7 @@ Selector::~Selector()
 bool				Selector::check(float timeout)
 {
 	struct timeval	tv;
-	int				max = 0;
+	Socket			max = 0;
 	int				ret;
 
 	tv.tv_sec = (int)timeout;
