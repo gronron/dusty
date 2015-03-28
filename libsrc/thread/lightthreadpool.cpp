@@ -30,6 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "lightthreadpool.hpp"
 
+Lightthreadpool	&Lightthreadpool::get_instance()
+{
+	static	Lightthreadpool	instance(8, 4096);
+
+	return (instance);
+}
+
 void				*Lightthreadpool::_runthrd(void *data)
 {
 	Worker			*wrkr = (Worker *)data;

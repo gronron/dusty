@@ -37,8 +37,12 @@ class	Physicengine
 {
 	public:
 	
+		struct	Body;
+		class	Actor;
+	
 		struct	Boundingbox
 		{
+			Body			*bd;
 			vec<float, 3>	loc;
 			vec<float, 3>	spd;
 			vec<float, 3>	acc;
@@ -54,7 +58,8 @@ class	Physicengine
 	
 		struct	Body
 		{
-			Boundingbox				*bb;
+			Actor					*actor;
+			unsigned int			bbidx;
 			unsigned int			vtcnbr;
 			vec<float, 3>			*vertices;
 			unsigned int			trinbr;
@@ -63,7 +68,7 @@ class	Physicengine
 
 		struct				Proxy
 		{
-			Boundingbox		*bb;
+			unsigned int	bbidx;
 			vec<float, 3>	bot;
 			vec<float, 3>	top;
 			bool			dynamic;

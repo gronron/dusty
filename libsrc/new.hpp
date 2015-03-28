@@ -28,53 +28,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef LIGHTTHREADPOOL_H_
-#define LIGHTTHREADPOOL_H_
+#ifndef NEW_H_
+#define NEW_H_
 
-#include "thread.hpp"
-#include "mutex.hpp"
-#include "conditionvariable.hpp"
-
-class	Lightthreadpool
+template<class T>
+T		*resize(T *ptr, unsigned int oldsize, unsigned int newsize)
 {
-	public:
+	T	*a;
 
-		struct		Task
-		{
-			void	*(*function)(void*);
-			void	*data;
-		};
+	a = new T[newsize];
+	for (unsigned int i = 0; i < oldsize; ++i)
+		a[i] = ptr[i];
+	delete [] ptr;
 
-		struct				Worker
-		{
-			Thread			thrd;
-			Lightthreadpool	*ltp;
-			Task			*tasks;
-			unsigned int	front;
-			unsigned int	back;
-		};
+	return (a);
+}
 
-		static Lightthreadpool		&get_instance();
-		static	void				*_runthrd(void *);
+template<class T>
+T		**new_matrix(unsigned int const x, unsigned int const y)
+{
+	T	**a;
 
+	a = new T*[y];
+	*a = new T[x * y];
+	for (unsigned int i = 1; i < y; ++i)
+		a[i] = *a + i * x;
 
-		unsigned int		_thrdnbr;
-		unsigned int		_queuesize;
-		unsigned int		_looper;
-		bool				_running;
+	return (a);
+}
 
-		Worker				*_wrkrs;
-
-		Mutex				_mtx;
-		Conditionvariable	_mcv;
-		Conditionvariable	_scv;
-
-
-		Lightthreadpool(unsigned int thrdnbr, unsigned int queuesize);
-		~Lightthreadpool();
-
-		void	addtask(void *(*function)(void*), void *data);
-		void	run();
-};
+template<class T>
+void	delete_matrix(T **a)
+{
+	delete [] *a;
+	delete [] a;
+}
 
 #endif

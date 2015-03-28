@@ -409,7 +409,7 @@ Df_node				*df_parse(std::istream &is)
 	if (ps.error)
 	{
 		std::cerr << "error! df_parse() fails to parse std::istream" << std::endl;
-		delete ps.data;
+		free(ps.data);
 	}
 	else
 	{

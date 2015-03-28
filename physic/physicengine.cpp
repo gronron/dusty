@@ -45,8 +45,26 @@ Physicengine::~Physicengine()
 
 }
 
-void		Physicengine::add(Body *bd)
+void		Physicengine::add(Body *bd, bool dynamic)
 {
+	if (dynamic)
+	{
+		if (_dbbnbr >= _dbbsize)
+		{
+			_dynamicbb = resize(_dynamicbb, _dbbsize, _dbbsize << 1);
+			_dbbsize <<= 1;
+		}
+		bd->>bbidx = _dbbnbr;
+		_sortedprx[_prxnbr].bbidx = _dbbnbr;
+		_sortedprx[_prxnbr].dynamic = dynamic;
+		_dynamicbb[_dbbnbr++].bd = bd;
+
+	}
+	else
+	{
+	
+	}
+	
 	//new BB and insert
 }
 
@@ -182,9 +200,9 @@ bool				Physicengine::_reaction(Boundingbox *x, Boundingbox *y, float t, unsigne
 		if (i != axis && (xloc[i] > yloc[i] + y->size[i] || yloc[i] > xloc[i] + x->size[i]))
 			return (false);
 	}
-	if (x->actor->collide(*y->actor) && x->dynamic)
+	if (x->body->actor->collide(*y->body->actor) && x->dynamic)
 		x->nextloc[axis] = xloc[axis];
-	if (y->actor->collide(*x->actor) && y->dynamic)
+	if (y->body->actor->collide(*x->body->actor) && y->dynamic)
 		y->nextloc[axis] = yloc[axis];
 	return (true);
 }
