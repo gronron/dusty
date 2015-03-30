@@ -28,43 +28,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef NEW_H_
-#define NEW_H_
+#include "boundingbox.hpp
 
-#include <stdlib.h>
-
-template<class T>
-T		*resize(T *ptr, unsigned int oldsize, unsigned int newsize)
+void	Boundingbox::get_replication(Packet &pckt) const
 {
-	T	*a;
-
-	if (!(a = new T[newsize]))
-		exit(EXIT_FAILURE);
-	for (unsigned int i = 0; i < oldsize; ++i)
-		a[i] = ptr[i];
-	delete [] ptr;
-
-	return (a);
+	pckt.write(loc);
+	pckt.write(spd);
+	pckt.write(acc);
+	pckt.write(mass);
+	pckt.write(size); //will be skiped
 }
 
-template<class T>
-T		**new_matrix(unsigned int const x, unsigned int const y)
+void	Boundingbox::replicate(Packet &pckt, float p)
 {
-	T	**a;
-
-	if (!(a = new T*[y]) || !(*a = new T[x * y]))
-		exit(EXIT_FAILURE);
-	for (unsigned int i = 1; i < y; ++i)
-		a[i] = *a + i * x;
-
-	return (a);
+	pckt.read(loc);
+	pckt.read(spd);
+	pckt.read(acc);
+	pckt.read(mass);
+	pckt.read(size);
 }
-
-template<class T>
-void	delete_matrix(T **a)
-{
-	delete [] *a;
-	delete [] a;
-}
-
-#endif

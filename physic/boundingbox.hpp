@@ -28,43 +28,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef NEW_H_
-#define NEW_H_
+#ifndef BOUNDINGBOX_H_
+#define BOUNDINGBOX_H_
 
-#include <stdlib.h>
+#include "math/vec.hpp"
+#include "endian/packet.hpp"
 
-template<class T>
-T		*resize(T *ptr, unsigned int oldsize, unsigned int newsize)
+struct	Body;
+
+struct				Boundingbox
 {
-	T	*a;
+	Body			*bd;
+	vec<float, 3>	loc;
+	vec<float, 3>	spd;
+	vec<float, 3>	acc;
+	float			mass;
 
-	if (!(a = new T[newsize]))
-		exit(EXIT_FAILURE);
-	for (unsigned int i = 0; i < oldsize; ++i)
-		a[i] = ptr[i];
-	delete [] ptr;
+	vec<float, 3>	size;
+	vec<float, 3>	nextloc;
+	vec<float, 3>	nextspd;
 
-	return (a);
-}
 
-template<class T>
-T		**new_matrix(unsigned int const x, unsigned int const y)
+	void	get_replication(Packet &) const;
+	void	replicate(Packet &, float);
+};
+
+struct				Proxy
 {
-	T	**a;
-
-	if (!(a = new T*[y]) || !(*a = new T[x * y]))
-		exit(EXIT_FAILURE);
-	for (unsigned int i = 1; i < y; ++i)
-		a[i] = *a + i * x;
-
-	return (a);
-}
-
-template<class T>
-void	delete_matrix(T **a)
-{
-	delete [] *a;
-	delete [] a;
-}
+	unsigned int	bbidx;
+	vec<float, 3>	bot;
+	vec<float, 3>	top;
+	bool			dynamic;
+};
 
 #endif

@@ -45,7 +45,7 @@ Physicengine::~Physicengine()
 
 }
 
-void		Physicengine::add(Body *bd, bool dynamic)
+void		Physicengine::add(Body *bd, vec<float, 3> &loc, bool dynamic)
 {
 	if (dynamic)
 	{
@@ -54,11 +54,16 @@ void		Physicengine::add(Body *bd, bool dynamic)
 			_dynamicbb = resize(_dynamicbb, _dbbsize, _dbbsize << 1);
 			_dbbsize <<= 1;
 		}
-		bd->>bbidx = _dbbnbr;
+		if (_prxnbr >= _prxsize)
+		{
+			_sortedprx = resize(_sortedprx, _prxsize, prxsize << 1);
+			_prxsize <<= 1;
+		}
+		bd->bbidx = _dbbnbr;
 		_sortedprx[_prxnbr].bbidx = _dbbnbr;
-		_sortedprx[_prxnbr].dynamic = dynamic;
+		_sortedprx[_prxnbr].dynamic = true;
 		_dynamicbb[_dbbnbr++].bd = bd;
-
+		//compute boundinxbox
 	}
 	else
 	{
