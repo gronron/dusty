@@ -28,44 +28,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PHYSICENGINE_H_
-#define PHYSICENGINE_H_
+#ifndef BODY_H_
+#define BODY_H_
 
+#include "math/vec.hpp"
 #include "boundingbox.hpp"
-#include "body.hpp"
 
-class	Physicengine
+class	Actor;
+
+struct	Body
 {
-	public:
-
-		unsigned int	_sbbsize;
-		unsigned int	_sbbnbr;
-		Boundingbox		*_staticbb;
-		unsigned int	_dbbsize;
-		unsigned int	_dbbnbr;
-		Boundingbox		*_dynamicbb;
-
-		unsigned int	_prxsize;
-		unsigned int	_prxnbr;
-		Proxy			*_sortedprx;
-		unsigned int	_faxis;
-		unsigned int	_saxis;
-		unsigned int	_taxis;
-
-
-		Physicengine();
-		~Physicengine();
-
-		void	add(Body *);
-		void	remove(Body *);
-
-		void	tick(float);
-
-		void	_insertion_sort();
-		void	_check_overlap(float);
-		void	_collide(float, Boundingbox *, Boundingbox *);
-		void	_collide2(float, Boundingbox *, Boundingbox *);
-		bool	_reaction(Boundingbox *, Boundingbox *, float, unsigned int);
+	Actor					*actor;
+	Boundingbox				*bbptr;
+	unsigned int			vtcnbr;
+	vec<float, 3>			*vertices;
+	unsigned int			trinbr;
+	vec<unsigned int, 3>	*triangles;
 };
 
 #endif
