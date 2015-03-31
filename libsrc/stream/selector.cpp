@@ -61,5 +61,5 @@ bool				Selector::check(float timeout)
 		perror("Error: select()");
 		return (false);
 	}
-	return (ret);
+	return (ret != 0);
 }

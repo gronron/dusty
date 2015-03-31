@@ -34,13 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <map>
 #include <list>
+#include "SDL.h"
 #include "math/vec.hpp"
 #include "animation.hpp"
-
-namespace sf
-{
-	class Window;
-}
 
 class	Graphicengine
 {
@@ -66,7 +62,8 @@ class	Graphicengine
 			vec<float, 2>	center;
 		};
 
-		sf::Window						*_window;
+		SDL_Window		*_window;
+		SDL_GLContext	*_glcontext;
 
 		vec<unsigned int, 2>			screensize;
 		std::string						assetsdir;

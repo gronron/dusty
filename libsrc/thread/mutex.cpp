@@ -49,7 +49,7 @@ void	Mutex::lock()
 
 bool	Mutex::trylock()
 {
-	return (TryEnterCriticalSection(&_mtx));
+	return (TryEnterCriticalSection(&_mtx) != 0);
 }
 
 void	Mutex::unlock()

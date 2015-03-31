@@ -71,7 +71,7 @@ void	Selector::rmsocket(T const &x)
 template<class T>
 bool	Selector::is_ready(T const &x)
 {
-	return (FD_ISSET(x._id, &_rfds));
+	return (FD_ISSET(x._id, &_rfds) != 0);
 }
 
 #endif

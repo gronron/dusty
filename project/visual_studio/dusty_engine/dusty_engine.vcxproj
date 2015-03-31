@@ -38,15 +38,21 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>$(SolutionDir)..\..\lib\SDL\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>$(SolutionDir)..\..\lib\SDL\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -55,12 +61,13 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

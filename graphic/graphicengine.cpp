@@ -33,16 +33,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "image.hpp"
 #include "graphicengine.hpp"
 
+#include <GL/glew.h>
+#include <SDL.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include <GL/glew.h>
-#include <SFML/Window.hpp>
+
 
 Graphicengine::Graphicengine(vec<unsigned int, 2> const &ss, std::string const &ad) : _window(), screensize(ss), assetsdir(ad), cam(0), _activetex(0)
 {
 	GLenum	error;
-
-	_window = new sf::Window(sf::VideoMode(screensize[0], screensize[1], 32), "Chasis", sf::Style::Default, sf::ContextSettings(0, 0, 0, 3, 3));
+	
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		std::cerr << "Error: SDL_Init() " << SDL_GetError() << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screensize[0], screensize[1], SDL_WINDOW_SHOWN );
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	_context = SDL_GL_CreateContext(_window);
 
 	if ((error = glewInit()) != GLEW_OK)
 	{
@@ -71,7 +81,9 @@ Graphicengine::~Graphicengine()
 
 	for (i = _animationlist.begin(); i != _animationlist.end(); ++i)
 		delete *i;
-	delete _window;
+	SDL_GL_DeleteContext(_glcontext)
+	SDL_DestroyWindow(_window);
+	SDL_Quit();
 }
 
 void	Graphicengine::add(Animation *a)
@@ -123,7 +135,8 @@ void									Graphicengine::tick(float delta)
 		delete *i;
 		i = _textlist.erase(i);
 	}
-	_window->display();
+
+	SDL_UpdateWindowSurface(_window);
 }
 
 void	Graphicengine::resize(unsigned int w, unsigned int h)
