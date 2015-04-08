@@ -28,6 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include "new.hpp"
 #include "actor.hpp"
 #include "replication.hpp"
 #include "controller.hpp"
@@ -43,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
-Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0), ne(0), ge(0), um(0), master(opt.master), local(opt.local), graphic(opt.graphic), audio(opt.audio), controllerclass(), _currentid(0)
+Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0), ne(0), ge(0), um(0), master(opt.master), local(opt.local), graphic(opt.graphic), audio(opt.audio), _asize(64), _actors(new Actor*[64]), controllerclass()
 {
 	Df_node	*nd;
 
@@ -66,10 +67,10 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
 	if (master)
-		create(opt.level, 0);
+		create(opt.level, 0, true);
 	if (local)
 	{
-		Controller *ctrl = (Controller *)create(controllerclass, 0);
+		Controller *ctrl = (Controller *)create(controllerclass, 0, true);
 		_controllermap[ctrl->id] = ctrl;
 		ctrl->bind();
 	}
@@ -77,10 +78,9 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 
 Actormanager::~Actormanager()
 {
-	Actoriterator	i;
-
-	for (i = _actormap.begin(); i != _actormap.end(); ++i)
-		delete i->second;
+	for (unsigned int i = 0; i < _asize; ++i)
+		if (_actors[i])
+			delete _actors[i];
 	if (graphic)
 	{
 		delete um;
@@ -93,59 +93,57 @@ Actormanager::~Actormanager()
 	delete cl;
 }
 
-Actor		*Actormanager::create(std::string const &name, Actor const *owner)
+Actor		*Actormanager::create(std::string const &name, Actor const *owner, bool need_replication)
 {
-	Actor	*actr;
-	int		id;
+	int		id = -1;
 
-	id = ++_currentid;
-	actr = Factory::get_instance().create(this, name, id, owner);
-	_actormap[id] = actr;
-	actr->postinstanciation();
-	return (actr);
-}
-
-Actor		*Actormanager::create(Replication *ri)
-{
-	Actor	*actr;
-
-	actr = Factory::get_instance().create(this, ri->type, ri);
-	_actormap[ri->id] = actr;
-	return (actr);
-}
-
-Actor				*Actormanager::findactor(int id)
-{
-	Actoriterator	i;
-
-	i = _actormap.find(id);
-	return (i == _actormap.end() ? 0 : i->second);
-}
-
-void				Actormanager::notify_owner(Actor *a, bool l)
-{
-	Actoriterator	i;
-
-	if ((i = _actormap.find(a->ownerid)) != _actormap.end())
-		i->second->notified_by_owned(a, l);
-}
-
-void				Actormanager::notify_owned(Actor *a, bool l)
-{
-	Actoriterator	i;
-
-	for (i = _actormap.begin(); i != _actormap.end(); ++i)
+	for (unsigned int i = 0; i < _asize; ++i)
 	{
-		if (i->second->ownerid == a->id)
-			i->second->notified_by_owner(a, l);
+		if (!_actors[i])
+		{
+			id = i;
+			break;
+		}
 	}
+	if (id < 0)
+	{
+		_actors = resize(_actors, _asize, _asize < 1);
+		_asize <<= 1;
+	}
+	_actors[id] = Factory::get_instance().create(this, (need_replication && !local ? ne->new_replication(id) : 0), id, name, owner);
+	_actors[id]->postinstanciation();
+	return (_actors[id]);
 }
 
-void			Actormanager::control(int id)
+Actor		*Actormanager::create(Replication *r)
+{
+	_actormap[r->id] = Factory::get_instance().create(this, r);
+	_actormap[r->id]->postinstanciation();
+	return (_actormap[r->id]);
+}
+
+Actor	*Actormanager::find_actor(int const id)
+{
+	return (id < _asize ? _actors[id] : 0);
+}
+
+void	Actormanager::notify_owner(Actor *a, bool l)
+{
+	if (a->ownerid < _asize && _actors[a->ownerid])
+		_actors[a->ownerid]->notified_by_owned(a, l);
+}
+
+void	Actormanager::notify_owned(Actor *a, bool l)
+{
+	if (a->ownedid < _asize && _actors[a->ownedid])
+		_actors[a->ownedid]->notified_by_owner(a, l);
+}
+
+void			Actormanager::control(int const id)
 {
 	Controller	*ctrl;
 
-	if ((ctrl = (Controller *)findactor(id)))
+	if ((ctrl = (Controller *)find_actor(id)))
 		ctrl->bind();
 	else
 		_controllermap[id] = ctrl;
@@ -153,8 +151,6 @@ void			Actormanager::control(int id)
 
 void				Actormanager::tick(float delta)
 {
-	Actoriterator	i;
-
 	//std::cout << "em" << std::endl;
 	em->event();
 	//std::cout << "cl" << std::endl;
@@ -165,20 +161,17 @@ void				Actormanager::tick(float delta)
 	//std::cout << "pe" << std::endl;
 	pe->tick(delta);
 	//std::cout << "ac" << std::endl;
-	for (i = _actormap.begin(); i != _actormap.end();)
+	for (unsigned int i = 0; i < _asize; ++i)
 	{
-		if (i->second->destroyed)
+		if (_actors[i])
 		{
-			if (!i->second->cleared)
+			if (_actors[i]->destroyed)
 			{
-				delete i->second;
-				_actormap.erase(i++);
+				delete _actors[i];
+				_actors[i] = 0;
 			}
-		}
-		else
-		{
-			i->second->tick(delta);
-			++i;
+			else
+				_actors[i]->tick(delta);
 		}
 	}
 	//std::cout << "end" << std::endl;

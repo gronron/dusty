@@ -53,8 +53,10 @@ class	Networkengine
 		bool	master;
 		std::string	ip;
 		std::string	port;
+		
+		unsigned int	_rsize;
+		Replication		*_replications;
 
-		std::map<int, Replication *>	_replicationmap;
 		std::map<int, int>				_playeridmap;
 
 		Messagequeue	mq;
@@ -68,8 +70,8 @@ class	Networkengine
 		Networkengine(Actormanager *);
 		~Networkengine();
 
-		void	add(Replication *);
-
+		Replication		*new_replication(int const id);
+		
 		void	tick(float);
 
 		void	connect(std::string const &, std::string const &);

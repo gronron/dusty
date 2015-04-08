@@ -45,8 +45,8 @@ class	Packet
 		Packet(unsigned int, char const *);
 		~Packet();
 
-		unsigned int	getsize() const;
-		char const		*getdata() const;
+		unsigned int	get_size() const;
+		char const		*get_data() const;
 
 		void	clear();
 

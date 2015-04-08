@@ -219,7 +219,7 @@ void							Server::_sendpacket()
 		{
 			for (i = _cltlist.begin(); i != _cltlist.end(); ++i)
 				if (i->udpid >= 0)
-					_udpsrv.write(i->udpid, msg->pckt->getsize(), msg->pckt->getdata());
+					_udpsrv.write(i->udpid, msg->pckt->get_size(), msg->pckt->get_data());
 			delete msg->pckt;
 		}
 		else if (msg->type == Messagequeue::CONNECTION)
@@ -241,12 +241,12 @@ void							Server::_sendpacket()
 			;//_delclient(id); KICK HIM
 		else if (msg->type == Messagequeue::TEXTMSG)
 		{
-			hdr.size = msg->pckt->getsize();
+			hdr.size = msg->pckt->get_size();
 			hdr.type = TEXTMSG;
 			for (i = _cltlist.begin(); i != _cltlist.end(); ++i)
 			{
 				i->tcp->write(sizeof(hdr), &hdr);
-				i->tcp->write(msg->pckt->getsize(), msg->pckt->getdata());
+				i->tcp->write(msg->pckt->get_size(), msg->pckt->get_data());
 			}
 			delete msg->pckt;
 		}

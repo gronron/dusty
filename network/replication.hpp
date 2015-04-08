@@ -33,39 +33,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "endian/packet.hpp"
 
-class	Networkengine;
+class	Actor;
 
 class	Replication
 {
 	public:
 
-		static int	get_id(Packet const &);
+		enum	AUTHORITY { NONE = 0, LOCAL = 1, GLOBAL = 2 };
 
 
-		Networkengine	*ne;
+		static int		get_id(Packet const &);
 
-		short int		type;
+
+		Actor			*actor;
+		unsigned char	authority;
+
 		int 			id;
+		short int		type;
 		int				numin;
 		int				numout;
 
-		float	updatetime;
-		float	timeout;
-		float	lastsendupd;
-		float	lastrecvupd;
-		bool	needupdate;
-		bool	dead;
-		bool	master;
+		float			updatetime;
+		float			timeout;
+		float			lastsendupd;
+		float			lastrecvupd;
+		bool			needupdate;
+		bool			dead;
 
-
-		Replication(Packet &, float);
-		Replication(float, float);
-		virtual ~Replication();
+		
+		void	init(Packet &pckt, float ping);
+		void	init(float const, float const);
 
 		Packet	*get_replication();
-        void	replicate(Packet &, float);
+        void	replicate(Packet &pckt, float ping);
 
-        bool	tick(float);
+        bool	tick(float delta);
 
         void	destroy();
 };

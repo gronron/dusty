@@ -48,7 +48,7 @@ class	Actormanager
 {
 	public:
 
-		struct	Option
+		struct			Option
 		{
 			bool		master;
 			bool		local;
@@ -58,8 +58,6 @@ class	Actormanager
 			std::string	port;
 			std::string	level;
 		};
-
-		typedef	std::map<int, Actor *>::iterator	Actoriterator;
 
 
 		Console					*cl;
@@ -73,24 +71,24 @@ class	Actormanager
 		bool const				local;
 		bool const				graphic;
 		bool const				audio;
+		
+		unsigned int			_asize;
+		Actor					**_actors;
 
 		std::string				controllerclass;
-
-		int							_currentid;
-		std::map<int, Actor *>		_actormap;
 		std::map<int, Controller *>	_controllermap;
 
 
 		Actormanager(Option	const &);
 		~Actormanager();
 
-		Actor	*create(std::string const &, Actor const *);
+		Actor	*create(std::string const &, Actor const *, bool need_replication);
 		Actor	*create(Replication *);
-		Actor	*findactor(int);
+		Actor	*find_actor(int const);
 		void	notify_owner(Actor *, bool);
 		void	notify_owned(Actor *, bool);
-		void	destroy(int);
-		void	control(int);
+		void	destroy(int const);
+		void	control(int const);
 
 		void	tick(float);
 };

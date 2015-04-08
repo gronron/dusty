@@ -28,61 +28,54 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "networkengine.hpp"
+#include "actor.hpp"
 #include "replication.hpp"
 
 int					Replication::get_id(Packet const &pckt)
 {
-	unsigned int	size;
 	char const		*data;
 
-	size = pckt.getsize();
-	data = pckt.getdata();
-	if (size >= sizeof(short int) + sizeof(int) && data)
+	data = pckt.get_data();
+	if (pckt.get_size() >= sizeof(int) && data)
 		return (*(int *)(data + sizeof(short int)));
 	else
-		return (0);
+		return (-1);
 }
 
-Replication::Replication(Packet &pckt, float ping) :
-	type(0),
-	id(0),
-	numin(0),
-	numout(0),
-	updatetime(0.5f),
-	timeout(5.0f),
-	lastsendupd(0.0f),
-	lastrecvupd(0.0f),
-	needupdate(true),
-	dead(false),
-	master(false)
+void	Replication::init(Packet &pckt, float ping)
 {
+	actor = 0;
+	authority = NONE;
+	id = 0;
+	type = 0;
+	numin = 0;
+	numout = 0;
+	updatetime = 0.5f;
+	timeout = 5.0f;
+	lastsendupd = 0.0f;
+	lastrecvupd = 0.0f;
+	needupdate = true;
+	dead = false;
+
 	pckt.read(type);
 	pckt.read(id);
 	pckt.read(numin);
-	if (ne->master)
-		needupdate = true;
 }
 
-Replication::Replication(float updtt, float tmt) :
-	type(),
-	id(),
-	numin(0),
-	numout(0),
-	updatetime(updtt),
-	timeout(tmt),
-	lastsendupd(0.0f),
-	lastrecvupd(0.0f),
-	needupdate(true),
-	dead(false),
-	master(false)
+void	Replication::init(float const updttm, float const tmt)
 {
-	ne->add(this);
-}
-
-Replication::~Replication()
-{
-
+	actor = 0;
+	authority = Replication::GLOBAL;
+	id = 0;
+	type = 0;
+	numin = 0;
+	numout = 0;
+	updatetime = updttm;
+	timeout = tmt;
+	lastsendupd = 0.0f;
+	lastrecvupd = 0.0f;
+	needupdate = true;
+	dead = false;
 }
 
 Packet		*Replication::get_replication()
@@ -91,28 +84,28 @@ Packet		*Replication::get_replication()
 
 	lastsendupd = 0.0f;
 	needupdate = false;
-	pckt->write(type);
 	pckt->write(id);
+	pckt->write(type);
 	pckt->write(++numout);
 	return (pckt);
 }
 
 void			Replication::replicate(Packet &pckt, float p)
 {
-	short int	t;
 	int			i;
+	short int	t;
 	int			n;
 
 	if (!dead)
 	{
-		pckt.read(t);
 		pckt.read(i);
+		pckt.read(t);
 		pckt.read(n);
 		if (n > numin)
 		{
 			lastrecvupd = 0.0f;
 			numin = n;
-			if (ne->master)
+			if (authority >= GLOBAL)
 				needupdate = true;
 		}
 	}
@@ -120,19 +113,21 @@ void			Replication::replicate(Packet &pckt, float p)
 
 bool	Replication::tick(float delta)
 {
-	if (ne->master || master)
+	lastsendupd += delta;
+	if (authority >= LOCAL)
 	{
-		if ((lastsendupd += delta) > updatetime)
+		if (lastsendupd > updatetime)
 			needupdate = true;
-		if (dead && (lastrecvupd += delta) > timeout)
+		if (dead && lastrecvupd > timeout)
 			return (false);
 	}
 	else
 	{
-		if ((lastrecvupd += delta) > timeout)
+		if (lastrecvupd > timeout)
 		{
 			if (!dead)
-				//actor->destroy();
+				actor->destroy();
+			actor = 0;
 			return (false);
 		}
 	}
@@ -141,6 +136,7 @@ bool	Replication::tick(float delta)
 
 void	Replication::destroy()
 {
+	actor = 0;
 	updatetime = 0.5f;
 	timeout = 5.0f;
 	lastsendupd = 0.0f;

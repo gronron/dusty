@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 
-#define FACTORYREG(name) Factoryregister<name> const	reg_##name(#name)
+#define FACTORYREG(name, network) Factoryregister<name> const	reg_##name(#name)
 
 class	Actor;
 class	Actormanager;
@@ -64,14 +64,14 @@ class	Factory
 
 		short int	get_type(std::string const &) const;
 
-		Actor		*create(Actormanager *, short int, Replication *) const;
-		Actor		*create(Actormanager *, std::string const&, int, Actor const *) const;
+		Actor		*create(Actormanager *, Replication *) const;
+		Actor		*create(Actormanager *, Replication *, int, std::string const&, Actor const *) const;
 };
 
 template<class T>
-Actor	*create(Actormanager *am, Replication *r, short int t, int i, Actor const *o)
+Actor	*create(Actormanager *am, Replication *r, int i, short int t, Actor const *o)
 {
-	return (new T(am, r, t, i, o));
+	return (new T(am, r, i, t, o));
 }
 
 template<class T>

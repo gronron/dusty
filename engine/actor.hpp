@@ -61,11 +61,10 @@ class	Actor
 		int			id;
 		int			ownerid;
 		bool		destroyed;
-		bool		cleared;
 		float		ping;
 
 
-		Actor(Actormanager *, Replication *, short int, int, Actor const *);
+		Actor(Actormanager *, Replication *, int, short int, Actor const *);
 		virtual ~Actor();
 
 		virtual void	postinstanciation();
@@ -74,7 +73,7 @@ class	Actor
 		virtual void	notified_by_owner(Actor *, bool);
 		virtual void	notified_by_owned(Actor *, bool);
 
-		virtual void	get_replication(Packet &);
+		virtual void	get_replication(Packet &) const;
         virtual void	replicate(Packet &, float);
 
 		virtual void	tick(float);

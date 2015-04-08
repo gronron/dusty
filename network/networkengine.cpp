@@ -28,6 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include "new.hpp"
 #include "time/time.hpp"
 #include "client.hpp"
 #include "server.hpp"
@@ -76,14 +77,25 @@ Networkengine::~Networkengine()
 	std::map<int, Replication *>::iterator	i;
 
 	running = false;
-	for (i = _replicationmap.begin(); i != _replicationmap.end(); ++i)
-		delete i->second;
+	delete [] _replications;
 	thrd.wait();
 }
 
-void	Networkengine::add(Replication *ri)
+Replication		*Networkengine::new_replication(int const id)
 {
-	_replicationmap[ri->id] = ri;
+	if (id >= _rsize)
+	{
+		_replications = resize(_replications, _rsize, _rsize < 1);
+		for (unsigned int i = 0; i < _rsize; ++i)
+			if (_replications[i].actor)
+				_replications[i].actor->rp = _replications + i;
+		_rsize <<= 1;
+	}
+	if (_replications[id].actor)
+	{
+		//destroy everything
+	}
+	return (_replications + id);
 }
 
 void										Networkengine::tick(float delta)
@@ -98,58 +110,60 @@ void										Networkengine::tick(float delta)
 		if (msg->type == Messagequeue::UPDATE)
 		{
 			id = Replication::get_id(*msg->pckt);
-			if ((i = _replicationmap.find(id)) != _replicationmap.end())
-				i->second->replicate(*msg->pckt, msg->ping);
+			if (id < _rsize && _replications[id].actor) // check type
+				_replications[id].replicate(*msg->pckt, msg->ping);
 			else if (!master)
-				_replicationmap[id] = new Replication(am, *msg->pckt, msg->ping);
+			{
+				Replication	*r = new_replication(id);
+				r->init(*msg->pckt, msg->ping);
+				am->create(r);
+			}
 			delete msg->pckt;
 		}
 		else if (msg->type == Messagequeue::DESTROY)
 		{
-			if (!master && (i = _replicationmap.find(Replication::get_id(*msg->pckt))) != _replicationmap.end())
-				i->second->actor->destroy();
+			id = Replication::get_id(*msg->pckt);
+			if (!master && id < _rsize && _replications[id].actor)
+				_replications[id].destroy();
 			delete msg->pckt;
 		}
 		else if (msg->type == Messagequeue::CONNECTION)
 		{
- 			id = am->create(am->controllerclass, 0)->id;
+ 			id = am->create(am->controllerclass, 0, true)->id;
 			_playeridmap[msg->cltid] = id;
 			mq.push_out_cnt(msg->cltid, id);
 		}
 		else if (msg->type == Messagequeue::DISCONNECTION)
 		{
 			if ((j = _playeridmap.find(msg->cltid)) != _playeridmap.end())
-				if ((i = _replicationmap.find(j->second)) != _replicationmap.end())
-					i->second->actor->destroy();
+				if (_replications[j->second].actor)
+					_replications[j->second].actor->destroy();
 		}
 		else if (msg->type == Messagequeue::CONTROL)
 			am->control(msg->actid);
 		else if (msg->type == Messagequeue::TEXTMSG)
-			am->cl->puttext(std::string(msg->pckt->getdata(), msg->pckt->getsize()));
-		mq->pop_in();
+			am->cl->puttext(std::string(msg->pckt->get_data(), msg->pckt->get_size()));
+		mq.pop_in();
 	}
 
-	for (i = _replicationmap.begin(); i != _replicationmap.end();)
+	for (unsigned int i = 0; i < _rsize; ++i)
 	{
-		if (!i->second->tick(delta))
+		if (_replications[i].actor)
 		{
-			delete i->second;
-			_replicationmap.erase(i++);
-		}
-		else
-		{
-			if (i->second->needupdate && (master || i->second->master))
+			if (_replications[i].tick(delta))
 			{
-				if (i->second->dead)
+				if (_replications[i].needupdate && _replications[i].authority > Replication::GLOBAL)
 				{
-					mq.push_out_pckt(i->second->id);
-					i->second->lastsendupd = 0.0f;
-					i->second->needupdate = false;
+					if (_replications[i].dead)
+					{
+						mq.push_out_pckt(i);
+						_replications[i].lastsendupd = 0.0f;
+						_replications[i].needupdate = false;
+					}
+					else
+						mq.push_out_pckt(_replications[i].get_replication());
 				}
-				else
-					mq.push_out_pckt(i->second->get_replication());
 			}
-			++i;
 		}
 	}
 }

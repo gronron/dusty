@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VEC_H_
 
 template<class T, unsigned int U>
-class vec
+class	vec
 {
 	public:
 

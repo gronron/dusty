@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "endian/packet.hpp"
 #include "actor.hpp"
 
-Actor::Actor(Actormanager *a, Replication *r, short int t, int i, Actor const *o) : _callbackid(0), am(a), rp(r), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), destroyed(false), cleared(true), ping(0.0f)
+Actor::Actor(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : _callbackid(0), am(a), rp(r), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), destroyed(false), ping(0.0f)
 {
 
 }
@@ -65,7 +65,7 @@ void	Actor::notified_by_owned(Actor *, bool)
 
 }
 
-void	Actor::get_replication(Packet &pckt)
+void	Actor::get_replication(Packet &pckt) const
 {
 	pckt.write(ownerid);
 }

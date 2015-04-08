@@ -46,12 +46,12 @@ Packet::~Packet()
 
 }
 
-unsigned int			Packet::getsize() const
+unsigned int			Packet::get_size() const
 {
 	return (_data.size());
 }
 
-char const	*Packet::getdata() const
+char const	*Packet::get_data() const
 {
 	return (_data.empty() ? 0 : &_data[0]);
 }
