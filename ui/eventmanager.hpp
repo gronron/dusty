@@ -26,11 +26,6 @@
 #include <vector>
 #include "controller.hpp"
 
-namespace	sf
-{
-	class	Event;
-}
-
 class	Actormanager;
 
 class	Eventmanager

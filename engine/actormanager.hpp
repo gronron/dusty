@@ -75,7 +75,7 @@ class	Actormanager
 		unsigned int			_asize;
 		Actor					**_actors;
 
-		std::string				controllerclass;
+		std::string					controllerclass;
 		std::map<int, Controller *>	_controllermap;
 
 
