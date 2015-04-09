@@ -1,23 +1,32 @@
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Copyright 2010-2012 Geoffrey TOURON (geoffrey.touron@gmail.com)
-//
-//    This file is part of Chasis.
-//
-//    Chasis is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-//
-//    Chasis is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with Chasis.  If not, see <http://www.gnu.org/licenses/>.
-//
-///////////////////////////////////////////////////////////////////////////////
+/******************************************************************************
+Copyright (c) 2015, Geoffrey TOURON
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of dusty nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+******************************************************************************/
 
 #include <cmath>
 #include <iostream>
@@ -73,6 +82,15 @@ void			Eventmanager::event()
 			case SDL_TEXTEDITING:
 			case SDL_TEXTINPUT:
 			case SDL_MOUSEMOTION:
+				if (_mousemove.ctrl)
+				{
+					vec<float, 2>	a;
+
+					a[0] = (float)event.motion.x;
+					a[1] = (float)event.motion.y;
+					(_mousemove.ctrl->*_mousemove.fx)(2, a.ar);
+				}
+				event.motion
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				_mousebutton(event, 1.0f);
@@ -124,17 +142,6 @@ void			Eventmanager::event()
 				else if (event.text.unicode == '\n' || event.text.unicode == '\r')
 					typing = true;
 				break;
-
-			case sf::Event::MouseMoved:
-				if (_mousemove.ctrl)
-				{
-					vec<float, 2>	a;
-
-					a[0] = (float)event.mouseMove.x;
-					a[1] = (float)event.mouseMove.y;
-					(_mousemove.ctrl->*_mousemove.fx)(2, a.ar);
-				}
-				break;
 		}
 	}
 }
@@ -169,7 +176,7 @@ bool					Eventmanager::bind(std::string const &name, Controller *ctrl, Controlle
 	return (false);
 }
 
-void		Eventmanager::_key(sf::Event &event, float d)
+void		Eventmanager::_key(SDL_Event &event, float d)
 {
 	Bind	*a;
 
@@ -202,20 +209,20 @@ void		Eventmanager::_key(sf::Event &event, float d)
 	}
 }
 
-void				Eventmanager::_mousebutton(sf::Event &event, float d)
+void				Eventmanager::_mousebutton(SDL_Event &event, float d)
 {
 	Bind			*a;
 	vec<float, 3>	b;
 
 	b[0] = d;
-	b[1] = (float)event.mouseButton.x;
-	b[2] = (float)event.mouseButton.y;
-	a = &_mousebuttonvector[event.mouseButton.button];
+	b[1] = (float)event.button.x;
+	b[2] = (float)event.button.x;
+	a = &_mousebuttonvector[event.button.button];
 	if (a->ctrl)
 		(a->ctrl->*a->fx)(1, (float *)&b);
 }
 
-void		Eventmanager::_joybutton(sf::Event &event, float d)
+void		Eventmanager::_joybutton(SDL_Event &event, float d)
 {
 	Bind	*a;
 
@@ -224,7 +231,7 @@ void		Eventmanager::_joybutton(sf::Event &event, float d)
 		(a->ctrl->*a->fx)(1, &d);
 }
 
-void	Eventmanager::_joymove(sf::Event &event)
+void	Eventmanager::_joymove(SDL_Event &event)
 {
 	Bind	*a;
 	float	b;
