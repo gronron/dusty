@@ -41,8 +41,8 @@ Server::Server(Messagequeue *m, std::string const &port) : mq(m), _tcpsrv(port.c
 {
 	if (!_tcpsrv.is_good() || !_udpsrv.is_good())
 		exit(EXIT_FAILURE);
-	_slctr.addsocket(_tcpsrv);
-	_slctr.addsocket(_udpsrv);
+	_slctr.add_socket(_tcpsrv);
+	_slctr.add_socket(_udpsrv);
 }
 
 Server::~Server()
@@ -96,7 +96,7 @@ void		Server::_addclient()
 	}
 	clt.udpid = INVALID_SOCKET;
 	clt.ping = new Ping(8);
-	_slctr.addsocket(*clt.tcp);
+	_slctr.add_socket(*clt.tcp);
 	mq->push_in_cnt(clt.id);
 	_cltlist.push_back(clt);
 }
@@ -105,8 +105,8 @@ void	Server::_delclient(std::list<Client>::iterator	&i)
 {
 	std::cout << "Client disconected" << std::endl;
 	mq->push_in_discnt(i->id);
-	_udpsrv.rmclient(i->udpid);
-	_slctr.rmsocket(*i->tcp);
+	_udpsrv.rm_client(i->udpid);
+	_slctr.rm_socket(*i->tcp);
 	delete i->tcp;
 	delete i->ping;
 	i = _cltlist.erase(i);
@@ -197,7 +197,7 @@ void							Server::_receivepacket()
 			{
 				if (i->id == cltid)
 				{
-					i->udpid = _udpsrv.addclient();
+					i->udpid = _udpsrv.add_client();
 					break;
 				}
 			}

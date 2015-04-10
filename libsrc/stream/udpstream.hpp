@@ -66,8 +66,8 @@ class	Udp_server
 		char const	*get_clientip(int id) const;
 		char const	*get_clientport(int id) const;
 
-		int			addclient();
-		void		rmclient(int id);
+		int			add_client();
+		void		rm_client(int id);
 
 		int			read(int &id, unsigned int size, void *data);
 		int			write(int id, unsigned int size, void const *data);
@@ -77,7 +77,7 @@ class	Udpstream : public Stream
 {
 	public:
 
-		static const int	MAXUDPSIZE = 65535;
+		static int const	MAXUDPSIZE = 65535;
 
 		Socket	_id;
 

@@ -47,9 +47,9 @@ class	Selector
 		~Selector();
 
 		template<class T>
-        void	addsocket(T const &);
+        void	add_socket(T const &);
         template<class T>
-        void	rmsocket(T const &);
+        void	rm_socket(T const &);
         template<class T>
         bool	is_ready(T const &);
 
@@ -57,13 +57,13 @@ class	Selector
 };
 
 template<class T>
-void	Selector::addsocket(T const &x)
+void	Selector::add_socket(T const &x)
 {
 	_strmlist.push_back(x._id);
 }
 
 template<class T>
-void	Selector::rmsocket(T const &x)
+void	Selector::rm_socket(T const &x)
 {
 	_strmlist.remove(x._id);
 }

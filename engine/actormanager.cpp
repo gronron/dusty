@@ -117,9 +117,9 @@ Actor		*Actormanager::create(std::string const &name, Actor const *owner, bool n
 
 Actor		*Actormanager::create(Replication *r)
 {
-	_actormap[r->id] = Factory::get_instance().create(this, r);
-	_actormap[r->id]->postinstanciation();
-	return (_actormap[r->id]);
+	_actors[r->id] = Factory::get_instance().create(this, r);
+	_actors[r->id]->postinstanciation();
+	return (_actors[r->id]);
 }
 
 Actor	*Actormanager::find_actor(int const id)

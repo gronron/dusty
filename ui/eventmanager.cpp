@@ -30,15 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 #include <iostream>
-#include "SDL.h"
 #include "actormanager.hpp"
 #include "console.hpp"
 #include "graphicengine.hpp"
-#include "renderer.hpp"
 #include "uimanager.hpp"
 #include "eventmanager.hpp"
 
-Eventmanager::Eventmanager(Actormanager *a) : am(a), running(true), typing(false), _keyvector(sf::Keyboard::KeyCount), _mousebuttonvector(sf::Mouse::ButtonCount), _joybuttonvector(sf::Joystick::ButtonCount), _joymovevector(sf::Joystick::AxisCount)
+Eventmanager::Eventmanager(Actormanager *a) : am(a), running(true), typing(false)
 {
 
 }
@@ -71,6 +69,12 @@ void			Eventmanager::event()
 			case SDL_APP_WILLENTERFOREGROUND:
 			case SDL_APP_DIDENTERFOREGROUND:
 			case SDL_WINDOWEVENT:
+				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					am->ge->resize(event.window.data1, event.window.data2);
+					am->um->resize(event.window.data1, event.window.data2);
+				}
+				break;
 			case SDL_SYSWMEVENT:
 				break;
 			case SDL_KEYDOWN:
@@ -90,7 +94,6 @@ void			Eventmanager::event()
 					a[1] = (float)event.motion.y;
 					(_mousemove.ctrl->*_mousemove.fx)(2, a.ar);
 				}
-				event.motion
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				_mousebutton(event, 1.0f);
@@ -103,16 +106,17 @@ void			Eventmanager::event()
 			case SDL_JOYBALLMOTION:
 			case SDL_JOYHATMOTION:
 			case SDL_JOYBUTTONDOWN:
-				_joybutton(event, 1.0f);
-				break;
 			case SDL_JOYBUTTONUP:
-				_joybutton(event, 0.0f);
-				break;
 			case SDL_JOYDEVICEADDED:
 			case SDL_JOYDEVICEREMOVED:
 			case SDL_CONTROLLERAXISMOTION:
+				_gamepadmove(event);
 			case SDL_CONTROLLERBUTTONDOWN:
+				_gamepadbutton(event, 1.0f);
+				break;
 			case SDL_CONTROLLERBUTTONUP:
+				_gamepadbutton(event, 0.0f);
+				break;
 			case SDL_CONTROLLERDEVICEADDED:
 			case SDL_CONTROLLERDEVICEREMOVED:
 			case SDL_CONTROLLERDEVICEREMAPPED:
@@ -127,12 +131,7 @@ void			Eventmanager::event()
 			case SDL_RENDER_TARGETS_RESET:
 			default:
 				break;
-
-			case sf::Event::Resized:
-				am->ge->resize(event.size.width, event.size.height);
-				am->um->resize(event.size.width, event.size.height);
-				break;
-
+/*
 			case sf::Event::TextEntered:
 				if (typing)
 				{
@@ -141,7 +140,7 @@ void			Eventmanager::event()
 				}
 				else if (event.text.unicode == '\n' || event.text.unicode == '\r')
 					typing = true;
-				break;
+				break;*/
 		}
 	}
 }
@@ -182,7 +181,7 @@ void		Eventmanager::_key(SDL_Event &event, float d)
 
 	if (typing)
 	{
-		if (d)
+		/*if (d)
 		{
 			switch (event.key.code)
 			{
@@ -199,11 +198,11 @@ void		Eventmanager::_key(SDL_Event &event, float d)
 					am->cl->movecursor(Console::DOWN);
 					break;
 			}
-		}
+		}*/
 	}
 	else
 	{
-		a = &_keyvector[event.key.code];
+		a = &_keys[event.key.keysym.scancode];
 		if (a->ctrl)
 			(a->ctrl->*a->fx)(1, &d);
 	}
@@ -217,27 +216,27 @@ void				Eventmanager::_mousebutton(SDL_Event &event, float d)
 	b[0] = d;
 	b[1] = (float)event.button.x;
 	b[2] = (float)event.button.x;
-	a = &_mousebuttonvector[event.button.button];
+	a = &_mousebuttons[event.button.button];
 	if (a->ctrl)
 		(a->ctrl->*a->fx)(1, (float *)&b);
 }
 
-void		Eventmanager::_joybutton(SDL_Event &event, float d)
+void		Eventmanager::_gamepadbutton(SDL_Event &event, float d)
 {
 	Bind	*a;
 
-	a = &_joybuttonvector[event.joystickButton.button];
+	a = &_gamepadbuttons[event.cbutton.button];
 	if (a->ctrl)
 		(a->ctrl->*a->fx)(1, &d);
 }
 
-void	Eventmanager::_joymove(SDL_Event &event)
+void	Eventmanager::_gamepadmove(SDL_Event &event)
 {
 	Bind	*a;
 	float	b;
 
-	b = event.joystickMove.position / 100.0f;
-	a = &_joymovevector[event.joystickMove.axis];
+	b = event.caxis.value / 32767.0f;
+	a = &_gamepadmoves[event.caxis.axis];
 	if (a->ctrl)
 		(a->ctrl->*a->fx)(1, &b);
 }

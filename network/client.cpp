@@ -41,8 +41,8 @@ Client::Client(Messagequeue *m, std::string const &ip, std::string const &port) 
 
 	if (!_tcp.is_good() || !_udp.is_good())
 		exit(EXIT_FAILURE);
-	_slctr.addsocket(_tcp);
-	_slctr.addsocket(_udp);
+	_slctr.add_socket(_tcp);
+	_slctr.add_socket(_udp);
 	_tcp.read(sizeof(Header), &hdr);
 	if (hdr.type != CNTID || hdr.size != sizeof(cntid) || hdr.size != _tcp.read(hdr.size, &cntid))
 	{

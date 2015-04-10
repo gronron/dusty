@@ -116,7 +116,7 @@ char const	*Udp_server::get_clientport(int id) const
 		return (0);
 }
 
-int			Udp_server::addclient()
+int			Udp_server::add_client()
 {
 	int		err;
 	Client	clt;
@@ -135,7 +135,7 @@ int			Udp_server::addclient()
 	}
 }
 
-void	Udp_server::rmclient(int id)
+void	Udp_server::rm_client(int id)
 {
 	_cltmap.erase(id);
 }

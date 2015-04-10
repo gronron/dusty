@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include <vector>
+#include "SDL.h"
 #include "controller.hpp"
 
 class	Actormanager;
@@ -56,13 +57,13 @@ class	Eventmanager
 
 		std::map<int, Controller *>	_controllermap;
 
-		bool						running;
-		bool						typing;
-		Bind						_mousemove;
-		std::vector<Bind>			_keyvector;
-		std::vector<Bind>			_mousebuttonvector;
-		std::vector<Bind>			_joybuttonvector;
-		std::vector<Bind>			_joymovevector;
+		bool	running;
+		bool	typing;
+		Bind	_mousemove;
+		Bind	_keys[SDL_NUM_SCANCODES];
+		Bind	_mousebuttons[8];
+		Bind	_gamepadbuttons[32];
+		Bind	_gamepadmoves[8];
 
 
 		Eventmanager(Actormanager *);
@@ -73,11 +74,10 @@ class	Eventmanager
 
 		void	event();
 
-		void	_key(sf::Event &, float );
-		void	_mousebutton(sf::Event &, float);
-		void	_joybutton(sf::Event &, float);
-		void	_joymove(sf::Event &);
-		void	_bidon(sf::Event &);
+		void	_key(SDL_Event &, float );
+		void	_mousebutton(SDL_Event &, float);
+		void	_gamepadbutton(SDL_Event &, float);
+		void	_gamepadmove(SDL_Event &);
 };
 
 #endif
