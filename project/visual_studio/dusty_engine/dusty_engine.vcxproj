@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\..\engine\actormanager.cpp" />
     <ClCompile Include="..\..\..\engine\configmanager.cpp" />
     <ClCompile Include="..\..\..\engine\factory.cpp" />
+    <ClCompile Include="..\..\..\graphic\animation.cpp" />
+    <ClCompile Include="..\..\..\graphic\graphicengine.cpp" />
+    <ClCompile Include="..\..\..\graphic\image.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_node.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp" />
     <ClCompile Include="..\..\..\libsrc\endian\endian.cpp" />
@@ -106,6 +109,9 @@
     <ClInclude Include="..\..\..\engine\actormanager.hpp" />
     <ClInclude Include="..\..\..\engine\configmanager.hpp" />
     <ClInclude Include="..\..\..\engine\factory.hpp" />
+    <ClInclude Include="..\..\..\graphic\animation.hpp" />
+    <ClInclude Include="..\..\..\graphic\graphicengine.hpp" />
+    <ClInclude Include="..\..\..\graphic\image.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_node.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_parser.hpp" />
     <ClInclude Include="..\..\..\libsrc\endian\endian.hpp" />

@@ -39,9 +39,9 @@ class	Image
 	public:
 
 		vec<unsigned int, 2>	size;
-		char					format;
+		int						format;
 
-		char					*data;
+		unsigned char			*data;
 
 		Image();
 		Image(std::string const &);

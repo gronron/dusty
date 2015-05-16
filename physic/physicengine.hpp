@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PHYSICENGINE_H_
 
 #include "boundingbox.hpp"
-#include "body.hpp"
 
 class	Physicengine
 {
@@ -44,6 +43,7 @@ class	Physicengine
 		unsigned int	_dbbsize;
 		unsigned int	_dbbnbr;
 		Boundingbox		*_dynamicbb;
+		Boundingbox		*_bb[2];
 
 		unsigned int	_prxsize;
 		unsigned int	_prxnbr;
@@ -56,8 +56,8 @@ class	Physicengine
 		Physicengine();
 		~Physicengine();
 
-		void	add(Body *);
-		void	remove(Body *);
+		void	add(Boundingbox **, Body *, bool);
+		void	remove(Boundingbox *);
 
 		void	tick(float);
 

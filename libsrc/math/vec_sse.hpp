@@ -28,23 +28,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef VEC_H_
-#define VEC_H_
+#ifndef VEC_SSE_H_
+#define VEC_SSE_H_
 
-template<class T, unsigned int U>
-class	vec
+#include "xmmintrin.h"
+
+template>
+class	vec<float, 4>
 {
 	public:
 
 		template<class V, unsigned int W>
 		static vec	cast(vec<V, W> const &);
 
+		union
+		{
+			float	ar[4];
+			__m128	v;
+		};
 
-		T	ar[U];
 
-
-		T		&operator[](unsigned int const x);
-		T const	&operator[](unsigned int const x) const;
+		float		&operator[](unsigned int const x);
+		float const	&operator[](unsigned int const x) const;
 
 		vec	&operator++();
 		vec	operator++(int);
@@ -52,309 +57,289 @@ class	vec
 		vec	operator--(int);
 
 		template<unsigned int V>
-		vec	&operator=(vec<T, V> const &x);
+		vec	&operator=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator+=(vec<T, V> const &x);
+		vec	&operator+=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator-=(vec<T, V> const &x);
+		vec	&operator-=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator*=(vec<T, V> const &x);
+		vec	&operator*=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator/=(vec<T, V> const &x);
+		vec	&operator/=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator%=(vec<T, V> const &x);
+		vec	&operator%=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator|=(vec<T, V> const &x);
+		vec	&operator|=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator&=(vec<T, V> const &x);
+		vec	&operator&=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator^=(vec<T, V> const &x);
+		vec	&operator^=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator<<=(vec<T, V> const &x);
+		vec	&operator<<=(vec<float, V> const &x);
 		template<unsigned int V>
-		vec	&operator>>=(vec<T, V> const &x);
+		vec	&operator>>=(vec<float, V> const &x);
 
-		vec	&operator=(T const &x);
-		vec	&operator+=(T const &x);
-		vec	&operator-=(T const &x);
-		vec	&operator*=(T const &x);
-		vec	&operator/=(T const &x);
-		vec	&operator%=(T const &x);
-		vec	&operator|=(T const &x);
-		vec	&operator&=(T const &x);
-		vec	&operator^=(T const &x);
-		vec	&operator<<=(T const &x);
-		vec	&operator>>=(T const &x);
+		vec	&operator=(float const &x);
+		vec	&operator+=(float const &x);
+		vec	&operator-=(float const &x);
+		vec	&operator*=(float const &x);
+		vec	&operator/=(float const &x);
+		vec	&operator%=(float const &x);
+		vec	&operator|=(float const &x);
+		vec	&operator&=(float const &x);
+		vec	&operator^=(float const &x);
+		vec	&operator<<=(float const &x);
+		vec	&operator>>=(float const &x);
 };
 
-template<class T, unsigned int U> template<class V, unsigned int W>
-vec<T, U>		vec<T, U>::cast(vec<V, W> const &x)
+template<class V, unsigned int W>
+vec<float, 4>		vec<float, 4>::cast(vec<V, W> const &x)
 {
-	vec<T, U>	a;
+	vec<float, 4>	a;
 
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = i < W ? (T)x.ar[i] : 0;
+	for (unsigned int i = 0; i < 4; ++i)
+		a.ar[i] = i < W ? (float)x.ar[i] : 0;
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline T	&vec<T, U>::operator[](unsigned int const x)
+inline float	&vec<float, 4>::operator[](unsigned int const x)
 {
 	return (ar[x]);
 }
 
-template<class T, unsigned int U>
-inline T const	&vec<T, U>::operator[](unsigned int const x) const
+inline float const	&vec<float, 4>::operator[](unsigned int const x) const
 {
 	return (ar[x]);
 }
 
 ///////////////////////////////////////
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator++()
+inline vec<float, 4>	&vec<float, 4>::operator++()
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		++ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>		vec<T, U>::operator++(int)
+inline vec<float, 4>		vec<float, 4>::operator++(int)
 {
-	vec<T, U>	x;
+	vec<float, 4>	x;
 
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		x.ar[i] = ar[i]++;
 	return (x);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator--()
+inline vec<float, 4>	&vec<float, 4>::operator--()
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		--ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>		vec<T, U>::operator--(int)
+inline vec<float, 4>		vec<float, 4>::operator--(int)
 {
-	vec<T, U>	x;
+	vec<float, 4>	x;
 
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		x.ar[i] = ar[i]--;
 	return (x);
 }
 
 ///////////////////////////////////////
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] = x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator+=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator+=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] += x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator-=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator-=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] -= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator*=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator*=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] *= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator/=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator/=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] /= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator%=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator%=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] %= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator|=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator|=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] |= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator&=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator&=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] &= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator^=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator^=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] ^= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator<<=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator<<=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] <<= x.ar[i];
 	return (*this);
 }
 
-template<class T, unsigned int U> template<unsigned int V>
-inline vec<T, U>	&vec<T, U>::operator>>=(vec<T, V> const &x)
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator>>=(vec<float, V> const &x)
 {
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
 		ar[i] >>= x.ar[i];
 	return (*this);
 }
 
 ///////////////////////////////////////
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] = x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator+=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator+=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] += x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator-=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator-=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] -= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator*=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator*=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] *= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator/=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator/=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] /= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator%=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator%=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] %= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator|=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator|=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] |= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator&=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator&=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] &= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator^=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator^=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] ^= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator<<=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator<<=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] <<= x;
 	return (*this);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	&vec<T, U>::operator>>=(T const &x)
+inline vec<float, 4>	&vec<float, 4>::operator>>=(float const &x)
 {
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		ar[i] >>= x;
 	return (*this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-template<class T, unsigned int U>
-inline vec<T, U>	operator+(vec<T, U> const &x)
+inline vec<float, 4>	operator+(vec<float, 4> const &x)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		a.ar[i] = +x.ar[i];
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	operator-(vec<T, U> const &x)
+inline vec<float, 4>	operator-(vec<float, 4> const &x)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		a.ar[i] = -x.ar[i];
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<T, U>	operator~(vec<T, U> const &x)
+inline vec<float, 4>	operator~(vec<float, 4> const &x)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < U; ++i)
+	for (unsigned int i = 0; i < 4; ++i)
 		a.ar[i] = ~x.ar[i];
 	return (a);
 }
@@ -362,7 +347,7 @@ inline vec<T, U>	operator~(vec<T, U> const &x)
 ///////////////////////////////////////
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator+(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator+(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -372,7 +357,7 @@ inline vec<T, (U > V ? V : U)>	operator+(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator-(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator-(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -382,7 +367,7 @@ inline vec<T, (U > V ? V : U)>	operator-(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator*(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator*(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -392,7 +377,7 @@ inline vec<T, (U > V ? V : U)>	operator*(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator/(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator/(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -402,7 +387,7 @@ inline vec<T, (U > V ? V : U)>	operator/(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator%(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator%(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -412,7 +397,7 @@ inline vec<T, (U > V ? V : U)>	operator%(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator|(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator|(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -422,7 +407,7 @@ inline vec<T, (U > V ? V : U)>	operator|(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator&(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator&(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -432,7 +417,7 @@ inline vec<T, (U > V ? V : U)>	operator&(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator^(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator^(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -442,7 +427,7 @@ inline vec<T, (U > V ? V : U)>	operator^(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator<<(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator<<(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -452,7 +437,7 @@ inline vec<T, (U > V ? V : U)>	operator<<(vec<T, U> const &x, vec<T, V> const &y
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator>>(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	operator>>(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -462,7 +447,7 @@ inline vec<T, (U > V ? V : U)>	operator>>(vec<T, U> const &x, vec<T, V> const &y
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline bool	operator<(vec<T, U> const &x, vec<T, V> const &y)
+inline bool	operator<(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
 		if (x.ar[i] >= y.ar[i])
@@ -471,7 +456,7 @@ inline bool	operator<(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline bool	operator>(vec<T, U> const &x, vec<T, V> const &y)
+inline bool	operator>(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
 		if (x.ar[i] <= y.ar[i])
@@ -480,7 +465,7 @@ inline bool	operator>(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline bool	operator<=(vec<T, U> const &x, vec<T, V> const &y)
+inline bool	operator<=(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
 		if (x.ar[i] > y.ar[i])
@@ -489,7 +474,7 @@ inline bool	operator<=(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline bool	operator>=(vec<T, U> const &x, vec<T, V> const &y)
+inline bool	operator>=(vec<float, 4> const &x, vec<T, V> const &y)
 {
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
 		if (x.ar[i] < y.ar[i])
@@ -500,9 +485,9 @@ inline bool	operator>=(vec<T, U> const &x, vec<T, V> const &y)
 ///////////////////////////////////////
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator+(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator+(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] + y;
@@ -510,9 +495,9 @@ inline vec<T, U>	operator+(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator-(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator-(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] - y;
@@ -520,9 +505,9 @@ inline vec<T, U>	operator-(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator*(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator*(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] * y;
@@ -530,9 +515,9 @@ inline vec<T, U>	operator*(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator/(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator/(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] / y;
@@ -540,9 +525,9 @@ inline vec<T, U>	operator/(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator%(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator%(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] % y;
@@ -550,9 +535,9 @@ inline vec<T, U>	operator%(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator|(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator|(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] | y;
@@ -560,9 +545,9 @@ inline vec<T, U>	operator|(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator&(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator&(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] & y;
@@ -570,9 +555,9 @@ inline vec<T, U>	operator&(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator^(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator^(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] ^ y;
@@ -580,9 +565,9 @@ inline vec<T, U>	operator^(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator<<(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator<<(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] << y;
@@ -590,9 +575,9 @@ inline vec<T, U>	operator<<(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator>>(vec<T, U> const &x, T const &y)
+inline vec<float, 4>	operator>>(vec<float, 4> const &x, T const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] >> y;
@@ -600,37 +585,37 @@ inline vec<T, U>	operator>>(vec<T, U> const &x, T const &y)
 }
 
 template<class T, unsigned int U>
-inline bool	operator<(vec<T, U> const &x, T const &y)
+inline bool	operator<(vec<float, 4> const &x, T const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar[i] >= y)
+		if (x.ar >= y)
 			return (false);
 	return (true);
 }
 
 template<class T, unsigned int U>
-inline bool	operator>(vec<T, U> const &x, T const &y)
+inline bool	operator>(vec<float, 4> const &x, T const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar[i] <= y)
+		if (x.ar <= y)
 			return (false);
 	return (true);
 }
 
 template<class T, unsigned int U>
-inline bool	operator<=(vec<T, U> const &x, T const &y)
+inline bool	operator<=(vec<float, 4> const &x, T const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar[i] > y)
+		if (x.ar > y)
 			return (false);
 	return (true);
 }
 
 template<class T, unsigned int U>
-inline bool	operator>=(vec<T, U> const &x, T const &y)
+inline bool	operator>=(vec<float, 4> const &x, T const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar[i] < y)
+		if (x.ar < y)
 			return (false);
 	return (true);
 }
@@ -638,9 +623,9 @@ inline bool	operator>=(vec<T, U> const &x, T const &y)
 ///////////////////////////////////////
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator+(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator+(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x + y.ar[i];
@@ -648,9 +633,9 @@ inline vec<T, U>	operator+(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator-(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator-(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x - y.ar[i];
@@ -658,9 +643,9 @@ inline vec<T, U>	operator-(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator*(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator*(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x * y.ar[i];
@@ -668,9 +653,9 @@ inline vec<T, U>	operator*(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator/(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator/(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x / y.ar[i];
@@ -678,9 +663,9 @@ inline vec<T, U>	operator/(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator%(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator%(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x % y.ar[i];
@@ -688,9 +673,9 @@ inline vec<T, U>	operator%(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator|(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator|(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x | y.ar[i];
@@ -698,9 +683,9 @@ inline vec<T, U>	operator|(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator&(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator&(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x & y.ar[i];
@@ -708,9 +693,9 @@ inline vec<T, U>	operator&(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator^(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator^(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x ^ y.ar[i];
@@ -718,9 +703,9 @@ inline vec<T, U>	operator^(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator<<(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator<<(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x << y.ar[i];
@@ -728,9 +713,9 @@ inline vec<T, U>	operator<<(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	operator>>(T const &x, vec<T, U> const &y)
+inline vec<float, 4>	operator>>(T const &x, vec<float, 4> const &y)
 {
-	vec<T, U>		a;
+	vec<float, 4>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x >> y.ar[i];
@@ -738,7 +723,7 @@ inline vec<T, U>	operator>>(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline bool	operator<(T const &x, vec<T, U> const &y)
+inline bool	operator<(T const &x, vec<float, 4> const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
 		if (x >= y.ar[i])
@@ -747,7 +732,7 @@ inline bool	operator<(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline bool	operator>(T const &x, vec<T, U> const &y)
+inline bool	operator>(T const &x, vec<float, 4> const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
 		if (x <= y.ar[i])
@@ -756,7 +741,7 @@ inline bool	operator>(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline bool	operator<=(T const &x, vec<T, U> const &y)
+inline bool	operator<=(T const &x, vec<float, 4> const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
 		if (x > y.ar[i])
@@ -765,7 +750,7 @@ inline bool	operator<=(T const &x, vec<T, U> const &y)
 }
 
 template<class T, unsigned int U>
-inline bool	operator>=(T const &x, vec<T, U> const &y)
+inline bool	operator>=(T const &x, vec<float, 4> const &y)
 {
 	for (unsigned int i = 0; i < U; ++i)
 		if (x < y.ar[i])

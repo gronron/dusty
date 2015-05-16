@@ -34,11 +34,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec.hpp"
 #include "endian/packet.hpp"
 
-struct	Body;
+class	Actor;
+
+struct						Body
+{
+	unsigned int			vtcnbr;
+	vec<float, 3>			*vertices;
+	unsigned int			trinbr;
+	vec<unsigned int, 3>	*triangles;
+};
 
 struct				Boundingbox
 {
+	Actor			*actor;
 	Body			*bd;
+	Boundingbox		**link;
 	vec<float, 3>	loc;
 	vec<float, 3>	spd;
 	vec<float, 3>	acc;
@@ -55,7 +65,7 @@ struct				Boundingbox
 
 struct				Proxy
 {
-	unsigned int	bbidx;
+	int				bbidx;
 	vec<float, 3>	bot;
 	vec<float, 3>	top;
 	bool			dynamic;

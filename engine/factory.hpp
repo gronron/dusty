@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 
-#define FACTORYREG(name, network) Factoryregister<name> const	reg_##name(#name)
+#define FACTORYREG(name) Factoryregister<name> const	reg_##name(#name)
 
 class	Actor;
 class	Actormanager;
