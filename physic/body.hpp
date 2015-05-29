@@ -32,18 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BODY_H_
 
 #include "math/vec.hpp"
-#include "boundingbox.hpp"
+#include "endian/packet.hpp"
 
 class	Actor;
 
 struct	Body
 {
-	Actor					*actor;
-	Boundingbox				*bbptr;
 	unsigned int			vtcnbr;
 	vec<float, 3>			*vertices;
 	unsigned int			trinbr;
 	vec<unsigned int, 3>	*triangles;
+
+	Body(Actor *a, bool dynamic, bool solide);
+	~Body();
 };
 
 #endif

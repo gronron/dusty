@@ -77,6 +77,20 @@ Df_node const			*Df_node::get(std::string const &researched_nane) const
 	return (0);
 }
 
+Df_node const		*Df_node::get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const
+{
+	Df_node const	*rnode;
+
+	if (!(rnode = get(researched_name)) || rnode->type != expected_type || rnode->size < expected_size)
+		return (0);
+	else
+	{
+		if (rnode->type > BLOCK && out)
+			memcpy(rnode->data, out, expected_size);
+		return (rnode);
+	}
+}
+
 Df_node const		*Df_node::safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const
 {
 	Df_node const	*rnode;

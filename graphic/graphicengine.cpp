@@ -30,18 +30,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <cstdlib>
+#include "configmanager.hpp"
 #include "image.hpp"
 #include "graphicengine.hpp"
 
 #include <GL/glew.h>
 #include <SDL.h>
-#include <ft2build.h>
+#include <freetype/ft2build.h>
 #include FT_FREETYPE_H
 
 
-Graphicengine::Graphicengine(vec<unsigned int, 2> const &ss, std::string const &ad) : _window(), screensize(ss), assetsdir(ad), cam(0), _activetex(0)
+Graphicengine::Graphicengine() : assetsdir(), screensize(), cam(0), _window(), _glcontext(), _activetex(0)
 {
 	GLenum	error;
+	Df_node	*config;
+	
+	assetsdir = Configmanager::get_instance().assetsdir;
+	config = Configmanager::get_instance().get("graphic_cfg.df");
+	if (!config->get("screensize", Df_node::INT, 2, &screensize))
+	{
+		screensize[0] = 1024;
+		screensize[1] = 768;
+	}
 	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -52,7 +62,7 @@ Graphicengine::Graphicengine(vec<unsigned int, 2> const &ss, std::string const &
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	_context = SDL_GL_CreateContext(_window);
+	_glcontext = SDL_GL_CreateContext(_window);
 
 	if ((error = glewInit()) != GLEW_OK)
 	{
@@ -81,7 +91,7 @@ Graphicengine::~Graphicengine()
 
 	for (i = _animationlist.begin(); i != _animationlist.end(); ++i)
 		delete *i;
-	SDL_GL_DeleteContext(_glcontext)
+	SDL_GL_DeleteContext(_glcontext);
 	SDL_DestroyWindow(_window);
 	SDL_Quit();
 }

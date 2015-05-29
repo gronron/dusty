@@ -29,7 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include <iostream>
-#include <cstdio>
 #include "image.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -42,7 +41,7 @@ Image::Image() : format(0), data(0)
 
 Image::Image(std::string const &filename) : format(0), data(0)
 {
-	load(name);
+	load(filename);
 }
 
 Image::~Image()
@@ -55,10 +54,9 @@ bool	Image::load(std::string const &filename)
 {
 	if (data)
 		stbi_image_free(data);
-
-	int x,y,n;
-	if (!(data = stbi_load(filename, &size[0], &size[1], &format, 0))
+	if (!(data = stbi_load(filename.c_str(), (int *)&size[0], (int *)&size[1], &format, 0)))
 	{
+		std::cerr << "Error Image::load(): cannot load " << filename << std::endl;
 		return (false);
 	}
 	else

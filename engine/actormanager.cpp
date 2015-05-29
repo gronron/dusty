@@ -135,8 +135,12 @@ void	Actormanager::notify_owner(Actor *a, bool l)
 
 void	Actormanager::notify_owned(Actor *a, bool l)
 {
-	if (a->ownedid < _asize && _actors[a->ownedid])
-		_actors[a->ownedid]->notified_by_owner(a, l);
+	for	(unsigned int i = 0; i < _asize; ++i)
+	{
+		if (_actors[i]->ownerid == a->id)
+			_actors[i]->notified_by_owner(a, l);
+	}
+	
 }
 
 void			Actormanager::control(int const id)

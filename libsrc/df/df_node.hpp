@@ -71,6 +71,7 @@ class			Df_node
 		~Df_node();
 
 		Df_node const	*get(std::string const &researched_name) const;
+		Df_node	const	*get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const;
 		Df_node const	*safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const;
 
 		void			print() const;

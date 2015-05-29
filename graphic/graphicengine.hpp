@@ -61,13 +61,13 @@ class	Graphicengine
 			vec<float, 2>	step;
 			vec<float, 2>	center;
 		};
+		
+		std::string						assetsdir;
+		vec<unsigned int, 2>			screensize;
+		vec<float, 2>					*cam;
 
 		SDL_Window		*_window;
-		SDL_GLContext	*_glcontext;
-
-		vec<unsigned int, 2>			screensize;
-		std::string						assetsdir;
-		vec<float, 2>					*cam;
+		SDL_GLContext	_glcontext;
 
 		Glyph							_glyphtex[128];
 		unsigned int					_textcoord;
@@ -79,7 +79,7 @@ class	Graphicengine
 		vec<float, 2>					_bot;
 
 
-		Graphicengine(vec<unsigned int, 2> const &, std::string const &);
+		Graphicengine();
 		~Graphicengine();
 
 		void	add(Animation *);

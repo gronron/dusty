@@ -41,6 +41,7 @@ class	Configmanager
 
 		static Configmanager	&get_instance();
 
+		std::string						configdir;
 		std::string						assetsdir;
 		std::map<std::string, Df_node*>	_nodemap;
 
