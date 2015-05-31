@@ -72,7 +72,7 @@ void			Eventmanager::event()
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
 				{
 					am->ge->resize(event.window.data1, event.window.data2);
-					am->um->resize(event.window.data1, event.window.data2);
+					//am->um->resize(event.window.data1, event.window.data2);
 				}
 				break;
 			case SDL_SYSWMEVENT:

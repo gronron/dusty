@@ -39,7 +39,7 @@ class	Replication;
 class	Controller;
 class	Console;
 class	Eventmanager;
-class	Uimanager;
+//class	Uimanager;
 class	Physicengine;
 class	Networkengine;
 class	Graphicengine;
@@ -65,7 +65,7 @@ class	Actormanager
 		Networkengine			*ne;
 		Graphicengine			*ge;
 		Eventmanager			*em;
-		Uimanager				*um;
+		//Uimanager				*um;
 
 		bool const				master;
 		bool const				local;

@@ -39,12 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "networkengine.hpp"
 #include "graphicengine.hpp"
 #include "eventmanager.hpp"
-#include "uimanager.hpp"
+//#include "uimanager.hpp"
 #include "actormanager.hpp"
 
 #include <iostream>
 
-Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0), ne(0), ge(0), um(0), master(opt.master), local(opt.local), graphic(opt.graphic), audio(opt.audio), _asize(64), _actors(new Actor*[64]), controllerclass()
+Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0), ne(0), ge(0), master(opt.master), local(opt.local), graphic(opt.graphic), audio(opt.audio), _asize(64), _actors(new Actor*[64]), controllerclass()
 {
 	Df_node	*nd;
 
@@ -62,7 +62,7 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 	if (graphic)
 	{
 		ge = new Graphicengine();
-		um = new Uimanager();
+		//um = new Uimanager();
 	}
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
@@ -83,7 +83,7 @@ Actormanager::~Actormanager()
 			delete _actors[i];
 	if (graphic)
 	{
-		delete um;
+		//delete um;
 		delete ge;
 	}
 	if (ne)
