@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include FT_FREETYPE_H
 
 
-Graphicengine::Graphicengine() : assetsdir(), screensize(), cam(0), _window(), _glcontext(), _activetex(0)
+Graphicengine::Graphicengine() : assetsdir(), screensize(), _window(), _glcontext(), _activetex(0)
 {
 	GLenum	error;
 	Df_node	*config;
@@ -119,12 +119,9 @@ void									Graphicengine::tick(float delta)
 	glLoadIdentity();
 
 	_top = vec<float, 2>::cast(screensize) / -2.0f;
-	_bot = -_top;
-	if (cam)
-	{
-		_top += *cam;
-		_bot += *cam;
-	}
+	_bot = -_top + cam_pos;
+	_top += cam_pos;
+
 	glTranslatef(-_top[0], -_top[1], 0.0f);
 	for (std::list<Animation *>::iterator i = _animationlist.begin(); i != _animationlist.end();)
 	{

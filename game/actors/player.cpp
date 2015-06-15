@@ -1,45 +1,45 @@
 #include "math/vec_util.hpp"
 #include "endian/packet.hpp"
-#include "mt/mt19937.hpp"
+#include "random/mt19937.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
 #include "actormanager.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
-
+/*
 #include "projectile.hpp"
 #include "player.hpp"
 #include "bonus.hpp"
 #include "feeder.hpp"
-#include "level.hpp"
+#include "level.hpp"*/
 #include "acontroller.hpp"
 
 FACTORYREG(Player);
 
-Player::Player(Actormanager *a, Replication *r, short int t, int i, Actor const *o) : Actor(a, r, t, i, o), bd(this, true, true), tolerance(1), dose(0), high(false), dmg(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)
+Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), tolerance(1), dose(0), high(false), dmg(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)
 {
-	if (!am->local && !rp)
-		rp = new Replication(this, 0.5f, 5.0f);
+	am->pe->add(&bdb, 0, true);
+	
 	firing = false;
 	loadingfire = false;
-	bd.loc[0] = 128.0f;
-	bd.loc[1] = 128.0f;
-	bd.size = 25.0f;
-	am->pe->add(&bd);
+	bdb->loc[0] = 128.0f;
+	bdb->loc[1] = 128.0f;
+	bdb->size = 25.0f;
+	
 }
 
 Player::~Player()
 {
-	am->pe->remove(&bd);
+
 }
 
 void	Player::postinstanciation()
 {
 	if (am->graphic)
 	{
-		ps = new Particlesystem(1.0f, &cleared, "player", &bd);
+		ps = new Particlesystem(am->ge, 1.0f, "player", &bdb);
 		am->ge->add(ps);
-		hud = new Hud(1.0f, &cleared, this);
+		//hud = new Hud(1.0f, &cleared, this);
 	}
 	if (!am->master)
 		am->notify_owner(this, true);
@@ -49,11 +49,9 @@ void	Player::postinstanciation()
 void	Player::destroy()
 {
 	Actor::destroy();
+	am->pe->remove(bdb);
 	if (am->graphic)
-	{
-		ps->destroyed = true;
-		hud->destroyed = true;
-	}
+		am->ge->remove(ps);
 }
 
 void	Player::notified_by_owner(Actor *a, bool)
@@ -63,8 +61,8 @@ void	Player::notified_by_owner(Actor *a, bool)
 	c->controlled = this;
 	if (am->graphic && am->_controllermap.find(c->id) != am->_controllermap.end())
 	{
-		am->ge->set_camera(&bd.loc);
-		am->ge->add(hud);
+		am->ge->cam_pos = bdb->loc;
+		//am->ge->add(hud);
 	}
 }
 
@@ -73,7 +71,7 @@ void	Player::get_replication(Packet &pckt)
 	Actor::get_replication(pckt);
 	pckt.write(dir);
 	pckt.write(firing);
-	bd.get_replication(pckt);
+	bdb->get_replication(pckt);
 }
 
 void	Player::replicate(Packet &pckt, float p)
@@ -81,7 +79,7 @@ void	Player::replicate(Packet &pckt, float p)
 	Actor::replicate(pckt, p);
 	pckt.read(dir);
 	pckt.read(firing);
-	bd.replicate(pckt, p);
+	bdb->replicate(pckt, p);
 }
 
 void	Player::tick(float delta)
@@ -97,7 +95,7 @@ void	Player::tick(float delta)
 		}
 		else if (loadingtime > 0.0f)
 		{
-			float	a = loadingtime * pow(log(firerate + M_E), 3);
+/*			float	a = loadingtime * pow(log(firerate + M_E), 3);
 			for (float i = 0.0f; i < a; ++i)
 			{
 				vec<float, 2>	a;
@@ -108,9 +106,9 @@ void	Player::tick(float delta)
 				p->bd.loc = bd.loc;
 				a[0] = MT().genrand_real1(-1.0, 1.0);
 				a[1] = MT().genrand_real1(-1.0, 1.0);
-				p->bd.spd = Sgl::unit(a) * 512.0f;
+				p->bdb->spd = Sgl::unit(a) * 512.0f;
 			}
-			loadingtime = 0.0f;
+			loadingtime = 0.0f;*/
 		}
 		else if (firing && !is_callback_started("fire"))
 		{
@@ -122,7 +120,7 @@ void	Player::tick(float delta)
 
 bool			Player::collide(Actor const &x)
 {
-	Bonus const	*b;
+/*	Bonus const	*b;
 	Feeder const *f;
 
 	if ((b = dynamic_cast<Bonus const *>(&x)))
@@ -143,13 +141,13 @@ bool			Player::collide(Actor const &x)
 			;//am->em.running = false;
 	}
 	else if (dynamic_cast<Level const *>(&x))
-		return (true);
+		return (true);*/
 	return (false);
 }
 
 bool	Player::fire()
 {
-	if (firing)
+	/*if (firing)
 	{
 		if (am->master)
 		{
@@ -162,7 +160,8 @@ bool	Player::fire()
 		return (true);
 	}
 	else
-		return (false);
+		return (false);*/
+	return (false);
 }
 
 bool	Player::down()

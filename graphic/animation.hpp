@@ -37,7 +37,7 @@ class	Animation
 {
 	public:
 
-		Graphicengine	*ge;
+		Graphicengine	*_ge;
 
 		float			depth;
 

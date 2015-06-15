@@ -124,12 +124,12 @@ Actor		*Actormanager::create(Replication *r)
 
 Actor	*Actormanager::find_actor(int const id)
 {
-	return (id < _asize ? _actors[id] : 0);
+	return (id < (int)_asize ? _actors[id] : 0);
 }
 
 void	Actormanager::notify_owner(Actor *a, bool l)
 {
-	if (a->ownerid < _asize && _actors[a->ownerid])
+	if (a->ownerid < (int)_asize && _actors[a->ownerid])
 		_actors[a->ownerid]->notified_by_owned(a, l);
 }
 

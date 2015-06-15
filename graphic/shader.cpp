@@ -28,38 +28,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "endian/packet.hpp"
-#include "body.hpp"
+#include "shader.hpp"
 
-Body::Body(Actor *a, bool d, bool s) : actor(a), dynamic(d), solid(s), ping(0.0f)
+Shader::Shader(std::string const &filename)
 {
-	mass = 0.0f;
-	loc = 0.0f;
-	spd = 0.0f;
-	acc = 0.0f;
-	size = 0.0f;
+	shader = glCreateShader(GLenum shaderType);
+	
+	glShaderSource(shader, GLsizei count, const GLchar **string, const GLint *length);
+	glCompileShader(shader);
 }
 
-Body::~Body()
+Shader::~Shader()
 {
 
-}
-
-void	Body::get_replication(Packet &pckt)
-{
-	pckt.write(mass);
-	pckt.write(loc);
-	pckt.write(spd);
-	pckt.write(acc);
-	pckt.write(size);
-}
-
-void	Body::replicate(Packet &pckt, float p)
-{
-	ping = p;
-	pckt.read(mass);
-	pckt.read(loc);
-	pckt.read(spd);
-	pckt.read(acc);
-	pckt.read(size);
 }

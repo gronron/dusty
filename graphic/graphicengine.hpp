@@ -64,7 +64,8 @@ class	Graphicengine
 		
 		std::string						assetsdir;
 		vec<unsigned int, 2>			screensize;
-		vec<float, 2>					*cam;
+		vec<float, 3>					cam_pos;
+		vec<float, 3>					cam_dir;
 
 		SDL_Window		*_window;
 		SDL_GLContext	_glcontext;

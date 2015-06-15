@@ -28,23 +28,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef BODY_H_
-#define BODY_H_
+#ifndef SHADER_H_
+#define SHADER_H_
 
-#include "math/vec.hpp"
-#include "endian/packet.hpp"
-
-class	Actor;
-
-struct	Body
+class	Shader
 {
-	unsigned int			vtcnbr;
-	vec<float, 3>			*vertices;
-	unsigned int			trinbr;
-	vec<unsigned int, 3>	*triangles;
-
-	Body(Actor *a, bool dynamic, bool solide);
-	~Body();
+	public:
+	
+		GLuint shader;
+	
+		Shader(std::string const &filename);
+		~Shader();
 };
 
 #endif

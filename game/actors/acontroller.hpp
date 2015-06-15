@@ -16,7 +16,7 @@ class	AController : public Controller
 		vec<float, 2>	move;
 
 
-		AController(Actormanager *, Replication *, short int, int, Actor const *);
+		AController(Actormanager *, Replication *, int, short int, Actor const *);
 		virtual ~AController();
 
 		void	postinstanciation();

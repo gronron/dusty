@@ -44,7 +44,7 @@ class	Factory
 {
 	public:
 
-		typedef Actor *(*CF)(Actormanager *, Replication *, short int, int, Actor const *);
+		typedef Actor *(*CF)(Actormanager *, Replication *, int, short int, Actor const *);
 
 		struct	Class
 		{
