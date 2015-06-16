@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "actormanager.hpp"
 #include "console.hpp"
 #include "graphicengine.hpp"
-#include "uimanager.hpp"
 #include "eventmanager.hpp"
 
 Eventmanager::Eventmanager(Actormanager *a) : am(a), running(true), typing(false)
@@ -70,10 +69,7 @@ void			Eventmanager::event()
 			case SDL_APP_DIDENTERFOREGROUND:
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-				{
 					am->ge->resize(event.window.data1, event.window.data2);
-					//am->um->resize(event.window.data1, event.window.data2);
-				}
 				break;
 			case SDL_SYSWMEVENT:
 				break;

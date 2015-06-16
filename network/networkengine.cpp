@@ -83,7 +83,7 @@ Networkengine::~Networkengine()
 
 Replication		*Networkengine::new_replication(int const id)
 {
-	if (id >= _rsize)
+	if (id >= (int)_rsize)
 	{
 		_replications = resize(_replications, _rsize, _rsize < 1);
 		for (unsigned int i = 0; i < _rsize; ++i)
@@ -98,19 +98,18 @@ Replication		*Networkengine::new_replication(int const id)
 	return (_replications + id);
 }
 
-void										Networkengine::tick(float delta)
+void								Networkengine::tick(float delta)
 {
-	std::map<int, Replication *>::iterator	i;
-	std::map<int, int>::iterator			j;
-	Messagequeue::Message					*msg;
-	int										id;
+	std::map<int, int>::iterator	j;
+	Messagequeue::Message			*msg;
+	int								id;
 
 	while ((msg = mq.get_in()))
 	{
 		if (msg->type == Messagequeue::UPDATE)
 		{
 			id = Replication::get_id(*msg->pckt);
-			if (id < _rsize && _replications[id].actor) // check type
+			if (id < (int)_rsize && _replications[id].actor) // check type
 				_replications[id].replicate(*msg->pckt, msg->ping);
 			else if (!master)
 			{
@@ -123,7 +122,7 @@ void										Networkengine::tick(float delta)
 		else if (msg->type == Messagequeue::DESTROY)
 		{
 			id = Replication::get_id(*msg->pckt);
-			if (!master && id < _rsize && _replications[id].actor)
+			if (!master && id < (int)_rsize && _replications[id].actor)
 				_replications[id].destroy();
 			delete msg->pckt;
 		}

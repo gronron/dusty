@@ -44,9 +44,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
-Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0), ne(0), ge(0), master(opt.master), local(opt.local), graphic(opt.graphic), audio(opt.audio), _asize(64), _actors(new Actor*[64]), controllerclass()
+Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0), ne(0), ge(0), master(opt.master), local(opt.local), graphic(opt.graphic), audio(opt.audio), _asize(0), _actors(0), controllerclass()
 {
 	Df_node	*nd;
+	
+	_asize = 64;
+	_actors = new Actor*[_asize];
+	for (unsigned int i = 0; i < _asize; ++i)
+		_actors[i] = 0;
 
 	nd = Configmanager::get_instance().get("game.df");
 	nd->print();
@@ -66,8 +71,8 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 	}
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
-	if (master)
-		create(opt.level, 0, true);
+	/*if (master)
+		create(opt.level, 0, true);*/
 	if (local)
 	{
 		Controller *ctrl = (Controller *)create(controllerclass, 0, true);
@@ -109,6 +114,8 @@ Actor		*Actormanager::create(std::string const &name, Actor const *owner, bool n
 	{
 		_actors = resize(_actors, _asize, _asize < 1);
 		_asize <<= 1;
+		for (unsigned int i = _asize > 1; i < _asize; ++i)
+			_actors[i] = 0;
 	}
 	_actors[id] = Factory::get_instance().create(this, (need_replication && !local ? ne->new_replication(id) : 0), id, name, owner);
 	_actors[id]->postinstanciation();
@@ -140,7 +147,6 @@ void	Actormanager::notify_owned(Actor *a, bool l)
 		if (_actors[i]->ownerid == a->id)
 			_actors[i]->notified_by_owner(a, l);
 	}
-	
 }
 
 void			Actormanager::control(int const id)
@@ -155,16 +161,16 @@ void			Actormanager::control(int const id)
 
 void				Actormanager::tick(float delta)
 {
-	//std::cout << "em" << std::endl;
+	std::cout << "em" << std::endl;
 	em->event();
-	//std::cout << "cl" << std::endl;
+	std::cout << "cl" << std::endl;
 	cl->tick(delta);
-	//std::cout << "ne" << std::endl;
+	std::cout << "ne" << std::endl;
 	if (ne)
 		ne->tick(delta);
-	//std::cout << "pe" << std::endl;
+	std::cout << "pe" << std::endl;
 	pe->tick(delta);
-	//std::cout << "ac" << std::endl;
+	std::cout << "ac" << std::endl;
 	for (unsigned int i = 0; i < _asize; ++i)
 	{
 		if (_actors[i])
@@ -178,5 +184,7 @@ void				Actormanager::tick(float delta)
 				_actors[i]->tick(delta);
 		}
 	}
-	//std::cout << "end" << std::endl;
+	if (ge)
+		ge->tick(delta);
+	std::cout << "end" << std::endl;
 }

@@ -46,24 +46,30 @@ Graphicengine::Graphicengine() : assetsdir(), screensize(), _window(), _glcontex
 	Df_node	*config;
 	
 	assetsdir = Configmanager::get_instance().assetsdir;
+	assetsdir = "assets\\";
 	config = Configmanager::get_instance().get("graphic_cfg.df");
 	if (!config->get("screensize", Df_node::INT, 2, &screensize))
 	{
 		screensize[0] = 1024;
 		screensize[1] = 768;
 	}
+	screensize[0] = 1024;
+	screensize[1] = 768;
 	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		std::cerr << "Error: SDL_Init() " << SDL_GetError() << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screensize[0], screensize[1], SDL_WINDOW_SHOWN );
+	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	
+	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screensize[0], screensize[1], SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
 	_glcontext = SDL_GL_CreateContext(_window);
 
+	glewExperimental = GL_TRUE;
 	if ((error = glewInit()) != GLEW_OK)
 	{
 		std::cerr << "Error: glewInit()" << glewGetErrorString(error) << std::endl;
@@ -142,8 +148,9 @@ void									Graphicengine::tick(float delta)
 		delete *i;
 		i = _textlist.erase(i);
 	}
-
-	SDL_UpdateWindowSurface(_window);
+	
+	glFlush();
+	SDL_GL_SwapWindow(_window);
 }
 
 void	Graphicengine::resize(unsigned int w, unsigned int h)
