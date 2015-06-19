@@ -42,8 +42,8 @@ Df_node::~Df_node()
 	if (type == BLOCK)
 	{
 		for (unsigned int i = 0; i < size; ++i)
-			delete [] node[i];
-		delete node;
+			delete node[i];
+		delete [] node;
 	}
 	else if (type ==  STRING)
 	{
