@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "networkengine.hpp"
 #include "graphicengine.hpp"
 #include "eventmanager.hpp"
-//#include "uimanager.hpp"
 #include "actormanager.hpp"
 
 #include <iostream>
@@ -65,10 +64,7 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 		ne->connect(opt.ip, opt.port);
 	}
 	if (graphic)
-	{
 		ge = new Graphicengine();
-		//um = new Uimanager();
-	}
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
 	/*if (master)
@@ -87,10 +83,7 @@ Actormanager::~Actormanager()
 		if (_actors[i])
 			delete _actors[i];
 	if (graphic)
-	{
-		//delete um;
 		delete ge;
-	}
 	if (ne)
 		delete ne;
 	delete pe;
@@ -161,16 +154,16 @@ void			Actormanager::control(int const id)
 
 void				Actormanager::tick(float delta)
 {
-	std::cout << "em" << std::endl;
+	//std::cout << "em" << std::endl;
 	em->event();
-	std::cout << "cl" << std::endl;
+	//std::cout << "cl" << std::endl;
 	cl->tick(delta);
-	std::cout << "ne" << std::endl;
+	//std::cout << "ne" << std::endl;
 	if (ne)
 		ne->tick(delta);
-	std::cout << "pe" << std::endl;
+	//std::cout << "pe" << std::endl;
 	pe->tick(delta);
-	std::cout << "ac" << std::endl;
+	//std::cout << "ac" << std::endl;
 	for (unsigned int i = 0; i < _asize; ++i)
 	{
 		if (_actors[i])
@@ -186,5 +179,5 @@ void				Actormanager::tick(float delta)
 	}
 	if (ge)
 		ge->tick(delta);
-	std::cout << "end" << std::endl;
+	//std::cout << "end" << std::endl;
 }

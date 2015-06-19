@@ -8,8 +8,6 @@
 #include "graphicengine.hpp"
 #include "SDL.h"
 
-#include <iostream>
-
 FACTORYREG(AController);
 
 AController::AController(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Controller(a, r, i, t, o)
@@ -78,7 +76,7 @@ void	AController::tick(float delta)
 	Controller::tick(delta);
 	if (controlled)
 	{
-		controlled->bdb->spd = move * 256.0f;
+		controlled->bdb->nextspd = move * 256.0f;
 		controlled->firing = firing;
 		controlled->loadingfire = loadingfire;
 		controlled->dir = aim;
@@ -138,8 +136,8 @@ void	AController::forward(int size, float *data)
 			rp->needupdate = true;
 		if (*data > 0.0f || (*data == 0.0f && move[1] < 0.0f))
 			move[1] = -*data;
+		
 	}
-	std::cout << "forward" << std::endl;
 }
 
 void	AController::backward(int size, float *data)

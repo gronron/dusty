@@ -92,5 +92,6 @@ int			main(int ac, char **av)
 			i = 0;
 		}
 	}
+	std::cout << "return" << std::endl;
 	return (0);
 }

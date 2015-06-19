@@ -13,6 +13,7 @@
 #include "feeder.hpp"
 #include "level.hpp"*/
 #include "acontroller.hpp"
+#include <iostream>
 
 FACTORYREG(Player);
 
@@ -22,8 +23,8 @@ Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const 
 	
 	firing = false;
 	loadingfire = false;
-	bdb->loc[0] = 128.0f;
-	bdb->loc[1] = 128.0f;
+	bdb->nextloc[0] = 128.0f;
+	bdb->nextloc[1] = 128.0f;
 	bdb->size = 25.0f;
 	
 }
@@ -61,7 +62,7 @@ void	Player::notified_by_owner(Actor *a, bool)
 	c->controlled = this;
 	if (am->graphic && am->_controllermap.find(c->id) != am->_controllermap.end())
 	{
-		am->ge->cam_pos = bdb->loc;
+		//am->ge->cam_pos = bdb->loc;
 		//am->ge->add(hud);
 	}
 }

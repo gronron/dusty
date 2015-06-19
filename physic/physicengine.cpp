@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "actor.hpp"
 #include "physicengine.hpp"
+#include <iostream>
 
 Physicengine::Physicengine() : _sbbsize(4096), _sbbnbr(0), _staticbb(0), _dbbsize(4096), _dbbnbr(0), _dynamicbb(0), _prxsize(_sbbsize + _dbbsize), _prxnbr(0), _sortedprx(0), _faxis(0), _saxis(1), _taxis(2)
 {
@@ -45,7 +46,7 @@ Physicengine::~Physicengine()
 
 }
 
-void		Physicengine::add(Boundingbox **bb, Body *bd, bool dynamic)
+void		Physicengine::add(Boundingbox **bdb, Body *bd, bool dynamic)
 {
 	if (dynamic)
 	{
@@ -53,7 +54,12 @@ void		Physicengine::add(Boundingbox **bb, Body *bd, bool dynamic)
 		{
 			_dynamicbb = resize(_dynamicbb, _dbbsize, _dbbsize << 1);
 			_dbbsize <<= 1;
-			_bb[1] = _dynamicbb;
+			if (_dynamicbb != _bb[1])
+			{
+				_bb[1] = _dynamicbb;
+				for (unsigned int i = 0; i < _dbbsize; ++i)
+					*_dynamicbb[i].link = _dynamicbb + i;
+			}
 		}
 		if (_prxnbr >= _prxsize)
 		{
@@ -63,8 +69,8 @@ void		Physicengine::add(Boundingbox **bb, Body *bd, bool dynamic)
 		_sortedprx[_prxnbr].bbidx = _dbbnbr;
 		_sortedprx[_prxnbr].dynamic = true;
 		_dynamicbb[_dbbnbr].bd = bd;
-		_dynamicbb[_dbbnbr].link = bb;
-		*bb = _dynamicbb + _dbbnbr;
+		_dynamicbb[_dbbnbr].link = bdb;
+		*bdb = _dynamicbb + _dbbnbr;
 		++_dbbnbr;
 		if (bd)
 			;//compute boundinxbox
@@ -77,20 +83,21 @@ void		Physicengine::add(Boundingbox **bb, Body *bd, bool dynamic)
 	//new BB and insert
 }
 
-void		Physicengine::remove(Boundingbox *bb)
+void		Physicengine::remove(Boundingbox *bdb)
 {
 	int		idx;
 
-	if (bb >= _dynamicbb && bb < _dynamicbb + _dbbnbr)
+	if (bdb >= _dynamicbb && bdb < _dynamicbb + _dbbnbr)
 	{
-		*bb = _dynamicbb[--_dbbnbr];
-		idx = bb - _dynamicbb;
+		*bdb = _dynamicbb[--_dbbnbr];
+		idx = bdb - _dynamicbb;
 	}
 	else
 	{
-		*bb = _staticbb[--_sbbnbr];
-		idx = bb -_staticbb;
+		*bdb = _staticbb[--_sbbnbr];
+		idx = bdb -_staticbb;
 	}
+	*(bdb->link) = bdb;
 	for (unsigned int i = 0; i < _prxnbr; ++i)
 	{
 		if (_sortedprx[i].bbidx == idx)
@@ -114,7 +121,9 @@ void		Physicengine::tick(float delta)
 	{
 		if (_sortedprx[i].bbidx < 0)
 		{
-			; // remove
+			--_prxnbr;
+			for (unsigned int j = i; j < _prxnbr; ++j)
+				_sortedprx[j] = _sortedprx[j + 1];
 		}
 		else if (_sortedprx[i].dynamic)
 		{
@@ -124,7 +133,7 @@ void		Physicengine::tick(float delta)
 	}
 
 	_insertion_sort();
-	_check_overlap(delta);
+	//_check_overlap(delta);
 }
 
 void				Physicengine::_insertion_sort()
