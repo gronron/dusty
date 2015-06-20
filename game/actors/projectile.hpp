@@ -2,14 +2,14 @@
 #define PROJECTILE_H_
 
 #include "actor.hpp"
-#include "body.hpp"
+#include "boundingbox.hpp"
 #include "particlesystem.hpp"
 
 class	Projectile : public Actor
 {
 	public:
 
-		Body	bd;
+		Boundingbox		*bdb;
 
 		float	dmg;
 
@@ -18,7 +18,7 @@ class	Projectile : public Actor
 		Particlesystem	*ps;
 
 
-		Projectile(Actormanager *, Replication *, short int, int, Actor const *);
+		Projectile(Actormanager *, Replication *, int, short int, Actor const *);
 		virtual ~Projectile();
 
 		void	postinstanciation();

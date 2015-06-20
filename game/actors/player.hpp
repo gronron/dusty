@@ -42,9 +42,6 @@ class	Player : public Actor
 
 		Boundingbox		*bdb;
 
-		int				tolerance;
-		int				dose;
-		bool			high;
 		float			dmg;
 		float			firerate;
 		float			score;
@@ -69,12 +66,11 @@ class	Player : public Actor
 		void	get_replication(Packet &);
 		void	replicate(Packet &, float);
 
-		void	tick(float delta);
+		void	tick(float);
 
 		bool	collide(Actor const &);
 
 		bool	fire();
-		bool	down();
 };
 
 #endif

@@ -138,6 +138,9 @@
     <ClCompile Include="..\..\..\physic\boundingbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\game\actors\projectile.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\actor.hpp">
@@ -256,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\physic\boundingbox.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\actors\projectile.hpp">
+      <Filter>Header Files\game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ class	Feeder : public Actor
 		Particlesystem	*ps;
 
 
-		Feeder(Actormanager *, Replication *, short int, int, Actor const *);
+		Feeder(Actormanager *, Replication *, int, short int, Actor const *);
 		virtual ~Feeder();
 
 		void	postinstanciation();

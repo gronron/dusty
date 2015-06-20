@@ -125,8 +125,8 @@ void									Graphicengine::tick(float delta)
 	glLoadIdentity();
 
 	_top = vec<float, 2>::cast(screensize) / -2.0f;
-	_bot = -_top + cam_pos;
-	_top += cam_pos;
+	_bot = -_top + cam_loc;
+	_top += cam_loc;
 
 	glTranslatef(-_top[0], -_top[1], 0.0f);
 	for (std::list<Animation *>::iterator i = _animationlist.begin(); i != _animationlist.end();)

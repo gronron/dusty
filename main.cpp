@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
 #include "time/time.hpp"
 #include "actormanager.hpp"
 #include "eventmanager.hpp"
@@ -74,7 +75,7 @@ int			main(int ac, char **av)
 	int		i = 0;
 
 	if (!parse_option(ac, av, opt))
-		return (-1);
+		return (EXIT_FAILURE);
 
 	Actormanager	am(opt);
 
@@ -92,6 +93,5 @@ int			main(int ac, char **av)
 			i = 0;
 		}
 	}
-	std::cout << "return" << std::endl;
-	return (0);
+	return (EXIT_SUCCESS);
 }

@@ -33,8 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "actor.hpp"
 #include "physicengine.hpp"
 #include <iostream>
+#include <cstdlib>
 
-Physicengine::Physicengine() : _sbbsize(4096), _sbbnbr(0), _staticbb(0), _dbbsize(4096), _dbbnbr(0), _dynamicbb(0), _prxsize(_sbbsize + _dbbsize), _prxnbr(0), _sortedprx(0), _faxis(0), _saxis(1), _taxis(2)
+Physicengine::Physicengine() : _sbbsize(1024), _sbbnbr(0), _staticbb(0), _dbbsize(1024), _dbbnbr(0), _dynamicbb(0), _prxsize(_sbbsize + _dbbsize), _prxnbr(0), _sortedprx(0), _faxis(0), _saxis(1), _taxis(2)
 {
 	_staticbb = new Boundingbox[_sbbsize];
 	_dynamicbb = new Boundingbox[_dbbsize];
@@ -53,13 +54,13 @@ void		Physicengine::add(Boundingbox **bdb, Body *bd, bool dynamic)
 		if (_dbbnbr >= _dbbsize)
 		{
 			_dynamicbb = resize(_dynamicbb, _dbbsize, _dbbsize << 1);
-			_dbbsize <<= 1;
 			if (_dynamicbb != _bb[1])
 			{
 				_bb[1] = _dynamicbb;
 				for (unsigned int i = 0; i < _dbbsize; ++i)
 					*_dynamicbb[i].link = _dynamicbb + i;
 			}
+			_dbbsize <<= 1;
 		}
 		if (_prxnbr >= _prxsize)
 		{
@@ -68,6 +69,7 @@ void		Physicengine::add(Boundingbox **bdb, Body *bd, bool dynamic)
 		}
 		_sortedprx[_prxnbr].bbidx = _dbbnbr;
 		_sortedprx[_prxnbr].dynamic = true;
+		memset(_dynamicbb + _dbbnbr, 0, sizeof(Boundingbox));
 		_dynamicbb[_dbbnbr].bd = bd;
 		_dynamicbb[_dbbnbr].link = bdb;
 		*bdb = _dynamicbb + _dbbnbr;
@@ -132,7 +134,7 @@ void		Physicengine::tick(float delta)
 		}
 	}
 
-	_insertion_sort();
+	//_insertion_sort();
 	//_check_overlap(delta);
 }
 

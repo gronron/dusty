@@ -6,22 +6,24 @@
 #include "actormanager.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
-/*
 #include "projectile.hpp"
 #include "player.hpp"
-#include "bonus.hpp"
+/*#include "bonus.hpp"
 #include "feeder.hpp"
 #include "level.hpp"*/
 #include "acontroller.hpp"
+
 #include <iostream>
+#include <cmath>
+#define M_E 2.718281828459045
 
 FACTORYREG(Player);
 
-Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), tolerance(1), dose(0), high(false), dmg(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)
+Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), dmg(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
 {
 	am->pe->add(&bdb, 0, true);
 	
-	firing = false;
+	firing = true;
 	loadingfire = false;
 	bdb->nextloc[0] = 128.0f;
 	bdb->nextloc[1] = 128.0f;
@@ -86,7 +88,6 @@ void	Player::replicate(Packet &pckt, float p)
 void	Player::tick(float delta)
 {
 	Actor::tick(delta);
-
 	if (am->master)
 	{
 		if (loadingfire)
@@ -96,20 +97,21 @@ void	Player::tick(float delta)
 		}
 		else if (loadingtime > 0.0f)
 		{
-/*			float	a = loadingtime * pow(log(firerate + M_E), 3);
+			float	a = loadingtime * pow(log(firerate + M_E), 3);
 			for (float i = 0.0f; i < a; ++i)
 			{
 				vec<float, 2>	a;
-				Projectile		*p = (Projectile *)am->create("Projectile", this);
+				Projectile		*p = (Projectile *)am->create("Projectile", this, true);
 
 				p->ownerid = id;
 				p->dmg = dmg;
-				p->bd.loc = bd.loc;
+				p->bdb->nextloc = bdb->nextloc;
+				p->bdb->loc = bdb->nextloc;
 				a[0] = MT().genrand_real1(-1.0, 1.0);
 				a[1] = MT().genrand_real1(-1.0, 1.0);
-				p->bdb->spd = Sgl::unit(a) * 512.0f;
+				p->bdb->nextspd = Sgl::unit(a) * 512.0f;
 			}
-			loadingtime = 0.0f;*/
+			loadingtime = 0.0f;
 		}
 		else if (firing && !is_callback_started("fire"))
 		{
@@ -148,29 +150,20 @@ bool			Player::collide(Actor const &x)
 
 bool	Player::fire()
 {
-	/*if (firing)
+	if (firing)
 	{
 		if (am->master)
 		{
-			Projectile *p = (Projectile *)am->create("Projectile", this);
+			Projectile *p = (Projectile *)am->create("Projectile", this, true);
 			p->ownerid = id;
 			p->dmg = dmg;
-			p->bd.loc = bd.loc;
-			p->bd.spd = dir * 512.0f;
+			p->bdb->nextloc = bdb->nextloc;
+			p->bdb->loc = bdb->nextloc;
+			p->bdb->nextspd = dir * 512.0f;
 		}
 		return (true);
 	}
 	else
-		return (false);*/
+		return (false);
 	return (false);
-}
-
-bool	Player::down()
-{
-	if (!--dose && high)
-	{
-		high = false;
-		++tolerance;
-	}
-	return (true);
 }

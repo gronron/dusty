@@ -211,7 +211,7 @@ void				Eventmanager::_mousebutton(SDL_Event &event, float d)
 
 	b[0] = d;
 	b[1] = (float)event.button.x;
-	b[2] = (float)event.button.x;
+	b[2] = (float)event.button.y;
 	a = &_mousebuttons[event.button.button];
 	if (a->ctrl)
 		(a->ctrl->*a->fx)(1, (float *)&b);

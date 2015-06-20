@@ -7,15 +7,13 @@
 #include "acontroller.hpp"
 #include "graphicengine.hpp"
 #include "SDL.h"
+#include <iostream>
 
 FACTORYREG(AController);
 
 AController::AController(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Controller(a, r, i, t, o)
 {
-	if (am->master)
-		controlled = (Player *)am->create("Player", this, true);
-	else
-		controlled = 0;
+	controlled = 0;
 	firing = false;
 	loadingfire = false;
 	aim = 0.0f;
@@ -31,6 +29,8 @@ AController::~AController()
 void	AController::postinstanciation()
 {
 	Controller::postinstanciation();
+	if (am->master)
+		controlled = (Player *)am->create("Player", this, true);
 	if (!am->master)
 		am->notify_owned(this, true);
 }
@@ -80,6 +80,8 @@ void	AController::tick(float delta)
 		controlled->firing = firing;
 		controlled->loadingfire = loadingfire;
 		controlled->dir = aim;
+		//beware
+		am->ge->cam_loc = controlled->bdb->loc;
 	}
 }
 
@@ -105,11 +107,11 @@ void	AController::bind()
 	am->em->_mousemove.ctrl = this;
 	am->em->_mousemove.fx = (BINDTYPE)&AController::aimloc;
 
-	am->em->_mousebuttons[0].ctrl = this;
-	am->em->_mousebuttons[0].fx = (BINDTYPE)&AController::fire;
+	am->em->_mousebuttons[SDL_BUTTON_LEFT].ctrl = this;
+	am->em->_mousebuttons[SDL_BUTTON_LEFT].fx = (BINDTYPE)&AController::fire;
 
-	am->em->_mousebuttons[1].ctrl = this;
-	am->em->_mousebuttons[1].fx = (BINDTYPE)&AController::strongfire;
+	am->em->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = this;
+	am->em->_mousebuttons[SDL_BUTTON_RIGHT].fx = (BINDTYPE)&AController::strongfire;
 
 /*
 	am->em->_joymovevector[0].ctrl = this;
@@ -200,6 +202,9 @@ void	AController::fire(int size, float *data)
 		if (rp)
 			rp->needupdate = true;
 		firing = *data;
+		aim[0] = data[1];
+		aim[1] = data[2];
+		aim = Sgl::unit(aim - vec<float, 2>::cast(am->ge->screensize) / 2.0f);
 	}
 }
 

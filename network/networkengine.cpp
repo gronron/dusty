@@ -85,7 +85,7 @@ Replication		*Networkengine::new_replication(int const id)
 {
 	if (id >= (int)_rsize)
 	{
-		_replications = resize(_replications, _rsize, _rsize < 1);
+		_replications = resize(_replications, _rsize, _rsize << 1);
 		for (unsigned int i = 0; i < _rsize; ++i)
 			if (_replications[i].actor)
 				_replications[i].actor->rp = _replications + i;

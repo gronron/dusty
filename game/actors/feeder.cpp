@@ -14,15 +14,13 @@
 
 FACTORYREG(Feeder);
 
-Feeder::Feeder(Actormanager *a, Replication *r, short int t, int i, Actor const *o) : Actor(a, r, t, i, o), bd(this, true, true), hp(2.0f)
+Feeder::Feeder(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), bdb(), hp(2.0f)
 {
-	if (!am->local && !rp)
-		rp = new Replication(this, 0.5f, 5.0f);
-	bd.loc[0] = 880.0f;
-	bd.loc[1] = 70.0f;
-	bd.size = 20.0f;
+	am->pe->add(&bdb, 0, true)
+	bdb->nextloc[0] = 880.0f;
+	bdb->nextloc[1] = 70.0f;
+	bdb->size = 20.0f;
 	aim = 0.0f;
-	am->pe->add(&bd);
 }
 
 Feeder::~Feeder()
@@ -55,7 +53,7 @@ void	Feeder::get_replication(Packet &pckt)
 	Actor::get_replication(pckt);
 	pckt.write(aim);
 	pckt.write(hp);
-	bd.get_replication(pckt);
+	bdb->get_replication(pckt);
 }
 
 void	Feeder::replicate(Packet &pckt, float p)
@@ -63,7 +61,7 @@ void	Feeder::replicate(Packet &pckt, float p)
 	Actor::replicate(pckt, p);
 	pckt.read(aim);
 	pckt.read(hp);
-	bd.replicate(pckt, p);
+	bdb->replicate(pckt, p);
 }
 
 bool	Feeder::targetsomeone()

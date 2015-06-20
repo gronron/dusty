@@ -56,7 +56,6 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 	nd->print();
 	Factory::get_instance().generate_type();
 	cl = new Console(this);
-	em = new Eventmanager(this);
 	pe = new Physicengine;
 	if (!local)
 	{
@@ -64,7 +63,10 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 		ne->connect(opt.ip, opt.port);
 	}
 	if (graphic)
+	{
 		ge = new Graphicengine();
+		em = new Eventmanager(this);
+	}
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
 	/*if (master)
@@ -83,11 +85,14 @@ Actormanager::~Actormanager()
 		if (_actors[i])
 			delete _actors[i];
 	if (graphic)
+	{
+		delete em;
 		delete ge;
+	}
+	
 	if (ne)
 		delete ne;
 	delete pe;
-	delete em;
 	delete cl;
 }
 
@@ -105,9 +110,10 @@ Actor		*Actormanager::create(std::string const &name, Actor const *owner, bool n
 	}
 	if (id < 0)
 	{
-		_actors = resize(_actors, _asize, _asize < 1);
+		id = _asize;
+		_actors = resize(_actors, _asize, _asize << 1);
 		_asize <<= 1;
-		for (unsigned int i = _asize > 1; i < _asize; ++i)
+		for (unsigned int i = _asize >> 1; i < _asize; ++i)
 			_actors[i] = 0;
 	}
 	_actors[id] = Factory::get_instance().create(this, (need_replication && !local ? ne->new_replication(id) : 0), id, name, owner);
@@ -155,7 +161,8 @@ void			Actormanager::control(int const id)
 void				Actormanager::tick(float delta)
 {
 	//std::cout << "em" << std::endl;
-	em->event();
+	if (em)
+		em->event();
 	//std::cout << "cl" << std::endl;
 	cl->tick(delta);
 	//std::cout << "ne" << std::endl;
