@@ -134,8 +134,8 @@ void		Physicengine::tick(float delta)
 		}
 	}
 
-	//_insertion_sort();
-	//_check_overlap(delta);
+	_insertion_sort();
+	_check_overlap(delta);
 }
 
 void				Physicengine::_insertion_sort()

@@ -11,23 +11,18 @@
 #include "labyrinth.hpp"
 #include "player.hpp"
 #include "feeder.hpp"
-#include "exit.hpp"
 #include "level.hpp"
 
 FACTORYREG(Level);
 
-Level::Level(Actormanager *a, Replication *r, short int t, int i, Actor const *o) : Actor(a, r, t, i, o), nbr(0)
+Level::Level(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), nbr(0)
 {
-	if (!am->local && !rp)
-		rp = new Replication(this, 2.0f, 20.0f);
 	if (am->master)
 	{
 		x = 16 * 4 + 1;
 		y = x;
 		map = generate_labyrinth(16, 16);
 		_generate_block();
-		Exit	*exit = (Exit *)am->create("Exit", 0);
-		exit->bd.loc = (x - 2) * 64.0f;
 		spawnrate = 1.0f;
 		start_callback("spawn_feeder", 1.0f / spawnrate, true, (bool (Actor::*)())&Level::spawn_feeder);
 		start_callback("increase_difficulty", 8.0f, true, (bool (Actor::*)())&Level::increase_difficulty);
@@ -39,11 +34,8 @@ Level::~Level()
 	delete_matrix(map);
 	for (unsigned int i = 0; i < _map.size(); ++i)
 	{
-		if (_map[i].bd)
-		{
-			am->pe->remove(_map[i].bd);
-			delete _map[i].bd;
-		}
+		if (_map[i].bdb)
+			am->pe->remove(_map[i].bdb);
 	}
 	if (am->graphic)
 		ld->destroyed = true;
@@ -93,7 +85,7 @@ bool							Level::spawn_feeder()
 			fdr->hp = 1.0f + nbr / 10;
 			loc[0] = MT().genrand_real1(-1.0, 1.0);
 			loc[1] = MT().genrand_real1(-1.0, 1.0);
-			fdr->bd.loc = plr->bd.loc + Sgl::unit(loc) * (float)MT().genrand_real1(512.0, 1024.0);
+			fdr->bdb->nextloc = plr->bdb->loc + Sgl::unit(loc) * (float)MT().genrand_real1(512.0, 1024.0);
 		}
 	}
 	nbr++;
@@ -119,10 +111,9 @@ void		Level::_generate_block()
 			blck.loc[1] = j * 64.0f;
 			if ((blck.t = map[j][i]))
 			{
-				blck.bd = new Body(this, false, true);
-				blck.bd->loc = blck.loc;
-				blck.bd->size = 64.0f;
-				am->pe->add(blck.bd);
+				am->pe->add(&blck.bdb, 0, false);
+				blck.bdb->nextloc = blck.loc;
+				blck.bdb->size = 64.0f;
 			}
 			else
 				blck.bd = 0;

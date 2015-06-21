@@ -14,7 +14,7 @@ class	Level : public Actor
 		{
 			int				t;
 			vec<float, 2>	loc;
-			Body			*bd;
+			Boundingbox		*bdb;
 		};
 
 		unsigned int		x;
@@ -28,7 +28,7 @@ class	Level : public Actor
 		int		nbr;
 		float	spawnrate;
 
-		Level(Actormanager *, Replication *, short int, int, Actor const *);
+		Level(Actormanager *, Replication *, int, short int, Actor const *);
 		virtual ~Level();
 
 		void	postinstanciation();
