@@ -67,24 +67,28 @@ class	Aabbtree
 	public:
 	
 		unsigned int	_nsize;
-		unsigned int	_ncount;
 		Node			*_nodes;
 
-		int	_root;
-		int	_free;
-		
+		int				_root;
+		int				_free;
+
+
 		Aabbtree();
 		~Aabbtree();
-		
+
 		int		add_aabb(Aabb const &, int const data));
 		void	remove_aabb(int const);
 		bool	move_aabb(int const, Aabb const &);
+
+		void	query(Aabb const &) const;
+		void	raycast() const;
 
 		int		_allocate_node();
 		void	_free_node(int const);
 
 		void	_insert_leaf(int const);
 		void	_remove_leaf(int const);
+
 		void	_balance(int const);
 		void	_rotate(int const, int const, int const);
 };

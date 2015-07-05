@@ -27,6 +27,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
+// this code is greatly inspired by Erin Catto's b2DynamicTree form Box2d
 
 #include "aabbtree.hpp"
 
@@ -107,6 +108,37 @@ bool	Aabbtree::move_aabb(int const index, Aabb const &aabb) // need to correct
 	return (true);
 }	
 
+int		Aabbtree::query(Aabb const &aabb) const
+{
+	
+	b2GrowableStack<int32, 256> stack;
+	stack.Push(_root);
+
+	while (stack.GetCount() > 0)
+	{
+		int32 nodeId = stack.Pop();
+		if (nodeId == b2_nullNode)
+			continue;
+
+		const b2TreeNode* node = m_nodes + nodeId;
+
+		if (b2TestOverlap(node->aabb, aabb))
+		{
+			if (node->IsLeaf())
+			{
+				bool proceed = callback->QueryCallback(nodeId);
+				if (proceed == false)
+					return;
+			}
+			else
+			{
+				stack.Push(node->child1);
+				stack.Push(node->child2);
+			}
+		}
+	}
+}
+
 int		Aabbtree::_allocate_node()
 {
 	int	index;
@@ -134,7 +166,7 @@ void	Aabbtree::_free_node(int const index)
 }
 
 
-void	Aabbtree::_insert_leaf(int index) // need to correct
+void	Aabbtree::_insert_leaf(int const index) // need to correct
 {
 	if (_root == -1)
 	{
@@ -146,27 +178,25 @@ void	Aabbtree::_insert_leaf(int index) // need to correct
 
 	// Find the best sibling for this node
 	b2AABB leafAABB = m_nodes[leaf].aabb;
-	int32 index = m_root;
-	while (m_nodes[index].IsLeaf() == false)
+	int i = _root;
+	while (_nodes[i].rigth != -1)
 	{
-		int32 child1 = m_nodes[index].child1;
-		int32 child2 = m_nodes[index].child2;
-
-		float32 area = m_nodes[index].aabb.GetPerimeter();
+		int child1 = _nodes[i].child1;
+		int child2 = _nodes[i].child2;
+		float area = _nodes[i].aabb.GetPerimeter();
 
 		b2AABB combinedAABB;
-		combinedAABB.Combine(m_nodes[index].aabb, leafAABB);
-		float32 combinedArea = combinedAABB.GetPerimeter();
+		combinedAABB.Combine(_nodes[i].aabb, leafAABB);
+		float combinedArea = combinedAABB.GetPerimeter();
 
 		// Cost of creating a new parent for this node and the new leaf
-		float32 cost = 2.0f * combinedArea;
-
+		float cost = 2.0f * combinedArea;
 		// Minimum cost of pushing the leaf further down the tree
-		float32 inheritanceCost = 2.0f * (combinedArea - area);
+		float inheritanceCost = 2.0f * (combinedArea - area);
 
 		// Cost of descending into child1
-		float32 cost1;
-		if (m_nodes[child1].IsLeaf())
+		float cost1;
+		if (_nodes[child1].IsLeaf())
 		{
 			b2AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[child1].aabb);
@@ -176,14 +206,14 @@ void	Aabbtree::_insert_leaf(int index) // need to correct
 		{
 			b2AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[child1].aabb);
-			float32 oldArea = m_nodes[child1].aabb.GetPerimeter();
-			float32 newArea = aabb.GetPerimeter();
+			float oldArea = m_nodes[child1].aabb.GetPerimeter();
+			float newArea = aabb.GetPerimeter();
 			cost1 = (newArea - oldArea) + inheritanceCost;
 		}
 
 		// Cost of descending into child2
-		float32 cost2;
-		if (m_nodes[child2].IsLeaf())
+		float cost2;
+		if (_nodes[child2].IsLeaf())
 		{
 			b2AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[child2].aabb);
@@ -193,8 +223,8 @@ void	Aabbtree::_insert_leaf(int index) // need to correct
 		{
 			b2AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[child2].aabb);
-			float32 oldArea = m_nodes[child2].aabb.GetPerimeter();
-			float32 newArea = aabb.GetPerimeter();
+			float oldArea = m_nodes[child2].aabb.GetPerimeter();
+			float newArea = aabb.GetPerimeter();
 			cost2 = newArea - oldArea + inheritanceCost;
 		}
 
@@ -206,41 +236,30 @@ void	Aabbtree::_insert_leaf(int index) // need to correct
 		i = cost1 < cost2 : child1 ? child2;
 	}
 
-	int32 sibling = index;
-
 	// Create a new parent.
-	int32 oldParent = m_nodes[sibling].parent;
-	int32 newParent = AllocateNode();
-	m_nodes[newParent].parent = oldParent;
-	m_nodes[newParent].userData = NULL;
-	m_nodes[newParent].aabb.Combine(leafAABB, m_nodes[sibling].aabb);
-	m_nodes[newParent].height = m_nodes[sibling].height + 1;
+	int oldparent = m_nodes[i].parent;
+	int newparent = _allocate_node();
 
-	if (oldParent != b2_nullNode)
+	_nodes[newparent].parent = oldparent;
+	_nodes[newparent].aabb.Combine(leafAABB, m_nodes[i].aabb);
+	_nodes[newparent].height = _nodes[i].height + 1;
+	_nodes[newparent].left = i;
+	_nodes[newparent].right = index;
+	_nodes[i].parent = newparent;
+	_nodes[index].parent = newparent;
+
+	if (oldarent != -1)
 	{
-		// The sibling was not the root.
-		if (m_nodes[oldParent].child1 == sibling)
-			m_nodes[oldParent].child1 = newParent;
+		// The i was not the root.
+		if (_nodes[oldparent].child1 == i)
+			_nodes[oldparent].child1 = newparent;
 		else
-			m_nodes[oldParent].child2 = newParent;
-	
-		m_nodes[newParent].child1 = sibling;
-		m_nodes[newParent].child2 = leaf;
-		m_nodes[sibling].parent = newParent;
-		m_nodes[leaf].parent = newParent;
+			_nodes[oldparent].child2 = newparent;
 	}
 	else
-	{
-		// The sibling was the root.
-		m_nodes[newParent].child1 = sibling;
-		m_nodes[newParent].child2 = leaf;
-		m_nodes[sibling].parent = newParent;
-		m_nodes[leaf].parent = newParent;
-		m_root = newParent;
-	}
+		_root = newparent;
 
-	// Walk back up the tree fixing heights and AABBs
-	_balance(index);
+	_balance(i);
 }
 
 void	Aabbtree::_remove_leaf(int const index)
@@ -261,15 +280,12 @@ void	Aabbtree::_remove_leaf(int const index)
 		}
 		else
 		{
-			// Destroy parent and connect sibling to grandParent.
 			if (_nodes[grandparent].children[0] == parent)
 				_nodes[grandparent].children[0] = sibling;
 			else
 				_nodes[grandparent].children[1] = sibling;
 			_nodes[sibling].parent = grandparent;
 			_free_node(parent);
-
-			// Adjust ancestor bounds.
 			_balance(index);
 		}
 	}
@@ -297,8 +313,8 @@ void	Aabbtree::_balance(int const index)
 			}
 		}
 		
-		int c1 = _nodes[i].children[0];
-		int c2 = _nodes[i].children[1];
+		int c1 = _nodes[i].left`;
+		int c2 = _nodes[i].right;
 
 		merge_aabb(_nodes[i].aabb, _nodes[c1].aabb, m_nodes[c2].aabb);
 		_nodes[i].height = 1 + _nodes[c1].height >= _nodes[c2].height ? _nodes[c1].height : _nodes[c2].height;
@@ -310,12 +326,10 @@ void	Aabbtree::_rotate(int const index, int const up, int const down) // a, b, c
 	int left = _nodes[up].left; //d
 	int right = _nodes[up].right; //e
 
-	// Swap A and B
 	_nodes[up].left = index;
 	_nodes[up].parent = _nodes[index].parent;
 	_nodes[index].parent = up;
 
-	// A's old parent should point to B
 	if (_nodes[up].parent != -1)
 	{
 		if (_nodes[_nodes[up].parent].left == index)
@@ -326,7 +340,6 @@ void	Aabbtree::_rotate(int const index, int const up, int const down) // a, b, c
 	else
 		_root = up;
 
-	// Rotate
 	if (_nodes[left].height > _nodes[right].height)
 	{
 		_nodes[up].right = left;
