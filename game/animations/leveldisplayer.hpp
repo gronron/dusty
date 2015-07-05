@@ -2,7 +2,7 @@
 #define LEVELDISPLAYER_H_
 
 #include "animation.hpp"
-#include "renderer.hpp"
+#include "graphicengine.hpp"
 
 class	Level;
 
@@ -11,12 +11,10 @@ class	Leveldisplayer : public Animation
 	public:
 
 		Level					*lvl;
-		Renderer::Texture	*tex;
+		Graphicengine::Texture	*tex;
 
-		Leveldisplayer(float, bool *, Level *);
+		Leveldisplayer(Graphicengine *, float, Level *);
 		virtual ~Leveldisplayer();
-
-		void	post_instanciation(Renderer *);
 
 		bool	tick(float);
 		void	draw();

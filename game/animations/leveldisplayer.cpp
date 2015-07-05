@@ -1,10 +1,9 @@
 #include "level.hpp"
 #include "leveldisplayer.hpp"
-#include <iostream>
 
-Leveldisplayer::Leveldisplayer(float d, bool *c, Level *l) : Animation(d, c), lvl(l)
+Leveldisplayer::Leveldisplayer(Graphicengine *ge, float d, Level *l) : Animation(ge, d), lvl(l)
 {
-
+	tex = _ge->load_texture("particle.png");
 }
 
 Leveldisplayer::~Leveldisplayer()
@@ -17,12 +16,6 @@ bool	Leveldisplayer::tick(float)
 	return (true);
 }
 
-void Leveldisplayer::post_instanciation(Renderer *r)
-{
-	Animation::post_instanciation(r);
-	tex = _rdr->load_texture("particle.png");
-}
-
 void									Leveldisplayer::draw()
 {
 	std::vector<Level::Block>::iterator	i;
@@ -33,7 +26,6 @@ void									Leveldisplayer::draw()
 	b[3] = 1.0f;
 	s = 0.25f;
 
-	std::cout << "ldd" << std::endl;
 	for (i = lvl->_map.begin(); i != lvl->_map.end(); ++i)
-		_rdr->draw_texture(tex, i->loc, s, i->t ? a : b);
+		_ge->draw_texture(tex, i->loc, s, i->t ? a : b);
 }

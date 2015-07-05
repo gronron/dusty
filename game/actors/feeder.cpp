@@ -9,30 +9,29 @@
 
 #include "player.hpp"
 #include "projectile.hpp"
-#include "bonus.hpp"
+//#include "bonus.hpp"
 #include "feeder.hpp"
 
 FACTORYREG(Feeder);
 
 Feeder::Feeder(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), bdb(), hp(2.0f)
 {
-	am->pe->add(&bdb, 0, true)
-	bdb->nextloc[0] = 880.0f;
-	bdb->nextloc[1] = 70.0f;
+	am->pe->add(&bdb, 0, true);
+	bdb->actor = this;
 	bdb->size = 20.0f;
 	aim = 0.0f;
 }
 
 Feeder::~Feeder()
 {
-	am->pe->remove(&bd);
+	am->pe->remove(bdb);
 }
 
 void	Feeder::postinstanciation()
 {
 	if (am->graphic)
 	{
-		ps = new Particlesystem(0.0f, &cleared, "feeder", &bd);
+		ps = new Particlesystem(am->ge, 0.0f, "feeder", &bdb);
 		am->ge->add(ps);
 	}
 	start_callback("TP", 0.3f, true, (bool (Actor::*)())&Feeder::targetsomeone);
@@ -43,8 +42,7 @@ void	Feeder::destroy()
 	Actor::destroy();
 	if (am->graphic)
 	{
-		am->ge->call(ps, (void (Animation::*)())&Particlesystem::stop);
-		am->ge->add(new Particlesystem(0.0f, "explosion", bd.loc));
+		am->ge->add(new Particlesystem(am->ge, 0.0f, "explosion", bdb->loc));
 	}
 }
 
@@ -73,27 +71,27 @@ bool	Feeder::targetsomeone()
 	aim = 0.0f;
 	max = 0.0f;
 	cur = 0.0f;
-	for (Actormanager::Actoriterator i = am->_actormap.begin(); i != am->_actormap.end(); ++i)
+	for (unsigned int i = 0; i < am->_asize; ++i)
 	{
-		if ((plr = dynamic_cast<Player *>(i->second)))
+		if (am->_actors[i] && (plr = dynamic_cast<Player *>(am->_actors[i])))
 		{
-			cur = Sgl::norm(bd.loc - plr->bd.loc);
+			cur = Sgl::norm(bdb->loc - plr->bdb->loc);
 			if (cur > max)
 			{
 				max = cur;
-				aim = plr->bd.loc;
+				aim = plr->bdb->loc;
 			}
 		}
 	}
-	dir = Sgl::unit(aim - bd.loc);
-	bd.spd = dir * 150.0f;
+	dir = Sgl::unit(aim - bdb->loc);
+	bdb->nextspd = dir * 150.0f;
 	return (true);
 }
 
 bool	Feeder::collide(Actor const &x)
 {
 	Projectile const	*prj;
-	Bonus				*b;
+	//Bonus				*b;
 
 	if ((prj = dynamic_cast<Projectile const *>(&x)))
 	{
@@ -101,16 +99,16 @@ bool	Feeder::collide(Actor const &x)
 			rp->needupdate = true;
 		if ((hp -= prj->dmg) <= 0.0f)
 		{
-			if (am->master && !(MT().genrand_int32() % 7))
+			/*if (am->master && !(MT().genrand_int32() % 7))
 			{
 				b = (Bonus *)am->create("Bonus", 0);
 				b->bd.loc = bd.loc;
 				b->dmg = 0.2f;
 				b->firerate = 1.0f;
 			}
-			Player *plr = (Player *)am->findactor(x.ownerid);
+			/*Player *plr = (Player *)am->findactor(x.ownerid);
 			if (plr)
-				plr->score++;
+				plr->score++;*/
 			destroy();
 		}
 	}

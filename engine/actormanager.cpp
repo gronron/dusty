@@ -69,8 +69,8 @@ Actormanager::Actormanager(Actormanager::Option const &opt) : cl(0), em(0), pe(0
 	}
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
-	/*if (master)
-		create(opt.level, 0, true);*/
+	if (master)
+		create(opt.level, 0, true);
 	if (local)
 	{
 		Controller *ctrl = (Controller *)create(controllerclass, 0, true);

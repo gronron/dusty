@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "actor.hpp"
-#include "body.hpp"
+#include "boundingbox.hpp"
 #include "leveldisplayer.hpp"
 
 class	Level : public Actor

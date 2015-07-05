@@ -17,6 +17,7 @@ Projectile::Projectile(Actormanager *a, Replication *r, int i, short int t, Acto
 	dmg = 1.0f;
 	dir = 0.0f;
 	am->pe->add(&bdb, 0, true);
+	bdb->actor = this;
 	bdb->size = 20.0f;
 }
 

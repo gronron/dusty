@@ -1,8 +1,8 @@
 #include <cstring>
 #include <stack>
-#include "central/new.hpp"
+#include "new.hpp"
 #include "math/vec.hpp"
-#include "mt/mt19937.hpp"
+#include "random/mt19937.hpp"
 
 struct		Block
 {

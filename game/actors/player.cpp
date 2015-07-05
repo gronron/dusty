@@ -8,9 +8,9 @@
 #include "graphicengine.hpp"
 #include "projectile.hpp"
 #include "player.hpp"
-/*#include "bonus.hpp"
+//#include "bonus.hpp"
 #include "feeder.hpp"
-#include "level.hpp"*/
+#include "level.hpp"
 #include "acontroller.hpp"
 
 #include <iostream>
@@ -25,6 +25,7 @@ Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const 
 	
 	firing = true;
 	loadingfire = false;
+	bdb->actor = this;
 	bdb->nextloc[0] = 128.0f;
 	bdb->nextloc[1] = 128.0f;
 	bdb->size = 25.0f;
@@ -142,9 +143,9 @@ bool			Player::collide(Actor const &x)
 			high = true;
 		if (dose > tolerance)
 			;//am->em.running = false;
-	}
-	else if (dynamic_cast<Level const *>(&x))
-		return (true);*/
+	}*/
+	if (dynamic_cast<Level const *>(&x))
+		return (true);
 	return (false);
 }
 

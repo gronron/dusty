@@ -2,14 +2,14 @@
 #define FEEDER_H_
 
 #include "actor.hpp"
-#include "body.hpp"
+#include "boundingbox.hpp"
 #include "particlesystem.hpp"
 
 class	Feeder : public Actor
 {
 	public:
 
-		Body	bd;
+		Boundingbox	*bdb;
 
 		float			hp;
 

@@ -2,21 +2,21 @@
 #define BONUS_H_
 
 #include "actor.hpp"
-#include "body.hpp"
+#include "boundingbox.hpp"
 #include "particlesystem.hpp"
 
 class	Bonus : public Actor
 {
 	public:
 
-		Body	bd;
+		Boundingbox	*bdb;
 
 		float	dmg;
 		float	firerate;
 
 		Particlesystem	*ps;
 
-		Bonus(Actormanager *, Replication *, short int, int, Actor const *);
+		Bonus(Actormanager *, Replication *, int, short int, Actor const *);
 		virtual ~Bonus();
 
 		void	postinstanciation();
