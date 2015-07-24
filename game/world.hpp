@@ -28,22 +28,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "boundingbox.hpp"
+#ifndef WORLD_H_
+#define WORLD_H_
 
-void	Boundingbox::get_replication(Packet &pckt) const
-{
-	pckt.write(loc);
-	pckt.write(spd);
-	pckt.write(acc);
-	pckt.write(mass);
-	pckt.write(size); //will be skiped
-}
+#include "actor.hpp"
+#include "chunk.hpp"
 
-void	Boundingbox::replicate(Packet &pckt, float p)
+class	World : public Actor
 {
-	pckt.read(loc);
-	pckt.read(spd);
-	pckt.read(acc);
-	pckt.read(mass);
-	pckt.read(size);
-}
+	public:
+	
+		World(Actormanager *, Replication *, int, short int, Actor const *);
+		virtual ~World();
+
+		virtual void	postinstanciation();
+		virtual void	destroy();
+
+		virtual void	get_replication(Packet &) const;
+        virtual void	replicate(Packet &, float);
+};
+
+#endif

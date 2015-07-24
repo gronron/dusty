@@ -204,7 +204,7 @@ void	AController::fire(int size, float *data)
 		firing = *data;
 		aim[0] = data[1];
 		aim[1] = data[2];
-		aim = Sgl::unit(aim - vec<float, 2>::cast(am->ge->screensize) / 2.0f);
+		aim = Sgl::unit(aim - vec<float, 4>::cast(am->ge->screensize) / 2.0f);
 	}
 }
 
@@ -226,7 +226,7 @@ void	AController::aimloc(int size, float *data)
 			rp->needupdate = true;
 		aim[0] = data[0];
 		aim[1] = data[1];
-		aim = Sgl::unit(aim - vec<float, 2>::cast(am->ge->screensize) / 2.0f);
+		aim = Sgl::unit(aim - vec<float, 4>::cast(am->ge->screensize) / 2.0f);
 	}
 }
 

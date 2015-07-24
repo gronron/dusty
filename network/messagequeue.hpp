@@ -48,7 +48,7 @@ class	Messagequeue
 			int		cltid;
 			int		actid;
 			float	ping;
-			Packet	*pckt;
+			Packet	pckt;
 		};
 
 
@@ -71,7 +71,7 @@ class	Messagequeue
 		void	push_in_textmsg(int size, char *data);
 		void	push_in_textmsg(int cltid, int size, char *data);
 
-		void	push_out_pckt(Packet *pckt);
+		void	push_out_pckt(Packet const &pckt);
 		void	push_out_pckt(int actorid);
 		void	push_out_cnt(int cltid, int actid);
 		void	push_out_discnt(int cltid);

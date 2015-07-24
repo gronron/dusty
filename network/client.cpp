@@ -85,14 +85,13 @@ void						Client::tick(float delta)
 	{
 		if (msg->type == Messagequeue::TEXTMSG)
 		{
-			hdr.size = msg->pckt->get_size();
+			hdr.size = msg->pckt.get_size();
 			hdr.type = TEXTMSG;
 			_tcp.write(sizeof(hdr), &hdr);
-			_tcp.write(msg->pckt->get_size(), msg->pckt->get_data());
+			_tcp.write(msg->pckt.get_size(), msg->pckt.get_data());
 		}
 		else
-			_udp.write(msg->pckt->get_size(), msg->pckt->get_data());
-		delete msg->pckt;
+			_udp.write(msg->pckt.get_size(), msg->pckt.get_data());
 		mq->pop_out();
 	}
 	if (!connected && (timer += delta) >= 0.1f)

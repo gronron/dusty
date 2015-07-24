@@ -32,59 +32,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VEC_H_
 
 template<class T, unsigned int U>
-class	vec
+struct	vec
 {
-	public:
-
-		template<class V, unsigned int W>
-		static vec	cast(vec<V, W> const &);
+	template<class V, unsigned int W>
+	static vec	cast(vec<V, W> const &);
 
 
-		T	ar[U];
+	T	ar[U];
 
 
-		T		&operator[](unsigned int const x);
-		T const	&operator[](unsigned int const x) const;
+	T		&operator[](unsigned int const x);
+	T const	&operator[](unsigned int const x) const;
 
-		vec	&operator++();
-		vec	operator++(int);
-		vec	&operator--();
-		vec	operator--(int);
+	vec	&operator++();
+	vec	operator++(int);
+	vec	&operator--();
+	vec	operator--(int);
 
-		template<unsigned int V>
-		vec	&operator=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator+=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator-=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator*=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator/=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator%=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator|=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator&=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator^=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator<<=(vec<T, V> const &x);
-		template<unsigned int V>
-		vec	&operator>>=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator+=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator-=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator*=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator/=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator%=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator|=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator&=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator^=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator<<=(vec<T, V> const &x);
+	template<unsigned int V>
+	vec	&operator>>=(vec<T, V> const &x);
 
-		vec	&operator=(T const &x);
-		vec	&operator+=(T const &x);
-		vec	&operator-=(T const &x);
-		vec	&operator*=(T const &x);
-		vec	&operator/=(T const &x);
-		vec	&operator%=(T const &x);
-		vec	&operator|=(T const &x);
-		vec	&operator&=(T const &x);
-		vec	&operator^=(T const &x);
-		vec	&operator<<=(T const &x);
-		vec	&operator>>=(T const &x);
+	vec	&operator=(T const &x);
+	vec	&operator+=(T const &x);
+	vec	&operator-=(T const &x);
+	vec	&operator*=(T const &x);
+	vec	&operator/=(T const &x);
+	vec	&operator%=(T const &x);
+	vec	&operator|=(T const &x);
+	vec	&operator&=(T const &x);
+	vec	&operator^=(T const &x);
+	vec	&operator<<=(T const &x);
+	vec	&operator>>=(T const &x);
 };
 
 template<class T, unsigned int U> template<class V, unsigned int W>
@@ -772,5 +770,7 @@ inline bool	operator>=(T const &x, vec<T, U> const &y)
 			return (false);
 	return (true);
 }
+
+//#include "vec_sse.hpp"
 
 #endif

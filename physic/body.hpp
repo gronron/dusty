@@ -33,13 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 #include "endian/packet.hpp"
+#include "actor.hpp"
 
 struct	Body
 {
-	enum Type { NONE = 0, ALLOCATED = 1, COLLISIONABLE = 2 };
-	
-	Type	type;
-
 	union
 	{
 		Actor		*actor;

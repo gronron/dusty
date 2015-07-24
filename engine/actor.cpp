@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "endian/packet.hpp"
 #include "actor.hpp"
 
-Actor::Actor(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : _callbackid(0), am(a), rp(r), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), destroyed(false), ping(0.0f)
+Actor::Actor(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : _callbackid(0), am(a), rp(r), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), state(CREATED), ping(0.0f)
 {
 
 }
@@ -45,12 +45,12 @@ Actor::~Actor()
 
 void	Actor::postinstanciation()
 {
-
+	state = OK;
 }
 
 void	Actor::destroy()
 {
-    destroyed = true;
+    state = DESTROYED;
 	if (rp)
 		rp->destroy();
 }

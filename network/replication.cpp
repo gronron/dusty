@@ -78,16 +78,14 @@ void	Replication::init(float const updttm, float const tmt)
 	dead = false;
 }
 
-Packet		*Replication::get_replication()
+void	Replication::get_replication(Packet &pckt)
 {
-	Packet	*pckt = new Packet();
-
 	lastsendupd = 0.0f;
 	needupdate = false;
-	pckt->write(id);
-	pckt->write(type);
-	pckt->write(++numout);
-	return (pckt);
+	pckt.write(id);
+	pckt.write(type);
+	pckt.write(++numout);
+	actor->get_replication(pckt);
 }
 
 void			Replication::replicate(Packet &pckt, float p)
@@ -107,6 +105,7 @@ void			Replication::replicate(Packet &pckt, float p)
 			numin = n;
 			if (authority >= GLOBAL)
 				needupdate = true;
+			actor->replicate(pckt, p);
 		}
 	}
 }

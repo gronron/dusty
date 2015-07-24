@@ -31,41 +31,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PHYSICENGINE_H_
 #define PHYSICENGINE_H_
 
-#include "boundingbox.hpp"
+#include "body.hpp"
+#include "aabbtree.hpp"
 
 class	Physicengine
 {
 	public:
 
-		unsigned int	_sbbsize;
-		unsigned int	_sbbnbr;
-		Boundingbox		*_staticbb;
-		unsigned int	_dbbsize;
-		unsigned int	_dbbnbr;
-		Boundingbox		*_dynamicbb;
-		Boundingbox		*_bb[2];
+		unsigned int	_bsize;
+		Body			*_bodies;
 
-		unsigned int	_prxsize;
-		unsigned int	_prxnbr;
-		Proxy			*_sortedprx;
-		unsigned int	_faxis;
-		unsigned int	_saxis;
-		unsigned int	_taxis;
+		int				_free;
+	
+		Aabbtree		_dynamictree;
+		Aabbtree		_statictree;
 
 
 		Physicengine();
 		~Physicengine();
 
-		void	add(Boundingbox **, Body *, bool);
-		void	remove(Boundingbox *);
+		Body	*alloc();
+		void	init(Body *);
+		void	free(Body *);
+		
+		int		add(Aabb const &);
+		void	move(int const, Aabb const &);
+		void	remove(int const);
 
 		void	tick(float);
-
-		void	_insertion_sort();
-		void	_check_overlap(float);
-		void	_collide(float, Boundingbox *, Boundingbox *);
-		void	_collide2(float, Boundingbox *, Boundingbox *);
-		bool	_reaction(Boundingbox *, Boundingbox *, float, unsigned int);
 };
 
 #endif

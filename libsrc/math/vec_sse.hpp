@@ -33,72 +33,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "xmmintrin.h"
 
-template>
-class	vec<float, 4>
+template<>
+struct	vec<float, 4>
 {
-	public:
+	template<class T, unsigned int U>
+	static vec	cast(vec<T, U> const &);
 
-		template<class V, unsigned int W>
-		static vec	cast(vec<V, W> const &);
+	union
+	{
+		float	ar[4];
+		__m128	v;
+	};
+	
+	float		&operator[](unsigned int const x);
+	float const	&operator[](unsigned int const x) const;
 
-		union
-		{
-			float	ar[4];
-			__m128	v;
-		};
-
-
-		float		&operator[](unsigned int const x);
-		float const	&operator[](unsigned int const x) const;
-
-		vec	&operator++();
-		vec	operator++(int);
-		vec	&operator--();
-		vec	operator--(int);
-
-		template<unsigned int V>
-		vec	&operator=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator+=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator-=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator*=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator/=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator%=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator|=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator&=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator^=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator<<=(vec<float, V> const &x);
-		template<unsigned int V>
-		vec	&operator>>=(vec<float, V> const &x);
-
-		vec	&operator=(float const &x);
-		vec	&operator+=(float const &x);
-		vec	&operator-=(float const &x);
-		vec	&operator*=(float const &x);
-		vec	&operator/=(float const &x);
-		vec	&operator%=(float const &x);
-		vec	&operator|=(float const &x);
-		vec	&operator&=(float const &x);
-		vec	&operator^=(float const &x);
-		vec	&operator<<=(float const &x);
-		vec	&operator>>=(float const &x);
+	vec	&operator=(vec<float, 4> const &x);
+	vec	&operator+=(vec<float, 4> const &x);
+	vec	&operator-=(vec<float, 4> const &x);
+	vec	&operator*=(vec<float, 4> const &x);
+	vec	&operator/=(vec<float, 4> const &x);
+	
+	vec	&operator=(float const &x);
+	vec	&operator+=(float const &x);
+	vec	&operator-=(float const &x);
+	vec	&operator*=(float const &x);
+	vec	&operator/=(float const &x);
 };
 
-template<class V, unsigned int W>
-vec<float, 4>		vec<float, 4>::cast(vec<V, W> const &x)
+template<class T, unsigned int U>
+vec<float, 4>		vec<float, 4>::cast(vec<T, U> const &x)
 {
 	vec<float, 4>	a;
 
 	for (unsigned int i = 0; i < 4; ++i)
-		a.ar[i] = i < W ? (float)x.ar[i] : 0;
+		a.ar[i] = i < U ? (float)x.ar[i] : 0.0f;
 	return (a);
 }
 
@@ -114,125 +83,33 @@ inline float const	&vec<float, 4>::operator[](unsigned int const x) const
 
 ///////////////////////////////////////
 
-inline vec<float, 4>	&vec<float, 4>::operator++()
+inline vec<float, 4>	&vec<float, 4>::operator=(vec<float, 4> const &x)
 {
-	for (unsigned int i = 0; i < 4; ++i)
-		++ar[i];
+	v = x.v;
 	return (*this);
 }
 
-inline vec<float, 4>		vec<float, 4>::operator++(int)
+inline vec<float, 4>	&vec<float, 4>::operator+=(vec<float, 4> const &x)
 {
-	vec<float, 4>	x;
-
-	for (unsigned int i = 0; i < 4; ++i)
-		x.ar[i] = ar[i]++;
-	return (x);
-}
-
-inline vec<float, 4>	&vec<float, 4>::operator--()
-{
-	for (unsigned int i = 0; i < 4; ++i)
-		--ar[i];
+	v = _mm_add_ps(v, x.v);
 	return (*this);
 }
 
-inline vec<float, 4>		vec<float, 4>::operator--(int)
+inline vec<float, 4>	&vec<float, 4>::operator-=(vec<float, 4> const &x)
 {
-	vec<float, 4>	x;
-
-	for (unsigned int i = 0; i < 4; ++i)
-		x.ar[i] = ar[i]--;
-	return (x);
-}
-
-///////////////////////////////////////
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] = x.ar[i];
+	v = _mm_sub_ps(v, x.v);
 	return (*this);
 }
 
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator+=(vec<float, V> const &x)
+inline vec<float, 4>	&vec<float, 4>::operator*=(vec<float, 4> const &x)
 {
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] += x.ar[i];
+	v = _mm_mul_ps(v, x.v);
 	return (*this);
 }
 
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator-=(vec<float, V> const &x)
+inline vec<float, 4>	&vec<float, 4>::operator/=(vec<float, 4> const &x)
 {
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] -= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator*=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] *= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator/=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] /= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator%=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] %= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator|=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] |= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator&=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] &= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator^=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] ^= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator<<=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] <<= x.ar[i];
-	return (*this);
-}
-
-template<unsigned int V>
-inline vec<float, 4>	&vec<float, 4>::operator>>=(vec<float, V> const &x)
-{
-	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
-		ar[i] >>= x.ar[i];
+	v = _mm_div_ps(v, x.v);
 	return (*this);
 }
 
@@ -240,522 +117,160 @@ inline vec<float, 4>	&vec<float, 4>::operator>>=(vec<float, V> const &x)
 
 inline vec<float, 4>	&vec<float, 4>::operator=(float const &x)
 {
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] = x;
+	v = _mm_set1_ps(x);
 	return (*this);
 }
 
 inline vec<float, 4>	&vec<float, 4>::operator+=(float const &x)
 {
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] += x;
+	v = _mm_add_ps(v, _mm_set1_ps(x));
 	return (*this);
 }
 
 inline vec<float, 4>	&vec<float, 4>::operator-=(float const &x)
 {
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] -= x;
+	v = _mm_sub_ps(v, _mm_set1_ps(x));
 	return (*this);
 }
 
 inline vec<float, 4>	&vec<float, 4>::operator*=(float const &x)
 {
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] *= x;
+	v = _mm_mul_ps(v, _mm_set1_ps(x));
 	return (*this);
 }
 
 inline vec<float, 4>	&vec<float, 4>::operator/=(float const &x)
 {
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] /= x;
-	return (*this);
-}
-
-inline vec<float, 4>	&vec<float, 4>::operator%=(float const &x)
-{
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] %= x;
-	return (*this);
-}
-
-inline vec<float, 4>	&vec<float, 4>::operator|=(float const &x)
-{
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] |= x;
-	return (*this);
-}
-
-inline vec<float, 4>	&vec<float, 4>::operator&=(float const &x)
-{
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] &= x;
-	return (*this);
-}
-
-inline vec<float, 4>	&vec<float, 4>::operator^=(float const &x)
-{
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] ^= x;
-	return (*this);
-}
-
-inline vec<float, 4>	&vec<float, 4>::operator<<=(float const &x)
-{
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] <<= x;
-	return (*this);
-}
-
-inline vec<float, 4>	&vec<float, 4>::operator>>=(float const &x)
-{
-	for (unsigned int i = 0; i < 4; ++i)
-		ar[i] >>= x;
+	v = _mm_div_ps(v, _mm_set1_ps(x));
 	return (*this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline vec<float, 4>	operator+(vec<float, 4> const &x)
+inline vec<float, 4>	operator+(vec<float, 4> const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < 4; ++i)
-		a.ar[i] = +x.ar[i];
+	a.v = _mm_add_ps(x.v, y.v);
 	return (a);
 }
 
-inline vec<float, 4>	operator-(vec<float, 4> const &x)
+inline vec<float, 4>	operator-(vec<float, 4> const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < 4; ++i)
-		a.ar[i] = -x.ar[i];
+	a.v = _mm_sub_ps(x.v, y.v);
 	return (a);
 }
 
-inline vec<float, 4>	operator~(vec<float, 4> const &x)
+inline vec<float, 4>	operator*(vec<float, 4> const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < 4; ++i)
-		a.ar[i] = ~x.ar[i];
+	a.v = _mm_mul_ps(x.v, y.v);
+	return (a);
+}
+
+inline vec<float, 4>	operator/(vec<float, 4> const &x, vec<float, 4> const &y)
+{
+	vec<float, 4>		a;
+
+	a.v = _mm_div_ps(x.v, y.v);
 	return (a);
 }
 
 ///////////////////////////////////////
 
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator+(vec<float, 4> const &x, vec<T, V> const &y)
+inline vec<float, 4>	operator+(vec<float, 4> const &x, float const &y)
 {
-	vec<T, (U > V ? V : U)>		a;
+	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] + y.ar[i];
+	a.v = _mm_add_ps(x.v, _mm_set1_ps(y));
 	return (a);
 }
 
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator-(vec<float, 4> const &x, vec<T, V> const &y)
+inline vec<float, 4>	operator-(vec<float, 4> const &x, float const &y)
 {
-	vec<T, (U > V ? V : U)>		a;
+	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] - y.ar[i];
+	a.v = _mm_sub_ps(x.v, _mm_set1_ps(y));
 	return (a);
 }
 
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator*(vec<float, 4> const &x, vec<T, V> const &y)
+inline vec<float, 4>	operator*(vec<float, 4> const &x, float const &y)
 {
-	vec<T, (U > V ? V : U)>		a;
+	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] * y.ar[i];
+	a.v = _mm_mul_ps(x.v, _mm_set1_ps(y));
 	return (a);
 }
 
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator/(vec<float, 4> const &x, vec<T, V> const &y)
+inline vec<float, 4>	operator/(vec<float, 4> const &x, float const &y)
 {
-	vec<T, (U > V ? V : U)>		a;
+	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] / y.ar[i];
+	a.v = _mm_div_ps(x.v, _mm_set1_ps(y));
 	return (a);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator%(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	vec<T, (U > V ? V : U)>		a;
-
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] % y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator|(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	vec<T, (U > V ? V : U)>		a;
-
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] | y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator&(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	vec<T, (U > V ? V : U)>		a;
-
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] & y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator^(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	vec<T, (U > V ? V : U)>		a;
-
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] ^ y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator<<(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	vec<T, (U > V ? V : U)>		a;
-
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] << y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	operator>>(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	vec<T, (U > V ? V : U)>		a;
-
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		a.ar[i] = x.ar[i] >> y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline bool	operator<(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		if (x.ar[i] >= y.ar[i])
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline bool	operator>(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		if (x.ar[i] <= y.ar[i])
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline bool	operator<=(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		if (x.ar[i] > y.ar[i])
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U, unsigned int V>
-inline bool	operator>=(vec<float, 4> const &x, vec<T, V> const &y)
-{
-	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
-		if (x.ar[i] < y.ar[i])
-			return (false);
-	return (true);
 }
 
 ///////////////////////////////////////
 
-template<class T, unsigned int U>
-inline vec<float, 4>	operator+(vec<float, 4> const &x, T const &y)
+inline vec<float, 4>	operator+(float const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] + y;
+	a.v = _mm_add_ps(_mm_set1_ps(x), y.v);
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<float, 4>	operator-(vec<float, 4> const &x, T const &y)
+inline vec<float, 4>	operator-(float const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] - y;
+	a.v = _mm_sub_ps(_mm_set1_ps(x), y.v);
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<float, 4>	operator*(vec<float, 4> const &x, T const &y)
+inline vec<float, 4>	operator*(float const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] * y;
+	a.v = _mm_mul_ps(_mm_set1_ps(x), y.v);
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<float, 4>	operator/(vec<float, 4> const &x, T const &y)
+inline vec<float, 4>	operator/(float const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>		a;
 
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] / y;
+	a.v = _mm_div_ps(_mm_set1_ps(x), y.v);
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<float, 4>	operator%(vec<float, 4> const &x, T const &y)
+///////////////////////////////////////////////////////////////////////////////
+/*
+inline vec<float, 4>	min(vec<float, 4> const &x, vec<float, 4> const &y)
 {
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] % y;
+	vec<float, 4>	a;
+	
+	a.v = _mm_min_ps(x.v, y.v);
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<float, 4>	operator|(vec<float, 4> const &x, T const &y)
+inline vec<float, 4>	max(vec<float, 4> const &x, vec<float, 4> const &y)
 {
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] | y;
+	vec<float, 4>	a;
+	
+	a.v = _mm_max_ps(x.v, y.v);
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline vec<float, 4>	operator&(vec<float, 4> const &x, T const &y)
+inline vec<float, 4>	sqrt(vec<float, 4> const &x)
 {
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] & y;
+	vec<float, 4>	a;
+	
+	a.v = _mm_sqrt_ps(x.v);
 	return (a);
 }
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator^(vec<float, 4> const &x, T const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] ^ y;
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator<<(vec<float, 4> const &x, T const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] << y;
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator>>(vec<float, 4> const &x, T const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x.ar[i] >> y;
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline bool	operator<(vec<float, 4> const &x, T const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar >= y)
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U>
-inline bool	operator>(vec<float, 4> const &x, T const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar <= y)
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U>
-inline bool	operator<=(vec<float, 4> const &x, T const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar > y)
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U>
-inline bool	operator>=(vec<float, 4> const &x, T const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x.ar < y)
-			return (false);
-	return (true);
-}
-
-///////////////////////////////////////
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator+(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x + y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator-(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x - y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator*(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x * y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator/(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x / y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator%(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x % y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator|(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x | y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator&(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x & y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator^(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x ^ y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator<<(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x << y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline vec<float, 4>	operator>>(T const &x, vec<float, 4> const &y)
-{
-	vec<float, 4>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = x >> y.ar[i];
-	return (a);
-}
-
-template<class T, unsigned int U>
-inline bool	operator<(T const &x, vec<float, 4> const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x >= y.ar[i])
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U>
-inline bool	operator>(T const &x, vec<float, 4> const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x <= y.ar[i])
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U>
-inline bool	operator<=(T const &x, vec<float, 4> const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x > y.ar[i])
-			return (false);
-	return (true);
-}
-
-template<class T, unsigned int U>
-inline bool	operator>=(T const &x, vec<float, 4> const &y)
-{
-	for (unsigned int i = 0; i < U; ++i)
-		if (x < y.ar[i])
-			return (false);
-	return (true);
-}
-
+*/
 #endif

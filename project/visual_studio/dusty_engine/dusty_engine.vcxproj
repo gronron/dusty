@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,13 +18,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -112,7 +112,8 @@
     <ClCompile Include="..\..\..\network\networkproto.cpp" />
     <ClCompile Include="..\..\..\network\replication.cpp" />
     <ClCompile Include="..\..\..\network\server.cpp" />
-    <ClCompile Include="..\..\..\physic\boundingbox.cpp" />
+    <ClCompile Include="..\..\..\physic\aabbtree.cpp" />
+    <ClCompile Include="..\..\..\physic\body.cpp" />
     <ClCompile Include="..\..\..\physic\physicengine.cpp" />
     <ClCompile Include="..\..\..\ui\console.cpp" />
     <ClCompile Include="..\..\..\ui\controller.cpp" />
@@ -158,7 +159,8 @@
     <ClInclude Include="..\..\..\network\networkproto.hpp" />
     <ClInclude Include="..\..\..\network\replication.hpp" />
     <ClInclude Include="..\..\..\network\server.hpp" />
-    <ClInclude Include="..\..\..\physic\boundingbox.hpp" />
+    <ClInclude Include="..\..\..\physic\aabbtree.hpp" />
+    <ClInclude Include="..\..\..\physic\body.hpp" />
     <ClInclude Include="..\..\..\physic\physicengine.hpp" />
     <ClInclude Include="..\..\..\ui\console.hpp" />
     <ClInclude Include="..\..\..\ui\controller.hpp" />

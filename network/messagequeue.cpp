@@ -38,16 +38,6 @@ Messagequeue::Messagequeue() : _size(4096), _frontin(0), _frontout(0), _backin(0
 
 Messagequeue::~Messagequeue()
 {
-	while (_frontin != _backin)
-	{
-		delete _msgin[_backin].pckt;
-		_backin = (_backin + 1) % _size;
-	}
-	while (_frontout != _backout)
-	{
-		delete _msgout[_backout].pckt;
-		_backout = (_backout + 1) % _size;
-	}
 	delete [] _msgin;
 	delete [] _msgout;
 }
@@ -62,7 +52,7 @@ void	Messagequeue::push_in_pckt(int cltid, float ping, int size, char *data)
 		_msgin[_frontin].cltid = cltid;
 		_msgin[_frontin].actid = 0;
 		_msgin[_frontin].ping = ping;
-		_msgin[_frontin].pckt = new Packet(size, data);
+		_msgin[_frontin].pckt(size, data);
 		_frontin = (_frontin + 1) % _size;
 	}
 }
@@ -75,7 +65,7 @@ void	Messagequeue::push_in_cnt(int cltid)
 		_msgin[_frontin].cltid = cltid;
 		_msgin[_frontin].actid = 0;
 		_msgin[_frontin].ping = 0.0f;
-		_msgin[_frontin].pckt = 0;
+		_msgin[_frontin].pckt();
 		_frontin = (_frontin + 1) % _size;
 	}
 }
@@ -88,7 +78,7 @@ void	Messagequeue::push_in_discnt(int cltid)
 		_msgin[_frontin].cltid = cltid;
 		_msgin[_frontin].actid = 0;
 		_msgin[_frontin].ping = 0.0f;
-		_msgin[_frontin].pckt = 0;
+		_msgin[_frontin].pckt();
 		_frontin = (_frontin + 1) % _size;
 	}
 }
@@ -101,7 +91,7 @@ void	Messagequeue::push_in_cntrl(int actid)
 		_msgin[_frontin].cltid = 0;
 		_msgin[_frontin].actid = actid;
 		_msgin[_frontin].ping = 0.0f;
-		_msgin[_frontin].pckt = 0;
+		_msgin[_frontin].pckt();
 		_frontin = (_frontin + 1) % _size;
 	}
 }
@@ -114,7 +104,7 @@ void	Messagequeue::push_in_textmsg(int size, char *data)
 		_msgin[_frontin].cltid = 0;
 		_msgin[_frontin].actid = 0;
 		_msgin[_frontin].ping = 0.0f;
-		_msgin[_frontin].pckt = new Packet(size, data);
+		_msgin[_frontin].pckt(size, data);
 		_frontin = (_frontin + 1) % _size;
 	}
 }
@@ -127,14 +117,14 @@ void	Messagequeue::push_in_textmsg(int cltid, int size, char *data)
 		_msgin[_frontin].cltid = cltid;
 		_msgin[_frontin].actid = 0;
 		_msgin[_frontin].ping = 0.0f;
-		_msgin[_frontin].pckt = new Packet(size, data);
+		_msgin[_frontin].pckt(size, data);
 		_frontin = (_frontin + 1) % _size;
 	}
 }
 
 ///////////////////////////////////////
 
-void		Messagequeue::push_out_pckt(Packet *pckt)
+void	Messagequeue::push_out_pckt(Packet const &pckt)
 {
 	if ((_frontout + 1) % _size != _backout)
 	{
@@ -142,12 +132,12 @@ void		Messagequeue::push_out_pckt(Packet *pckt)
 		_msgout[_frontout].cltid = 0;
 		_msgout[_frontout].actid = 0;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt = pckt;
+		_msgout[_frontout].pckt(pckt);
 		_frontout = (_frontout + 1) % _size;
 	}
 }
 
-void		Messagequeue::push_out_pckt(int actorid)
+void	Messagequeue::push_out_pckt(int actorid)
 {
 	if ((_frontout + 1) % _size != _backout)
 	{
@@ -155,8 +145,7 @@ void		Messagequeue::push_out_pckt(int actorid)
 		_msgout[_frontout].cltid = 0;
 		_msgout[_frontout].actid = 0;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt = new Packet;
-		_msgout[_frontout].pckt->write(actorid);
+		_msgout[_frontout].pckt(actorid);
 		_frontout = (_frontout + 1) % _size;
 	}
 }
@@ -169,7 +158,7 @@ void	Messagequeue::push_out_cnt(int cltid, int actid)
 		_msgout[_frontout].cltid = cltid;
 		_msgout[_frontout].actid = actid;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt = 0;
+		_msgout[_frontout].pckt();
 		_frontout = (_frontout + 1) % _size;
 	}
 }
@@ -182,7 +171,7 @@ void	Messagequeue::push_out_discnt(int cltid)
 		_msgout[_frontout].cltid = cltid;
 		_msgout[_frontout].actid = 0;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt = 0;
+		_msgout[_frontout].pckt();
 		_frontout = (_frontout + 1) % _size;
 	}
 }
@@ -195,7 +184,7 @@ void	Messagequeue::push_out_textmsg(std::string const &str)
 		_msgout[_frontout].cltid = 0;
 		_msgout[_frontout].actid = 0;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt = new Packet(str.length() + 1, str.c_str());
+		_msgout[_frontout].pckt(str.length() + 1, str.c_str());
 		_frontout = (_frontout + 1) % _size;
 	}
 }
@@ -208,7 +197,7 @@ void	Messagequeue::push_out_textmsg(int cltid, std::string const &str)
 		_msgout[_frontout].cltid = cltid;
 		_msgout[_frontout].actid = 0;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt = new Packet(str.length() + 1, str.c_str());
+		_msgout[_frontout].pckt(str.length() + 1, str.c_str());
 		_frontout = (_frontout + 1) % _size;
 	}
 }

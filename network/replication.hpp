@@ -64,7 +64,7 @@ class	Replication
 		void	init(Packet &pckt, float ping);
 		void	init(float const, float const);
 
-		Packet	*get_replication();
+		void	get_replication(Packet &pckt);
         void	replicate(Packet &pckt, float ping);
 
         bool	tick(float delta);

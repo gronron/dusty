@@ -35,147 +35,102 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <cstdlib>
 
-Physicengine::Physicengine() : _sbbsize(1024), _sbbnbr(0), _staticbb(0), _dbbsize(1024), _dbbnbr(0), _dynamicbb(0), _prxsize(_sbbsize + _dbbsize), _prxnbr(0), _sortedprx(0), _faxis(0), _saxis(1), _taxis(2)
+Physicengine::Physicengine() : _bsize(64), _bodies(0), _free(0);
 {
-	_staticbb = new Boundingbox[_sbbsize];
-	_dynamicbb = new Boundingbox[_dbbsize];
-	_sortedprx = new Proxy[_prxsize];
+	_bodies = new Body[_bsize];
+
+	for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
+			_bodies[i].next = i + 1;
+	_bodies[_bsize - 1].next = -1;
 }
 
 Physicengine::~Physicengine()
 {
-
+	delete [] _bodies;
 }
 
-void		Physicengine::add(Boundingbox **bdb, Body *bd, bool dynamic)
+Body	*Physicengine::alloc()
 {
-	if (dynamic)
+	Body	*body;
+
+	if (_free == -1)
 	{
-		if (_dbbnbr >= _dbbsize)
-		{
-			_dynamicbb = resize(_dynamicbb, _dbbsize, _dbbsize << 1);
-			if (_dynamicbb != _bb[1])
-			{
-				_bb[1] = _dynamicbb;
-				for (unsigned int i = 0; i < _dbbsize; ++i)
-					*_dynamicbb[i].link = _dynamicbb + i;
-			}
-			_dbbsize <<= 1;
-		}
-		if (_prxnbr >= _prxsize)
-		{
-			_sortedprx = resize(_sortedprx, _prxsize, _prxsize << 1);
-			_prxsize <<= 1;
-		}
-		_sortedprx[_prxnbr].bbidx = _dbbnbr;
-		_sortedprx[_prxnbr].dynamic = true;
-		memset(_dynamicbb + _dbbnbr, 0, sizeof(Boundingbox));
-		_dynamicbb[_dbbnbr].bd = bd;
-		_dynamicbb[_dbbnbr].link = bdb;
-		*bdb = _dynamicbb + _dbbnbr;
-		++_dbbnbr;
-		if (bd)
-			;//compute boundinxbox
+		_free = _bsize;
+		_bodies = resize(_bodies, _bsize,_bsize << 1);
+		_bsize <<= 1;
+		for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
+			_bodies[i].next = i + 1;
+		_bodies[_bsize - 1].next = -1;
+		/*for (unsigned int i = 0; i < _dbbsize; ++i)
+					*_dynamicbb[i]*/		
 	}
-	else
-	{
+
+	body = _bodies + _free;
+	_free = _bodies[_free].next;
 	
-	}
+	body->index = -1;
 	
-	//new BB and insert
+	return (body);
 }
 
-void		Physicengine::remove(Boundingbox *bdb)
+void		Physicengine::init(Body *body)
 {
-	int		idx;
+	body->index = _dynamictree.add_aabb(aabb);
+}
 
-	if (bdb >= _dynamicbb && bdb < _dynamicbb + _dbbnbr)
-	{
-		*bdb = _dynamicbb[--_dbbnbr];
-		idx = bdb - _dynamicbb;
-	}
-	else
-	{
-		*bdb = _staticbb[--_sbbnbr];
-		idx = bdb -_staticbb;
-	}
-	*(bdb->link) = bdb;
-	for (unsigned int i = 0; i < _prxnbr; ++i)
-	{
-		if (_sortedprx[i].bbidx == idx)
-		{
-			_sortedprx[i].bbidx = -1;
-			break;
-		}
-	}
+void		Physicengine::remove(Body *body)
+{
+	int		index;
+	
+	_dynamictree.remove_aabb(body->index);
+	body->index = -1;
+	body->next = _free;
+	_free = body - _bodies;
+}
+
+int	Physicengine::add(Aabb const &aabb)
+{
+	return (_statictree.add_aabb(aabb));
+}
+
+void	Physicengine::move(int const index, Aabb const &aabb)
+{
+	_statictree.move(index, aabb);
+}
+
+void	Physicengine::remove(int const index)
+{
+	_statictree.remove_aabb(index);
 }
 
 void		Physicengine::tick(float delta)
 {
-	for (unsigned int i = 0; i < _dbbnbr; ++i)
+	for (unsigned int i = 0; i < _bsize; ++i)
 	{
-		_dynamicbb[i].loc = _dynamicbb[i].nextloc;
-		_dynamicbb[i].spd = _dynamicbb[i].nextspd;
-		_dynamicbb[i].nextloc = _dynamicbb[i].loc + _dynamicbb[i].spd * delta + _dynamicbb[i].acc * delta * delta * 0.5f; // + bd->ping
-		_dynamicbb[i].nextspd = _dynamicbb[i].spd + _dynamicbb[i].acc * delta;
-	}
-	for (unsigned int i = 0; i < _prxnbr; ++i)
-	{
-		if (_sortedprx[i].bbidx < 0)
+		if (_bodies[i].index != -1)
 		{
-			--_prxnbr;
-			for (unsigned int j = i; j < _prxnbr; ++j)
-				_sortedprx[j] = _sortedprx[j + 1];
-		}
-		else if (_sortedprx[i].dynamic)
-		{
-			_sortedprx[i].bot = min(_dynamicbb[i].loc, _dynamicbb[i].nextloc);
-			_sortedprx[i].top = max(_dynamicbb[i].loc, _dynamicbb[i].nextloc + _dynamicbb[i].size);
+			_bodies[i].position = _bodies[i].nextposition;
+			_bodies[i].velocity = _bodies[i].nextvelocity;
+			_bodies[i].nextposition = _bodies[i].loc + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
+			_bodies[i].nextvelocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
+			
+			
+			/*move aabb
+			_dynamictree.move_aabb(_bodies[i].index, aabb);
+			*/
 		}
 	}
-
-	_insertion_sort();
-	_check_overlap(delta);
-}
-
-void				Physicengine::_insertion_sort()
-{
-	unsigned int	i;
-	unsigned int	j;
-	Proxy			a;
-
-	for (j = 1; j < _prxnbr; ++j)
+	/*
+	for (unsigned int i = 0; i < _bsize; ++i)
 	{
-		a = _sortedprx[j];
-		for (i = j; i && _sortedprx[i - 1].bot[_faxis] > a.bot[_faxis]; --i)
-			_sortedprx[i] = _sortedprx[i + 1];
-		_sortedprx[i] = a;
-	}
-}
-
-void		Physicengine::_check_overlap(float delta)
-{
-	unsigned int	prxnbr = _prxnbr; // because proxy can be added while iterrating
-
-	for (unsigned int j = 0; j < prxnbr; ++j)
-	{
-		for (unsigned int i = j + 1; i < prxnbr; ++i)
+		if (_bodies[i].index != -1)
 		{
-			if (_sortedprx[i].bot[_faxis] < _sortedprx[j].top[_faxis])
-			{
-				if (_sortedprx[i].dynamic || _sortedprx[j].dynamic)
-				{
-					if (_sortedprx[i].top[_saxis] > _sortedprx[j].bot[_saxis] && _sortedprx[j].top[_saxis] > _sortedprx[i].bot[_saxis]
-						&& _sortedprx[i].top[_taxis] > _sortedprx[j].bot[_taxis] && _sortedprx[j].top[_taxis] > _sortedprx[i].bot[_taxis])
-						_collide(delta, _bb[_sortedprx[j].dynamic] + _sortedprx[j].bbidx , _bb[_sortedprx[i].dynamic] + _sortedprx[i].bbidx);
-				}
-			}
-			else
-				break;
+			_dynamictree.query(aabb);
+			_statictree.query(aabb);
 		}
-	}
+	}*/
 }
-
+/*
 void				Physicengine::_collide2(float delta, Boundingbox *x, Boundingbox *y)
 {
 	vec<float, 3>	u;
@@ -219,20 +174,18 @@ void				Physicengine::_collide(float delta, Boundingbox *x, Boundingbox *y)
 	vec<float, 2>	u;
 	vec<float, 2>	v;
 
-	if (x->actor && y->actor)
+	//std::cout << "collide begin" << std::endl;
+	u = (y->loc - (x->loc + x->size)) / (x->spd - y->spd);
+	v = (x->loc - (y->loc + y->size)) / (y->spd - x->spd);
+	for (unsigned int i = 0; i < 2; ++i)
 	{
-		u = (y->loc - (x->loc + x->size)) / (x->spd - y->spd);
-		v = (x->loc - (y->loc + y->size)) / (y->spd - x->spd);
-		for (unsigned int i = 0; i < 2; ++i)
-		{
-			float t = -1.0f;
-			if (u[i] >= 0.0f && u[i] <= delta)
-				t = v[i] >= 0.0f && v[i] < u[i] ? v[i] : u[i];
-			else if (v[i] >= 0.0f && v[i] <= delta)
-				t = v[i];
-			if (t >= 0.0f && _reaction(x, y, t, i))
-				break;
-		}
+		float t = -1.0f;
+		if (u[i] >= 0.0f && u[i] <= delta)
+			t = v[i] >= 0.0f && v[i] < u[i] ? v[i] : u[i];
+		else if (v[i] >= 0.0f && v[i] <= delta)
+			t = v[i];
+		if (t >= 0.0f && _reaction(x, y, t, i))
+			break;
 	}
 }
 
@@ -241,6 +194,7 @@ bool				Physicengine::_reaction(Boundingbox *x, Boundingbox *y, float t, unsigne
 	vec<float, 2>	xloc;
 	vec<float, 2>	yloc;
 
+	//std::cout << "reaction begin" << std::endl;
 	xloc = x->loc + x->spd * t;
 	yloc = y->loc + y->spd * t;
 	for (unsigned int i = 0; i < 2; ++i)
@@ -248,9 +202,11 @@ bool				Physicengine::_reaction(Boundingbox *x, Boundingbox *y, float t, unsigne
 		if (i != axis && (xloc[i] > yloc[i] + y->size[i] || yloc[i] > xloc[i] + x->size[i]))
 			return (false);
 	}
-	if (x->actor->collide(*y->actor))
+	//std::cout << "reaction" << std::endl;
+	if (x->actor && x->actor->collide(*y->actor))
 		x->nextloc[axis] = xloc[axis];
-	if (y->actor->collide(*x->actor))
+	if (y->actor && y->actor->collide(*x->actor))
 		y->nextloc[axis] = yloc[axis];
+	//std::cout << "reaction ended" << std::endl;
 	return (true);
-}
+}*/

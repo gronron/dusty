@@ -41,6 +41,8 @@ class	Packet;
 class	Actor
 {
 	public:
+	
+		enum	State { CREATED, OK, DESTROYED };
 
 		struct	Callback
 		{
@@ -60,7 +62,7 @@ class	Actor
 		short int	type;
 		int			id;
 		int			ownerid;
-		bool		destroyed;
+		char		state;
 		float		ping;
 
 

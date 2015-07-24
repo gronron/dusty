@@ -28,47 +28,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef BOUNDINGBOX_H_
-#define BOUNDINGBOX_H_
+#ifndef CHUNK_H_
+#define CHUNK_H_
 
-#include "math/vec.hpp"
-#include "endian/packet.hpp"
+#include "actor.hpp"
 
-class	Actor;
+#define CHUNK_SIZE 32
 
-struct						Body
+class	Chunk : public Actor
 {
-	unsigned int			vtcnbr;
-	vec<float, 3>			*vertices;
-	unsigned int			trinbr;
-	vec<unsigned int, 3>	*triangles;
-};
-
-struct				Boundingbox
-{
-	Actor			*actor;
-	Body			*bd;
-	Boundingbox		**link;
-	vec<float, 3>	loc;
-	vec<float, 3>	spd;
-	vec<float, 3>	acc;
-	float			mass;
-
-	vec<float, 3>	size;
-	vec<float, 3>	nextloc;
-	vec<float, 3>	nextspd;
+	public:
+	
+		vec<unsigned int, 3>	location;
+		char					block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 
 
-	void	get_replication(Packet &) const;
-	void	replicate(Packet &, float);
-};
+		Chunk(Actormanager *, Replication *, int, short int, Actor const *);
+		virtual ~Chunk();
 
-struct				Proxy
-{
-	int				bbidx;
-	vec<float, 3>	bot;
-	vec<float, 3>	top;
-	bool			dynamic;
+		virtual void	postinstanciation();
+		virtual void	destroy();
+
+		virtual void	get_replication(Packet &) const;
+        virtual void	replicate(Packet &, float);
 };
 
 #endif

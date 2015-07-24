@@ -108,23 +108,22 @@ void								Networkengine::tick(float delta)
 	{
 		if (msg->type == Messagequeue::UPDATE)
 		{
-			id = Replication::get_id(*msg->pckt);
+			id = Replication::get_id(msg->pckt);
 			if (id < (int)_rsize && _replications[id].actor) // check type
-				_replications[id].replicate(*msg->pckt, msg->ping);
+				_replications[id].replicate(msg->pckt, msg->ping);
 			else if (!master)
 			{
 				Replication	*r = new_replication(id);
-				r->init(*msg->pckt, msg->ping);
-				am->create(r);
+				r->init(msg->pckt, msg->ping);
+				r->actor = am->create(r);
+				r->actor->replicate(msg->pckt, msg->ping);
 			}
-			delete msg->pckt;
 		}
 		else if (msg->type == Messagequeue::DESTROY)
 		{
-			id = Replication::get_id(*msg->pckt);
+			id = Replication::get_id(msg->pckt);
 			if (!master && id < (int)_rsize && _replications[id].actor)
 				_replications[id].destroy();
-			delete msg->pckt;
 		}
 		else if (msg->type == Messagequeue::CONNECTION)
 		{
@@ -141,7 +140,7 @@ void								Networkengine::tick(float delta)
 		else if (msg->type == Messagequeue::CONTROL)
 			am->control(msg->actid);
 		else if (msg->type == Messagequeue::TEXTMSG)
-			am->cl->puttext(std::string(msg->pckt->get_data(), msg->pckt->get_size()));
+			am->cl->puttext(std::string(msg->pckt.get_data(), msg->pckt.get_size()));
 		mq.pop_in();
 	}
 
@@ -160,7 +159,11 @@ void								Networkengine::tick(float delta)
 						_replications[i].needupdate = false;
 					}
 					else
-						mq.push_out_pckt(_replications[i].get_replication());
+					{
+						Packet	pckt;
+						_replications[i].get_replication(pckt);
+						mq.push_out_pckt(pckt);
+					}
 				}
 			}
 		}

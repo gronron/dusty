@@ -1,0 +1,21 @@
+Dusty API
+
+Everything works around the class Actor.
+It's an entity that have a game logic role, like a player, a projectile, a level...
+The creation of this object is done by the Actormanager via a methode.
+The creation works in 3 steps, the constructor is called, data are filled manually by another actor or by the network, then the postinstanciation methode of the actor is called.
+The constructor must not do anything with other actors, his ID is not registered yet so it can't interract others entities.
+You can only create actors when the actormanager::master is true.
+
+offline client, online client, server, dedicated server share the same code.
+The network engine is not instanciated on the offline client and the bool local in actormanager is true.
+The graphic engine is not instanciated on the dedicated server and the bool graphic in actormanager is false.
+On the online client the bool master in actormanger is false.
+
+The nertcode works with replication. Each Actors have his own replication that is reponsible for sending and receiving data for the actor.
+Replications work with UDP, they usually send all the needed data about the actor in each packet.
+Actors can configure their replication by changing the frequency of the update, they can also ask to the replication for a forced update.
+
+The get_replication methode of the actor is called by the replication, the actor must write his own needed data in a packet.
+The replicate methode of the actor is called by the replication, the actor must read the data from the packet and fills his own data with it.
+

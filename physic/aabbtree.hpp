@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AABBTREE_H_
 #define AABBTREE_H_
 
-#include "vec.hpp"
+#include "math/vec.hpp"
 
 struct				Aabb
 {
@@ -54,7 +54,7 @@ struct		Node
 			int	left;
 			int	right;
 		};
-		int	children[2];
+		int				children[2];
 		unsigned int	data;	// id of the data
 	};
 
@@ -65,9 +65,10 @@ struct		Node
 class	Aabbtree
 {
 	public:
-	
+
 		unsigned int	_nsize;
 		Node			*_nodes;
+		int				*_nstack;
 
 		int				_root;
 		int				_free;
@@ -76,7 +77,7 @@ class	Aabbtree
 		Aabbtree();
 		~Aabbtree();
 
-		int		add_aabb(Aabb const &, int const data));
+		int		add_aabb(Aabb const &, int const data);
 		void	remove_aabb(int const);
 		bool	move_aabb(int const, Aabb const &);
 

@@ -117,14 +117,12 @@ Actor		*Actormanager::create(std::string const &name, Actor const *owner, bool n
 			_actors[i] = 0;
 	}
 	_actors[id] = Factory::get_instance().create(this, (need_replication && !local ? ne->new_replication(id) : 0), id, name, owner);
-	_actors[id]->postinstanciation();
 	return (_actors[id]);
 }
 
 Actor		*Actormanager::create(Replication *r)
 {
 	_actors[r->id] = Factory::get_instance().create(this, r);
-	_actors[r->id]->postinstanciation();
 	return (_actors[r->id]);
 }
 
@@ -175,13 +173,18 @@ void				Actormanager::tick(float delta)
 	{
 		if (_actors[i])
 		{
-			if (_actors[i]->destroyed)
+			switch (_actors[i]->state)
 			{
-				delete _actors[i];
-				_actors[i] = 0;
-			}
-			else
-				_actors[i]->tick(delta);
+				case Actor::CREATED:
+					_actors[i]->postinstanciation();
+				case Actor::OK:
+					_actors[i]->tick(delta);
+					break;
+				case Actor::DESTROYED:
+					delete _actors[i];
+					_actors[i] = 0;
+					break;
+			};
 		}
 	}
 	if (ge)

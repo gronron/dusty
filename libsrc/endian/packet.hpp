@@ -42,22 +42,41 @@ class	Packet
 
 
 		Packet();
+		Packet(Packet const &);
+		template<class T>
+		Packet(T const &);
 		Packet(unsigned int, char const *);
 		~Packet();
+		
+		void	operator()();
+		void	operator()(Packet const &);
+		template<class T>
+		void	operator()(T const &);
+		void	operator()(unsigned int const, char const *);
 
 		unsigned int	get_size() const;
 		char const		*get_data() const;
 
-		void	clear();
-
-		bool	read(unsigned int, char *);
-		bool	write(unsigned int, char const *);
+		bool	read(unsigned int const, char *);
+		bool	write(unsigned int const, char const *);
 
 		template<class T>
 		bool	read(T &);
 		template<class T>
 		bool	write(T const &);
 };
+
+template<class T>
+Packet::Packet(T const &d) : _getit(0), _data(sizeof(d), (char *)&d)
+{
+
+}
+
+template<class T>
+void	Packet::operator()(T const &d)
+{
+	this->(sizeof(d), (char *)&d);
+}
 
 template<class T>
 bool	Packet::read(T &d)
