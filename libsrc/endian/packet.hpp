@@ -45,7 +45,7 @@ class	Packet
 		Packet(Packet const &);
 		template<class T>
 		Packet(T const &);
-		Packet(unsigned int, char const *);
+		Packet(unsigned int const, char const *);
 		~Packet();
 		
 		void	operator()();
@@ -75,7 +75,7 @@ Packet::Packet(T const &d) : _getit(0), _data(sizeof(d), (char *)&d)
 template<class T>
 void	Packet::operator()(T const &d)
 {
-	this->(sizeof(d), (char *)&d);
+	(*this)(sizeof(d), (char *)&d);
 }
 
 template<class T>
