@@ -42,7 +42,7 @@ Packet::Packet(Packet const &pckt) : _getit(pckt._getit), _data(pckt._data)
 }
 
 
-Packet::Packet(unsigned int size, char const *d) : _getit(0), _data(d, d + size)
+Packet::Packet(unsigned int const size, char const *d) : _getit(0), _data(d, d + size)
 {
 
 }
