@@ -29,10 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 // this code is greatly inspired by Erin Catto's b2DynamicTree form Box2d
 
+#include "new.hpp"
 #include "math/vec_util.hpp"
 #include "aabbtree.hpp"
 
 #define GAP 0.5f
+#define	MUL 2.0f
 
 static void		merge_aabb(Aabb &x, Aabb const &y, Aabb const &z)
 {
@@ -88,37 +90,33 @@ void			Aabbtree::remove_aabb(int const index)
 	_free_node(index);
 }
 
-bool	Aabbtree::move_aabb(int const index, Aabb const &aabb) // need to correct
+bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 3> const &velocity) // need to correct
 {
-	if (_nodes[index].aabb.bottom <= aabb.bottom && _nodes[index].aabb.top >= aabb.top)
+	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
 		return false;
 
 	_remove_leaf(index);
 
-	// Extend AABB.
-	Aabb a = aabb;
+	Aabb	a = aabb;
 	a.bottom -= GAP;
 	a.top += GAP;
 
-	// Predict AABB displacement.
-	vec<float, 3>	d = b2_aabbMultiplier * displacement;
+	vec<float, 3>	b = velocity * MUL;
+	
+	for (unsigned int i = 0; i < 3; ++i)
+	{
+		if (b[i] < 0.0f)
+			a.bottom[i] += b[i];
+		else
+			a.top[i] += b[i];
+	}
 
-	if (d.x < 0.0f
-		b.lowerBound.x += d.x;
-	else
-		b.upperBound.x += d.x;
-
-	if (d.y < 0.0f)
-		b.lowerBound.y += d.y;
-	else
-		b.upperBound.y += d.y;
-
-	_nodes[index].aabb = b;
+	_nodes[index].aabb = a;
 	_insert_leaf(index);
 	return (true);
 }	
 
-int		Aabbtree::query(Aabb const &aabb) const
+void	Aabbtree::query(Aabb const &aabb) const
 {
 	int	top = 0;
 	
@@ -129,9 +127,9 @@ int		Aabbtree::query(Aabb const &aabb) const
 		if (index == -1)
 			continue;
 
-		if (b2TestOverlap(_nodes[index].aabb, aabb))
+		if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
 		{
-			if (_nodes[index].IsLeaf())
+			if (_nodes[index].right == -1)
 			{
 				bool proceed = callback->QueryCallback(nodeId);
 				if (proceed == false)
@@ -154,16 +152,16 @@ int		Aabbtree::_allocate_node()
 	{
 		_free = _nsize;
 		_nodes = resize(_nodes, _nsize, _nsize << 1);
-		_nstack = resize(_nstack, _nsize, _nsize << 1)
+		_nstack = resize(_nstack, _nsize, _nsize << 1);
 		_nsize <<= 1;
-		for (int i = _nsize >> 1; i < _nsize - 1; ++i)
+		for (unsigned int i = _nsize >> 1; i < _nsize - 1; ++i)
 			_nodes[i].next = i + 1;
 		_nodes[_nsize - 1].next = -1;
 	}
 	
 	index = _free;
 	_free = _nodes[_free].next;
-	_nodes[indez].children[1] = -1;
+	_nodes[index].right = -1;
 	return (index);
 }
 
@@ -186,7 +184,7 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 	// Find the best sibling for this node
 	Aabb leafaabb = _nodes[index].aabb;
 	int i = _root;
-	while (_nodes[i].rigth != -1)
+	while (_nodes[i].right != -1)
 	{
 		int left = _nodes[i].left;
 		int right = _nodes[i].right;
@@ -196,28 +194,28 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 		// Cost of creating a new parent for this node and the new leaf
 		float cost = 2.0f * combinedArea;
 		// Minimum cost of pushing the leaf further down the tree
-		float inheritanceCost = 2.0f * (combinedArea - _nodes[i].aabb.GetPerimeter());
+		float inheritanceCost = 2.0f * (combinedArea - perimeter(_nodes[i].aabb));
 
 		float left_cost;
 		float right_cost;
 		
-		if (_nodes[child1].IsLeaf())
+		if (_nodes[left].right == -1)
 			left_cost = merged_perimeter(_nodes[left].aabb, leafaabb) + inheritanceCost;
 		else
-			left_cost = (merged_perimeter(_nodes[left].aabb, leafaabb) - perimeter(nodes[left].aabb)) + inheritanceCost;
+			left_cost = (merged_perimeter(_nodes[left].aabb, leafaabb) - perimeter(_nodes[left].aabb)) + inheritanceCost;
 
-		if (_nodes[child2].IsLeaf())
+		if (_nodes[right].right == -1)
 			right_cost = merged_perimeter(_nodes[right].aabb, leafaabb) + inheritanceCost;
 		else
 			right_cost = (merged_perimeter(_nodes[right].aabb, leafaabb) - perimeter(_nodes[right].aabb)) + inheritanceCost;
 
 		if (cost < left_cost && cost < right_cost)
 			break;
-		i = left_cost < right_cost : left_cost ? right_cost;
+		i = left_cost <= right_cost ? left : right;
 	}
 
 	// Create a new parent.
-	int oldparent = m_nodes[i].parent;
+	int oldparent = _nodes[i].parent;
 	int newparent = _allocate_node();
 
 	_nodes[newparent].parent = oldparent;

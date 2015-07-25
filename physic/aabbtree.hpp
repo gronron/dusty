@@ -79,7 +79,7 @@ class	Aabbtree
 
 		int		add_aabb(Aabb const &, int const data);
 		void	remove_aabb(int const);
-		bool	move_aabb(int const, Aabb const &);
+		bool	move_aabb(int const, Aabb const &, vec<float, 3> const &);
 
 		void	query(Aabb const &) const;
 		void	raycast() const;
