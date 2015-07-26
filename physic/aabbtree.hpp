@@ -54,7 +54,6 @@ struct		Node
 			int	left;
 			int	right;
 		};
-		int				children[2];
 		unsigned int	data;	// id of the data
 	};
 
@@ -79,9 +78,11 @@ class	Aabbtree
 
 		int		add_aabb(Aabb const &, int const data);
 		void	remove_aabb(int const);
+		bool	move_aabb(int const, Aabb const &);
 		bool	move_aabb(int const, Aabb const &, vec<float, 3> const &);
 
-		void	query(Aabb const &) const;
+		template<class T>
+		void	query(Aabb const &, T *, void (T::*)(int));
 		void	raycast() const;
 
 		int		_allocate_node();
@@ -93,5 +94,30 @@ class	Aabbtree
 		void	_balance(int const);
 		void	_rotate(int const, int const, int const);
 };
+
+template<class T>
+void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int))
+{
+	int	top = 0;
+	
+	_nstack[top++] = _root;
+	while (top > 0)
+	{
+		int	index = _nstack[--top];
+		if (index == -1)
+			continue;
+
+		if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
+		{
+			if (_nodes[index].right == -1)
+				object->callback(index);
+			else
+			{
+				_nstack[top++] = _nodes[index].left;
+				_nstack[top++] = _nodes[index].right;
+			}
+		}
+	}
+}
 
 #endif

@@ -35,11 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <cstdlib>
 
-Physicengine::Physicengine() : _bsize(64), _bodies(0), _free(0);
+Physicengine::Physicengine() : _bsize(64), _bodies(0), _free(0)
 {
 	_bodies = new Body[_bsize];
 
-	for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
+	for (unsigned int i = 0; i < _bsize - 1; ++i)
 			_bodies[i].next = i + 1;
 	_bodies[_bsize - 1].next = -1;
 }
@@ -75,15 +75,20 @@ Body	*Physicengine::alloc()
 
 void		Physicengine::init(Body *body)
 {
-	body->index = _dynamictree.add_aabb(aabb);
+	Aabb	aabb;
+	
+	aabb.bottom = body->position;
+	aabb.top = body->position + body->size;
+	body->index = _dynamictree.add_aabb(aabb, (unsigned int)(body - _bodies));
 }
 
-void		Physicengine::remove(Body *body)
+void		Physicengine::free(Body *body)
 {
-	int		index;
-	
-	_dynamictree.remove_aabb(body->index);
-	body->index = -1;
+	if (body->index != -1)
+	{
+		_dynamictree.remove_aabb(body->index);
+		body->index = -1;
+	}
 	body->next = _free;
 	_free = body - _bodies;
 }
@@ -95,7 +100,7 @@ int	Physicengine::add(Aabb const &aabb)
 
 void	Physicengine::move(int const index, Aabb const &aabb)
 {
-	_statictree.move(index, aabb);
+	_statictree.move_aabb(index, aabb);
 }
 
 void	Physicengine::remove(int const index)
@@ -111,7 +116,7 @@ void		Physicengine::tick(float delta)
 		{
 			_bodies[i].position = _bodies[i].nextposition;
 			_bodies[i].velocity = _bodies[i].nextvelocity;
-			_bodies[i].nextposition = _bodies[i].loc + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
+			_bodies[i].nextposition = _bodies[i].position + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
 			_bodies[i].nextvelocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
 			
 			

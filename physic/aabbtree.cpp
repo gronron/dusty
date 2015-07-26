@@ -90,12 +90,22 @@ void			Aabbtree::remove_aabb(int const index)
 	_free_node(index);
 }
 
+bool	Aabbtree::move_aabb(int const index, Aabb const &aabb)
+{
+	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
+		return (false);
+
+	_nodes[index].aabb = aabb;
+
+	_remove_leaf(index);
+	_insert_leaf(index);
+	return (true);
+}
+
 bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 3> const &velocity) // need to correct
 {
 	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
-		return false;
-
-	_remove_leaf(index);
+		return (false);
 
 	Aabb	a = aabb;
 	a.bottom -= GAP;
@@ -110,39 +120,12 @@ bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 3> const 
 		else
 			a.top[i] += b[i];
 	}
-
 	_nodes[index].aabb = a;
+
+	_remove_leaf(index);
 	_insert_leaf(index);
 	return (true);
 }	
-
-void	Aabbtree::query(Aabb const &aabb) const
-{
-	int	top = 0;
-	
-	_nstack[top++] = _root;
-	while (top > 0)
-	{
-		int	index = _nstack[--top];
-		if (index == -1)
-			continue;
-
-		if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
-		{
-			if (_nodes[index].right == -1)
-			{
-				bool proceed = callback->QueryCallback(nodeId);
-				if (proceed == false)
-					return;
-			}
-			else
-			{
-				_nstack[top++] = _nodes[index].left;
-				_nstack[top++] = _nodes[index].right;
-			}
-		}
-	}
-}
 
 int		Aabbtree::_allocate_node()
 {
@@ -248,7 +231,7 @@ void	Aabbtree::_remove_leaf(int const index)
 	{
 		int	parent = _nodes[index].parent;
 		int	grandparent = _nodes[parent].parent;
-		int	sibling = _nodes[parent].children[_nodes[parent].children[0] == index ? 1 : 0];
+		int	sibling = _nodes[parent].left != index ? _nodes[parent].left : _nodes[parent].right;
 
 		if (grandparent == -1)
 		{
@@ -299,10 +282,10 @@ void	Aabbtree::_balance(int const index)
 	}
 }
 
-void	Aabbtree::_rotate(int const index, int const up, int const down) // a, b, c
+void	Aabbtree::_rotate(int const index, int const up, int const down)
 {
-	int left = _nodes[up].left; //d
-	int right = _nodes[up].right; //e
+	int left = _nodes[up].left;
+	int right = _nodes[up].right;
 
 	_nodes[up].left = index;
 	_nodes[up].parent = _nodes[index].parent;

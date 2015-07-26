@@ -28,43 +28,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PHYSICENGINE_H_
-#define PHYSICENGINE_H_
+#ifndef SHAPE_H_
+#define SHAPE_H_
 
-#include "body.hpp"
-#include "aabbtree.hpp"
-
-class	Physicengine
+class	Shape
 {
 	public:
 
-		unsigned int	_bsize;
-		Body			*_bodies;
-
-		int				_free;
-	
-		Aabbtree		_dynamictree;
-		Aabbtree		_statictree;
-
-		unsigned int	_ddsize;
-		unsigned int	_dssize;
-		unsigned int	_ddtop;
-		unsigned int	_dstop;
-		vec<int, 2>		*_ddpairs;
-		vec<int, 2>		*_dspairs;
-
-		Physicengine();
-		~Physicengine();
-
-		Body	*alloc();
-		void	init(Body *);
-		void	free(Body *);
+		enum Type	{ SPHERE, AXIS_CYLINDER, AXIS_BOX, MESH };
 		
-		int		add(Aabb const &);
-		void	move(int const, Aabb const &);
-		void	remove(int const);
-
-		void	tick(float);
+		char	type;
+		
+		union
+		{
+			float	radius;
+			
+			char	axis;
+			float	lenght;
+			float	radius;
+			
+			vec<float, 3>	size;
+			
+			unsigned int	vsize;
+			unsigned int	tsize;
+			float			*vertices;
+			unsigned int	*triangles;
+			
+		};
 };
 
 #endif
