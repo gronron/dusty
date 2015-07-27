@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SHAPE_H_
 #define SHAPE_H_
 
+#include "math/vec.hpp"
+
 class	Shape
 {
 	public:
@@ -41,6 +43,8 @@ class	Shape
 
 		Shape();
 		virtual ~Shape();
+		
+		virtual void	compute_aabb(Aabbb &aabb, vec<float, 4> const &position) = 0;
 };
 
 class	Sphereshape : public Shape

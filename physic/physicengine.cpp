@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <cstdlib>
 
-Physicengine::Physicengine() : _bsize(64), _bodies(0), _free(0)
+Physicengine::Physicengine() : _bsize(64), _bodies(0), _bfree(0)
 {
 	_bodies = new Body[_bsize];
 
@@ -49,13 +49,13 @@ Physicengine::~Physicengine()
 	delete [] _bodies;
 }
 
-Body	*Physicengine::alloc()
+Body		*Physicengine::new_body()
 {
 	Body	*body;
 
-	if (_free == -1)
+	if (_bfree == -1)
 	{
-		_free = _bsize;
+		_bfree = _bsize;
 		_bodies = resize(_bodies, _bsize,_bsize << 1);
 		_bsize <<= 1;
 		for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
@@ -65,54 +65,52 @@ Body	*Physicengine::alloc()
 					*_dynamicbb[i]*/		
 	}
 
-	body = _bodies + _free;
-	_free = _bodies[_free].next;
+	body = _bodies + _bfree;
+	_bfree = _bodies[_bfree].next;
 	
 	body->index = -1;
 	
 	return (body);
 }
 
-void		Physicengine::init(Body *body)
+void		Physicengine::init_body(Body *body)
 {
 	Aabb	aabb;
 	
-	aabb.bottom = body->position;
-	aabb.top = body->position + body->size;
-	body->index = _dynamictree.add_aabb(aabb, (unsigned int)(body - _bodies));
+	body->shape->compute_aabb(aabb, body->position);
+	if (body->dynamic)
+		body->index = _dynamictree.add_aabb(aabb, (unsigned int)(body - _bodies));
+	else
+		body->index = _statictree.add_aabb(aabb, (unsigned int)(body - _bodies));
 }
 
-void		Physicengine::free(Body *body)
+void	Physicengine::move(Body *body, vec<float, 4> const &position)
+{
+
+	//_statictree.move_aabb(index, aabb);
+}	
+
+void		Physicengine::delete_body(Body *body)
 {
 	if (body->index != -1)
 	{
-		_dynamictree.remove_aabb(body->index);
+		if (body->dynamic)
+			_dynamictree.remove_aabb(body->index);
+		else
+			_statictree.remove_aabb(body->index);
 		body->index = -1;
 	}
-	body->next = _free;
-	_free = body - _bodies;
+	body->next = _bfree;
+	_bfree = body - _bodies;
 }
 
-int	Physicengine::add(Aabb const &aabb)
-{
-	return (_statictree.add_aabb(aabb));
-}
 
-void	Physicengine::move(int const index, Aabb const &aabb)
-{
-	_statictree.move_aabb(index, aabb);
-}
-
-void	Physicengine::remove(int const index)
-{
-	_statictree.remove_aabb(index);
-}
 
 void		Physicengine::tick(float delta)
 {
 	for (unsigned int i = 0; i < _bsize; ++i)
 	{
-		if (_bodies[i].index != -1)
+		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 		{
 			_bodies[i].position = _bodies[i].nextposition;
 			_bodies[i].velocity = _bodies[i].nextvelocity;
@@ -121,6 +119,8 @@ void		Physicengine::tick(float delta)
 			
 			
 			/*move aabb
+			Aabb	aabb;
+			_bodies[i].shape->compute_aabb(aabb, _bodies[i].position);
 			_dynamictree.move_aabb(_bodies[i].index, aabb);
 			*/
 		}

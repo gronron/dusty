@@ -40,29 +40,22 @@ class	Physicengine
 
 		unsigned int	_bsize;
 		Body			*_bodies;
+		int				_bfree;
 
-		int				_free;
-	
 		Aabbtree		_dynamictree;
 		Aabbtree		_statictree;
 
-		unsigned int	_ddsize;
-		unsigned int	_dssize;
-		unsigned int	_ddtop;
-		unsigned int	_dstop;
-		vec<int, 2>		*_ddpairs;
-		vec<int, 2>		*_dspairs;
+		unsigned int	_psize;
+		vec<int, 2>		*_pairs;
+		unsigned int	_ptop;
+
 
 		Physicengine();
 		~Physicengine();
 
-		Body	*alloc();
-		void	init(Body *);
-		void	free(Body *);
-		
-		int		add(Aabb const &);
-		void	move(int const, Aabb const &);
-		void	remove(int const);
+		Body	*new_body();
+		void	init_body(Body *);
+		void	delete_body(Body *);
 
 		void	tick(float);
 };

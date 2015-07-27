@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 #include "endian/packet.hpp"
+#include "shape.hpp"
 
 class	Actor;
 
@@ -46,12 +47,10 @@ struct	Body
 
 	Shape			*shape;
 	int				index;
+	
+	bool			dynamic;
 
 	vec<float, 4>	position;
-};
-
-struct	Dynamicbody : public Body
-{
 	vec<float, 4>	velocity;
 	vec<float, 4>	acceleration;
 

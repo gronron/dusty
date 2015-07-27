@@ -115,6 +115,7 @@
     <ClCompile Include="..\..\..\physic\aabbtree.cpp" />
     <ClCompile Include="..\..\..\physic\body.cpp" />
     <ClCompile Include="..\..\..\physic\physicengine.cpp" />
+    <ClCompile Include="..\..\..\physic\shape.cpp" />
     <ClCompile Include="..\..\..\ui\console.cpp" />
     <ClCompile Include="..\..\..\ui\controller.cpp" />
     <ClCompile Include="..\..\..\ui\eventmanager.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="..\..\..\physic\aabbtree.hpp" />
     <ClInclude Include="..\..\..\physic\body.hpp" />
     <ClInclude Include="..\..\..\physic\physicengine.hpp" />
+    <ClInclude Include="..\..\..\physic\shape.hpp" />
     <ClInclude Include="..\..\..\ui\console.hpp" />
     <ClInclude Include="..\..\..\ui\controller.hpp" />
     <ClInclude Include="..\..\..\ui\eventmanager.hpp" />
