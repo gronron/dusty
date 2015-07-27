@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "body.hpp"
 
-void	Body::get_replication(Packet &pckt) const
+void	Dynamicbody::get_replication(Packet &pckt) const
 {
 	pckt.write(mass);
 	pckt.write(position);
@@ -39,7 +39,7 @@ void	Body::get_replication(Packet &pckt) const
 	pckt.write(size); //will be skiped
 }
 
-void	Body::replicate(Packet &pckt, float p)
+void	Dynamicbody::replicate(Packet &pckt, float p)
 {
 	pckt.read(mass);
 	pckt.read(position);

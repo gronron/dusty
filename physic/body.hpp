@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 #include "endian/packet.hpp"
-#include "actor.hpp"
+
+class	Actor;
 
 struct	Body
 {
@@ -43,16 +44,21 @@ struct	Body
 		int			next;
 	};
 
+	Shape			*shape;
 	int				index;
 
-	float			mass;
 	vec<float, 4>	position;
+};
+
+struct	Dynamicbody : public Body
+{
 	vec<float, 4>	velocity;
 	vec<float, 4>	acceleration;
 
-	vec<float, 4>	size;
 	vec<float, 4>	nextposition;
 	vec<float, 4>	nextvelocity;
+
+	float	mass;
 
 
 	void	get_replication(Packet &) const;

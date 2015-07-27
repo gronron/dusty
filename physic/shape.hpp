@@ -38,23 +38,54 @@ class	Shape
 		enum Type	{ SPHERE, AXIS_CYLINDER, AXIS_BOX, MESH };
 		
 		char	type;
+
+		Shape();
+		virtual ~Shape();
+};
+
+class	Sphereshape : public Shape
+{
+	public:
+	
+		float	radius;
 		
-		union
-		{
-			float	radius;
-			
-			char	axis;
-			float	lenght;
-			float	radius;
-			
-			vec<float, 3>	size;
-			
-			unsigned int	vsize;
-			unsigned int	tsize;
-			float			*vertices;
-			unsigned int	*triangles;
-			
-		};
+		Sphereshape();
+		virtual ~Sphereshape();
+};
+
+class	Axiscylindershape : public Shape
+{
+	public:
+	
+		char	axis;
+		float	lenght;
+		float	radius;
+		
+		Axiscylindershape();
+		virtual ~Axiscylindershape();
+};
+
+class	Axisboxshape : public Shape
+{
+	public:
+	
+		vec<float, 3>	size;
+		
+		Axisboxshape();
+		virtual ~Axisboxshape();
+};
+
+class	Meshshape : public Shape
+{
+	public:
+
+		unsigned int	vsize;
+		unsigned int	tsize;
+		float			*vertices;
+		unsigned int	*triangles;
+		
+		Meshshape();
+		virtual ~Meshshape();
 };
 
 #endif
