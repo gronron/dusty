@@ -49,7 +49,7 @@ Physicengine::~Physicengine()
 	delete [] _bodies;
 }
 
-Body		*Physicengine::new_body()
+void		Physicengine::new_body(Body **link)
 {
 	Body	*body;
 
@@ -58,6 +58,8 @@ Body		*Physicengine::new_body()
 		_bfree = _bsize;
 		_bodies = resize(_bodies, _bsize,_bsize << 1);
 		_bsize <<= 1;
+		for (unsigned int i = 0; i < _bsize >> 1; ++i)
+			*_bodies[i].link = _bodies + i;
 		for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
 			_bodies[i].next = i + 1;
 		_bodies[_bsize - 1].next = -1;
@@ -68,9 +70,9 @@ Body		*Physicengine::new_body()
 	body = _bodies + _bfree;
 	_bfree = _bodies[_bfree].next;
 	
+	body->link = link;
+	*body->link = body;
 	body->index = -1;
-	
-	return (body);
 }
 
 void		Physicengine::init_body(Body *body)
@@ -83,13 +85,13 @@ void		Physicengine::init_body(Body *body)
 	else
 		body->index = _statictree.add_aabb(aabb, (unsigned int)(body - _bodies));
 }
-
+/*
 void	Physicengine::move(Body *body, vec<float, 4> const &position)
 {
 
 	//_statictree.move_aabb(index, aabb);
 }	
-
+*/
 void		Physicengine::delete_body(Body *body)
 {
 	if (body->index != -1)
@@ -104,36 +106,41 @@ void		Physicengine::delete_body(Body *body)
 	_bfree = body - _bodies;
 }
 
-
-
 void		Physicengine::tick(float delta)
 {
 	for (unsigned int i = 0; i < _bsize; ++i)
 	{
 		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 		{
-			_bodies[i].position = _bodies[i].nextposition;
-			_bodies[i].velocity = _bodies[i].nextvelocity;
-			_bodies[i].nextposition = _bodies[i].position + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
-			_bodies[i].nextvelocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
+			_bodies[i].prevposition = _bodies[i].position;
+			_bodies[i].prevvelocity = _bodies[i].velocity;
+			_bodies[i].position = _bodies[i].position + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
+			_bodies[i].velocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
 			
 			
 			/*move aabb
-			Aabb	aabb;
-			_bodies[i].shape->compute_aabb(aabb, _bodies[i].position);
-			_dynamictree.move_aabb(_bodies[i].index, aabb);
+			_bodies[i].shape->compute_aabb(_bodies[i].aabb, _bodies[i].position);
+			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb);
 			*/
 		}
 	}
-	/*
+	
 	for (unsigned int i = 0; i < _bsize; ++i)
 	{
 		if (_bodies[i].index != -1)
 		{
-			_dynamictree.query(aabb);
-			_statictree.query(aabb);
+			_currentquery = i;
+			_dynamictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
+			_statictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
 		}
-	}*/
+	}
+}
+
+void	Physicengine::_add_pair(int const index)
+{
+	_pairs[_ptop][0] = _currentquery;
+	_pairs[_ptop][1] = index;
+	++_ptop;
 }
 /*
 void				Physicengine::_collide2(float delta, Boundingbox *x, Boundingbox *y)

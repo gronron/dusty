@@ -48,16 +48,19 @@ class	Physicengine
 		unsigned int	_psize;
 		vec<int, 2>		*_pairs;
 		unsigned int	_ptop;
+		int				_currentquery;
 
 
 		Physicengine();
 		~Physicengine();
 
-		Body	*new_body();
+		void	new_body(Body **);
 		void	init_body(Body *);
 		void	delete_body(Body *);
 
-		void	tick(float);
+		void	tick(float const);
+		
+		void	_add_pair(int const);
 };
 
 #endif

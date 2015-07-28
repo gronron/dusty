@@ -28,109 +28,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "shape.hpp"
+#ifndef AABB_H_
+#define AABB_H_
 
-Shape::Shape(char const t) : type(t)
+#include "math/vec.hpp"
+
+struct				Aabb
 {
+	vec<float, 3>	bottom;
+	vec<float, 3>	top;
+};
 
-}
-
-Shape::~Shape()
-{
-
-}
-
-///////////////////////////////////////
-
-Sphereshape::Sphereshape() : Shape(SPHERE)
-{
-
-}
-
-Sphereshape::~Sphereshape()
-{
-
-}
-
-Aabb	&Sphereshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position - radius;
-	aabb.top = position + radius;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Axiscylindershape::Axiscylindershape() : Shape(AXIS_CYLINDER)
-{
-
-}
-
-Axiscylindershape::~Axiscylindershape()
-{
-
-}
-
-Aabb	&Axiscylindershape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position - radius;
-	aabb.top = position + radius;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Axisboxshape::Axisboxshape() : Shape(AXIS_BOX)
-{
-
-}
-
-Axisboxshape::~Axisboxshape()
-{
-
-}
-
-Aabb	&Axisboxshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position - size;
-	aabb.top = position + size;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Boxshape::Boxshape() : Shape(BOX)
-{
-
-}
-
-Boxshape::~Boxshape()
-{
-
-}
-
-Aabb	&Boxshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position;
-	aabb.top = position;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Meshshape::Meshshape() : Shape(MESH)
-{
-
-}
-
-Meshshape::~Meshshape()
-{
-
-}
-
-Aabb	&Meshshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position;
-	aabb.top = position;
-	return (aabb);
-}
+#endif

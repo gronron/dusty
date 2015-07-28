@@ -32,12 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AABBTREE_H_
 
 #include "math/vec.hpp"
-
-struct				Aabb
-{
-	vec<float, 3>	bottom;
-	vec<float, 3>	top;
-};
+#include "aabb.hpp"
 
 struct		Node
 {
@@ -82,7 +77,7 @@ class	Aabbtree
 		bool	move_aabb(int const, Aabb const &, vec<float, 3> const &);
 
 		template<class T>
-		void	query(Aabb const &, T *, void (T::*)(int));
+		void	query(Aabb const &, T *, void (T::*)(int const));
 		void	raycast() const;
 
 		int		_allocate_node();
@@ -96,7 +91,7 @@ class	Aabbtree
 };
 
 template<class T>
-void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int))
+void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const))
 {
 	int	top = 0;
 	
@@ -110,7 +105,7 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int))
 		if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
 		{
 			if (_nodes[index].right == -1)
-				object->callback(index);
+				(object->*callback)(index);
 			else
 			{
 				_nstack[top++] = _nodes[index].left;

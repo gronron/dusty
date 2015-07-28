@@ -35,18 +35,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "endian/packet.hpp"
 #include "shape.hpp"
 
-class	Actor;
+class	Collider
+{
+	public:
+	
+		virtual bool	collide() = 0;
+		virtual bool	touch() = 0;
+		virtual bool	untouch() = 0;
+};
 
 struct	Body
 {
 	union
 	{
-		Actor		*actor;
+		Body		**link;
 		int			next;
 	};
-
-	Shape			*shape;
+	
 	int				index;
+	Shape			*shape;
+	Collider		*collider;
 	
 	bool			dynamic;
 
@@ -54,11 +62,12 @@ struct	Body
 	vec<float, 4>	velocity;
 	vec<float, 4>	acceleration;
 
-	vec<float, 4>	nextposition;
-	vec<float, 4>	nextvelocity;
+	vec<float, 4>	prevposition;
+	vec<float, 4>	prevvelocity;
 
-	float	mass;
+	float			mass;
 
+	Aabb			aabb;
 
 	void	get_replication(Packet &) const;
 	void	replicate(Packet &, float);

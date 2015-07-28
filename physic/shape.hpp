@@ -32,19 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SHAPE_H_
 
 #include "math/vec.hpp"
+#include "aabb.hpp"
 
 class	Shape
 {
 	public:
 
-		enum Type	{ SPHERE, AXIS_CYLINDER, AXIS_BOX, MESH };
-		
+		enum Type	{ SPHERE, AXIS_CYLINDER, AXIS_BOX, BOX, MESH };
+
+
 		char	type;
 
-		Shape();
+
+		Shape(char const);
 		virtual ~Shape();
 		
-		virtual void	compute_aabb(Aabbb &aabb, vec<float, 4> const &position) = 0;
+		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const = 0;
 };
 
 class	Sphereshape : public Shape
@@ -52,9 +55,12 @@ class	Sphereshape : public Shape
 	public:
 	
 		float	radius;
-		
+
+
 		Sphereshape();
 		virtual ~Sphereshape();
+		
+		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
 };
 
 class	Axiscylindershape : public Shape
@@ -64,9 +70,12 @@ class	Axiscylindershape : public Shape
 		char	axis;
 		float	lenght;
 		float	radius;
-		
+
+
 		Axiscylindershape();
 		virtual ~Axiscylindershape();
+		
+		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
 };
 
 class	Axisboxshape : public Shape
@@ -74,9 +83,25 @@ class	Axisboxshape : public Shape
 	public:
 	
 		vec<float, 3>	size;
-		
+
+
 		Axisboxshape();
 		virtual ~Axisboxshape();
+		
+		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
+};
+
+class	Boxshape : public Shape
+{
+	public:
+	
+		vec<float, 3>	size;
+
+
+		Boxshape();
+		virtual ~Boxshape();
+		
+		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
 };
 
 class	Meshshape : public Shape
@@ -87,9 +112,12 @@ class	Meshshape : public Shape
 		unsigned int	tsize;
 		float			*vertices;
 		unsigned int	*triangles;
-		
+
+
 		Meshshape();
 		virtual ~Meshshape();
+		
+		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
 };
 
 #endif
