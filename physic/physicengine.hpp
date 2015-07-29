@@ -37,6 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class	Physicengine
 {
 	public:
+	
+		struct	Pair
+		{
+			int	a;
+			int	b;
+		};
+
 
 		unsigned int	_bsize;
 		Body			*_bodies;
@@ -45,9 +52,9 @@ class	Physicengine
 		Aabbtree		_dynamictree;
 		Aabbtree		_statictree;
 
+		unsigned int	_pcount;
 		unsigned int	_psize;
-		vec<int, 2>		*_pairs;
-		unsigned int	_ptop;
+		Pair			*_pairs;
 		int				_currentquery;
 
 

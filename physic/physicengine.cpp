@@ -35,9 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <cstdlib>
 
-Physicengine::Physicengine() : _bsize(64), _bodies(0), _bfree(0)
+Physicengine::Physicengine() : _bsize(64), _bodies(0), _bfree(0), _pcount(0), _psize(64), _pairs(0), _currentquery(0)
 {
 	_bodies = new Body[_bsize];
+	_pairs = new Pair[_psize];
 
 	for (unsigned int i = 0; i < _bsize - 1; ++i)
 			_bodies[i].next = i + 1;
@@ -62,9 +63,7 @@ void		Physicengine::new_body(Body **link)
 			*_bodies[i].link = _bodies + i;
 		for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
 			_bodies[i].next = i + 1;
-		_bodies[_bsize - 1].next = -1;
-		/*for (unsigned int i = 0; i < _dbbsize; ++i)
-					*_dynamicbb[i]*/		
+		_bodies[_bsize - 1].next = -1;	
 	}
 
 	body = _bodies + _bfree;
@@ -125,6 +124,7 @@ void		Physicengine::tick(float delta)
 		}
 	}
 	
+	_pcount = 0;
 	for (unsigned int i = 0; i < _bsize; ++i)
 	{
 		if (_bodies[i].index != -1)
@@ -138,9 +138,18 @@ void		Physicengine::tick(float delta)
 
 void	Physicengine::_add_pair(int const index)
 {
-	_pairs[_ptop][0] = _currentquery;
-	_pairs[_ptop][1] = index;
-	++_ptop;
+	if (index > _currentquery || !_bodies[index].dynamic)
+	{
+		if (_pcount >= _psize)
+		{
+			_psize <<= 1;
+			_pairs = resize(_pairs, _pcount, _psize);
+		}
+	
+		_pairs[_pcount].a = _currentquery;
+		_pairs[_pcount].b = index;
+		++_pcount;
+	}
 }
 /*
 void				Physicengine::_collide2(float delta, Boundingbox *x, Boundingbox *y)
