@@ -25,6 +25,18 @@
     <Filter Include="Header Files\game">
       <UniqueIdentifier>{42553ebb-56d4-4e6a-bd6c-93b0ecec20d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\physic">
+      <UniqueIdentifier>{a7039354-f13d-4691-a691-c57d162206e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\network">
+      <UniqueIdentifier>{36610f18-6660-4271-9cd9-48d7f835b211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\physic">
+      <UniqueIdentifier>{a9faa104-f172-4994-aac3-ec5875ecc62b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\network">
+      <UniqueIdentifier>{2f56fb09-059e-477c-8435-19a04ae13a16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\engine\actor.cpp">
@@ -37,27 +49,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\engine\factory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\network\client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\network\messagequeue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\network\networkengine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\network\networkproto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\network\replication.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\network\server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\physic\physicengine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\stream\winsock_init.cpp">
@@ -151,13 +142,34 @@
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\physic\aabbtree.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\physic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\physic\body.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\physic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\physic\physicengine.cpp">
+      <Filter>Source Files\physic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\physic\shape.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\physic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\server.cpp">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\replication.cpp">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\networkproto.cpp">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\networkengine.cpp">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\messagequeue.cpp">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\network\client.cpp">
+      <Filter>Source Files\network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -171,27 +183,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\engine\factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\network\client.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\network\messagequeue.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\network\networkengine.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\network\networkproto.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\network\replication.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\network\server.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\physic\physicengine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\math\vec_util.hpp">
@@ -291,13 +282,34 @@
       <Filter>Header Files\game</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\physic\aabbtree.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\physic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\physic\body.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\physic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\physic\physicengine.hpp">
+      <Filter>Header Files\physic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\physic\shape.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\physic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\server.hpp">
+      <Filter>Header Files\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\replication.hpp">
+      <Filter>Header Files\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\networkproto.hpp">
+      <Filter>Header Files\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\networkengine.hpp">
+      <Filter>Header Files\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\messagequeue.hpp">
+      <Filter>Header Files\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\network\client.hpp">
+      <Filter>Header Files\network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
