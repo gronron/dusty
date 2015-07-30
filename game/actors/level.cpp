@@ -37,8 +37,8 @@ Level::~Level()
 	delete_matrix(map);
 	for (unsigned int i = 0; i < _map.size(); ++i)
 	{
-		if (_map[i].bdb)
-			am->pe->remove(_map[i].bdb);
+		if (_map[i].body)
+			am->pe->delete_body(_map[i].body);
 	}
 	if (am->graphic)
 		am->ge->remove(ld);
@@ -88,8 +88,7 @@ bool							Level::spawn_feeder()
 			fdr->hp = 1.0f + nbr / 10;
 			loc[0] = (float)MT().genrand_real1(-1.0, 1.0);
 			loc[1] = (float)MT().genrand_real1(-1.0, 1.0);
-			fdr->bdb->loc = plr->bdb->loc + Sgl::unit(loc) * (float)MT().genrand_real1(512.0, 1024.0);
-			fdr->bdb->nextloc = fdr->bdb->loc;
+			fdr->body->position = plr->body->position + Sgl::unit(loc) * (float)MT().genrand_real1(512.0, 1024.0);
 		}
 	}
 	nbr++;
@@ -107,20 +106,24 @@ void		Level::_generate_block()
 {
 	Block	blck;
 
-	for (int j = 0; j < y; ++j)
+	shape.size = 64.0f;
+	for (unsigned int j = 0; j < y; ++j)
 	{
-		for (int i = 0; i < x; ++i)
+		for (unsigned int i = 0; i < x; ++i)
 		{
 			blck.loc[0] = i * 64.0f;
 			blck.loc[1] = j * 64.0f;
 			if ((blck.t = map[j][i]))
 			{
-				am->pe->add(&blck.bdb, 0, false);
-				blck.bdb->loc = blck.loc;
-				blck.bdb->size = 64.0f;
+				am->pe->new_body(&blck.body);
+				blck.body->collider = this;
+				blck.body->shape = &shape;
+				blck.body->dynamic = false;
+				blck.body->position = blck.loc;
+				am->pe->init_body(blck.body);
 			}
 			else
-				blck.bdb = 0;
+				blck.body = 0;
 			_map.push_back(blck);
 		}
 	}

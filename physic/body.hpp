@@ -39,9 +39,9 @@ class	Collider
 {
 	public:
 	
-		virtual bool	collide() = 0;
-		virtual bool	touch() = 0;
-		virtual bool	untouch() = 0;
+		virtual bool	collide(Collider *) = 0;
+		/*virtual bool	touch() = 0;
+		virtual bool	untouch() = 0;*/
 };
 
 struct	Body

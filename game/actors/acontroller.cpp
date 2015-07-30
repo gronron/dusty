@@ -76,12 +76,12 @@ void	AController::tick(float delta)
 	Controller::tick(delta);
 	if (controlled)
 	{
-		controlled->bdb->nextspd = move * 256.0f;
+		controlled->body->velocity = move * 256.0f;
 		controlled->firing = firing;
 		controlled->loadingfire = loadingfire;
 		controlled->dir = aim;
 		//beware
-		am->ge->cam_loc = controlled->bdb->loc;
+		am->ge->cam_loc = controlled->body->position;
 	}
 }
 

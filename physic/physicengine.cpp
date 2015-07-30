@@ -134,6 +134,12 @@ void		Physicengine::tick(float delta)
 			_statictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
 		}
 	}
+	
+	for (unsigned int i = 0; i < _pcount; ++i)
+	{
+		_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
+		_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
+	}
 }
 
 void	Physicengine::_add_pair(int const index)

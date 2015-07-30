@@ -12,8 +12,8 @@ class	AController : public Controller
 
 		bool			firing;
 		bool			loadingfire;
-		vec<float, 2>	aim;
-		vec<float, 2>	move;
+		vec<float, 4>	aim;
+		vec<float, 4>	move;
 
 
 		AController(Actormanager *, Replication *, int, short int, Actor const *);

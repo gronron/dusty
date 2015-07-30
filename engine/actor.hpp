@@ -33,12 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <map>
+#include "endian/packet.hpp"
+#include "body.hpp"
 
 class	Actormanager;
 class	Replication;
-class	Packet;
 
-class	Actor
+class	Actor : public Collider
 {
 	public:
 	
@@ -79,7 +80,7 @@ class	Actor
         virtual void	replicate(Packet &, float);
 
 		virtual void	tick(float);
-		virtual bool	collide(Actor const &);
+		virtual bool	collide(Collider *);
 
 		virtual void	start_callback(std::string const &, float, bool, bool (Actor::*)());
 		virtual void	start_callback(float, bool (Actor::*)());

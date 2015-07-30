@@ -41,6 +41,9 @@ struct	vec
 	T	ar[U];
 
 
+	template<class V, unsigned int W>
+	operator vec<V, W>();
+
 	T		&operator[](unsigned int const x);
 	T const	&operator[](unsigned int const x) const;
 
@@ -84,6 +87,16 @@ struct	vec
 	vec	&operator<<=(T const &x);
 	vec	&operator>>=(T const &x);
 };
+
+template<class T, unsigned int U> template<class V, unsigned int W>
+vec<T, U>::operator vec<V, W>()
+{
+	vec<V, W>	a;
+
+	for (unsigned int i = 0; i < U; ++i)
+		a.ar[i] = i < W ? (V)ar[i] : 0;
+	return (a);
+}
 
 template<class T, unsigned int U> template<class V, unsigned int W>
 vec<T, U>		vec<T, U>::cast(vec<V, W> const &x)

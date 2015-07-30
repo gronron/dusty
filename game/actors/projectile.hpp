@@ -2,14 +2,14 @@
 #define PROJECTILE_H_
 
 #include "actor.hpp"
-#include "boundingbox.hpp"
 #include "particlesystem.hpp"
 
 class	Projectile : public Actor
 {
 	public:
 
-		Boundingbox		*bdb;
+		Body		*body;
+		Sphereshape	shape;
 
 		float	dmg;
 
@@ -27,7 +27,7 @@ class	Projectile : public Actor
 		void	get_replication(Packet &);
 		void	replicate(Packet &, float);
 
-		bool	collide(Actor const &);
+		bool	collide(Collider *);
 
 		bool	selfdestroy();
 };

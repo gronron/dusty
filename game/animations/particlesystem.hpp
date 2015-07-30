@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PARTICLESYSTEM_H_
 
 #include <string>
-#include "boundingbox.hpp"
+#include "body.hpp"
 #include "animation.hpp"
 #include "graphicengine.hpp"
 
@@ -50,7 +50,7 @@ class	Particlesystem : public Animation
 		};
 
 		Graphicengine::Texture	*tex;
-		Boundingbox				**boundingbox;
+		Body					**body;
 		
 		unsigned int		_size;
 		Particle			*_particles;
@@ -65,8 +65,8 @@ class	Particlesystem : public Animation
 		vec<float, 2>	fade;
 		vec<float, 2>	speed;
 
-		Particlesystem(Graphicengine *, float, std::string const &, Boundingbox **);
-		Particlesystem(Graphicengine *, float, std::string const &, vec<float, 2> const &);
+		Particlesystem(Graphicengine *, float, std::string const &, Body **);
+		Particlesystem(Graphicengine *, float, std::string const &, vec<float, 3> const &);
 		virtual ~Particlesystem();
 
 		bool	tick(float);

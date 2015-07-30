@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "actor.hpp"
-#include "boundingbox.hpp"
+#include "body.hpp"
 #include "leveldisplayer.hpp"
 
 class	Level : public Actor
@@ -14,7 +14,7 @@ class	Level : public Actor
 		{
 			int				t;
 			vec<float, 2>	loc;
-			Boundingbox		*bdb;
+			Body			*body;
 		};
 
 		unsigned int		x;
@@ -23,6 +23,7 @@ class	Level : public Actor
 
 		std::vector<Block>	_map;
 
+		Axisboxshape	shape;
 		Leveldisplayer	*ld;
 
 		int		nbr;

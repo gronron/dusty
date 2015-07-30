@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "configmanager.hpp"
 #include "particlesystem.hpp"
 
-Particlesystem::Particlesystem(Graphicengine *ge, float d, std::string const &name, Boundingbox **bdb) : Animation(ge, d), boundingbox(bdb), _size(0), _particles(0), attractor(false), spawnrate(0.0f), spawntime(0.0f), time(0.0f)
+Particlesystem::Particlesystem(Graphicengine *ge, float d, std::string const &name, Body **bd) : Animation(ge, d), body(bd), _size(0), _particles(0), attractor(false), spawnrate(0.0f), spawntime(0.0f), time(0.0f)
 {
 	Df_node const	*nd = Configmanager::get_instance().get("particle.df");
 
@@ -53,7 +53,7 @@ Particlesystem::Particlesystem(Graphicengine *ge, float d, std::string const &na
 	tex = ge->load_texture("particle.png");
 }
 
-Particlesystem::Particlesystem(Graphicengine *ge, float d, std::string const &name, vec<float, 2> const &v) : Animation(ge, d), boundingbox(0), _size(0), _particles(0), attractor(false), spawnrate(0.0f), spawntime(0.0f), time(0.0f)
+Particlesystem::Particlesystem(Graphicengine *ge, float d, std::string const &name, vec<float, 3> const &v) : Animation(ge, d), body(0), _size(0), _particles(0), attractor(false), spawnrate(0.0f), spawntime(0.0f), time(0.0f)
 {
 	Df_node const	*nd = Configmanager::get_instance().get("particle.df");
 	
@@ -124,7 +124,7 @@ bool	Particlesystem::tick(float delta)
 			_particles[i].color[3] = 1.0f;
 
 			_particles[i].fade =  (float)MT().genrand_real1(fade[0], fade[1]);
-			_particles[i].loc = (*boundingbox)->loc;
+			_particles[i].loc = (*body)->position;
 			_particles[i].spd[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			_particles[i].spd[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			_particles[i].spd = Sgl::unit(_particles[i].spd) * (float)MT().genrand_real1(speed[0], speed[1]);

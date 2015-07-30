@@ -98,7 +98,7 @@ void											Actor::tick(float delta)
 	}
 }
 
-bool	Actor::collide(Actor const &)
+bool	Actor::collide(Collider *)
 {
 	return (false);
 }

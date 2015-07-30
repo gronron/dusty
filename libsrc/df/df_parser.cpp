@@ -370,6 +370,8 @@ static bool	_read_expr(Parser_state &ps)
 			return (true);
 		else if (_read_xexpr(ps) && _read_close_bracket(ps))
 			return (true);
+		else
+			return (false);
 	}
 	else if (_read_data(ps))
 		return (true);

@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PLAYER_H_
 
 #include "actor.hpp"
-#include "boundingbox.hpp"
 #include "particlesystem.hpp"
 #include "hud.hpp"
 
@@ -40,7 +39,8 @@ class	Player : public Actor
 {
 	public:
 
-		Boundingbox		*bdb;
+		Body			*body;
+		Sphereshape		shape;
 
 		float			dmg;
 		float			firerate;
@@ -68,7 +68,7 @@ class	Player : public Actor
 
 		void	tick(float);
 
-		bool	collide(Actor const &);
+		bool	collide(Collider *);
 
 		bool	fire();
 };

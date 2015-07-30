@@ -14,24 +14,27 @@
 
 FACTORYREG(Feeder);
 
-Feeder::Feeder(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), bdb(), hp(2.0f)
+Feeder::Feeder(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), body(0), hp(2.0f)
 {
-	am->pe->add(&bdb, 0, true);
-	bdb->actor = this;
-	bdb->size = 20.0f;
+	am->pe->new_body(&body);
+	body->collider = this;
+	shape.radius = 20.0f;
+	body->shape = &shape;
+	body->dynamic = true;
 	aim = 0.0f;
 }
 
 Feeder::~Feeder()
 {
-	am->pe->remove(bdb);
+	am->pe->delete_body(body);
 }
 
 void	Feeder::postinstanciation()
 {
+	am->pe->init_body(body);
 	if (am->graphic)
 	{
-		ps = new Particlesystem(am->ge, 0.0f, "feeder", &bdb);
+		ps = new Particlesystem(am->ge, 0.0f, "feeder", &body);
 		am->ge->add(ps);
 	}
 	start_callback("TP", 0.3f, true, (bool (Actor::*)())&Feeder::targetsomeone);
@@ -42,7 +45,7 @@ void	Feeder::destroy()
 	Actor::destroy();
 	if (am->graphic)
 	{
-		am->ge->add(new Particlesystem(am->ge, 0.0f, "explosion", bdb->loc));
+		am->ge->add(new Particlesystem(am->ge, 0.0f, "explosion", (vec<float, 3>)body->position));
 	}
 }
 
@@ -51,7 +54,7 @@ void	Feeder::get_replication(Packet &pckt)
 	Actor::get_replication(pckt);
 	pckt.write(aim);
 	pckt.write(hp);
-	bdb->get_replication(pckt);
+	body->get_replication(pckt);
 }
 
 void	Feeder::replicate(Packet &pckt, float p)
@@ -59,7 +62,7 @@ void	Feeder::replicate(Packet &pckt, float p)
 	Actor::replicate(pckt, p);
 	pckt.read(aim);
 	pckt.read(hp);
-	bdb->replicate(pckt, p);
+	body->replicate(pckt, p);
 }
 
 bool	Feeder::targetsomeone()
@@ -75,25 +78,25 @@ bool	Feeder::targetsomeone()
 	{
 		if (am->_actors[i] && (plr = dynamic_cast<Player *>(am->_actors[i])))
 		{
-			cur = Sgl::norm(bdb->loc - plr->bdb->loc);
+			cur = Sgl::norm(body->position - plr->body->position);
 			if (cur > max)
 			{
 				max = cur;
-				aim = plr->bdb->loc;
+				aim = plr->body->position;
 			}
 		}
 	}
-	dir = Sgl::unit(aim - bdb->loc);
-	bdb->nextspd = dir * 150.0f;
+	dir = Sgl::unit(aim - body->position);
+	body->velocity = dir * 150.0f;
 	return (true);
 }
 
-bool	Feeder::collide(Actor const &x)
+bool	Feeder::collide(Collider *x)
 {
 	Projectile const	*prj;
 	//Bonus				*b;
 
-	if ((prj = dynamic_cast<Projectile const *>(&x)))
+	if ((prj = dynamic_cast<Projectile const *>(x)))
 	{
 		if (am->master && rp)
 			rp->needupdate = true;
@@ -112,7 +115,7 @@ bool	Feeder::collide(Actor const &x)
 			destroy();
 		}
 	}
-	else if (dynamic_cast<Player const *>(&x))
+	else if (dynamic_cast<Player const *>(x))
 		destroy();
 	return (false);
 }

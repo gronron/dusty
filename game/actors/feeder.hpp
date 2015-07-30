@@ -2,14 +2,14 @@
 #define FEEDER_H_
 
 #include "actor.hpp"
-#include "boundingbox.hpp"
 #include "particlesystem.hpp"
 
 class	Feeder : public Actor
 {
 	public:
 
-		Boundingbox	*bdb;
+		Body			*body;
+		Sphereshape		shape;
 
 		float			hp;
 
@@ -28,7 +28,7 @@ class	Feeder : public Actor
 		void	get_replication(Packet &);
 		void	replicate(Packet &, float);
 
-		bool	collide(Actor const &);
+		bool	collide(Collider *);
 
 		bool	targetsomeone();
 };

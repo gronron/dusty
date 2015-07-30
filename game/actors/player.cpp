@@ -21,15 +21,15 @@ FACTORYREG(Player);
 
 Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), dmg(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
 {
-	am->pe->add(&bdb, 0, true);
+	am->pe->new_body(&body);
+	body->collider = this;
+	shape.radius = 32.0f;
+	body->shape = &shape;
+	body->dynamic = true;
+	body->position = 128.0f;
 	
 	firing = true;
 	loadingfire = false;
-	bdb->actor = this;
-	bdb->nextloc[0] = 128.0f;
-	bdb->nextloc[1] = 128.0f;
-	bdb->size = 25.0f;
-	
 }
 
 Player::~Player()
@@ -39,9 +39,10 @@ Player::~Player()
 
 void	Player::postinstanciation()
 {
+	am->pe->init_body(body);
 	if (am->graphic)
 	{
-		ps = new Particlesystem(am->ge, 1.0f, "player", &bdb);
+		ps = new Particlesystem(am->ge, 1.0f, "player", &body);
 		am->ge->add(ps);
 		//hud = new Hud(1.0f, &cleared, this);
 	}
@@ -53,7 +54,7 @@ void	Player::postinstanciation()
 void	Player::destroy()
 {
 	Actor::destroy();
-	am->pe->remove(bdb);
+	am->pe->delete_body(body);
 	if (am->graphic)
 		am->ge->remove(ps);
 }
@@ -75,7 +76,7 @@ void	Player::get_replication(Packet &pckt)
 	Actor::get_replication(pckt);
 	pckt.write(dir);
 	pckt.write(firing);
-	bdb->get_replication(pckt);
+	body->get_replication(pckt);
 }
 
 void	Player::replicate(Packet &pckt, float p)
@@ -83,7 +84,7 @@ void	Player::replicate(Packet &pckt, float p)
 	Actor::replicate(pckt, p);
 	pckt.read(dir);
 	pckt.read(firing);
-	bdb->replicate(pckt, p);
+	body->replicate(pckt, p);
 }
 
 void	Player::tick(float delta)
@@ -106,11 +107,10 @@ void	Player::tick(float delta)
 
 				p->ownerid = id;
 				p->dmg = dmg;
-				p->bdb->nextloc = bdb->nextloc;
-				p->bdb->loc = bdb->nextloc;
+				p->body->position = body->position;
 				a[0] = MT().genrand_real1(-1.0, 1.0);
 				a[1] = MT().genrand_real1(-1.0, 1.0);
-				p->bdb->nextspd = Sgl::unit(a) * 512.0f;
+				p->body->velocity = Sgl::unit(a) * 512.0f;
 			}
 			loadingtime = 0.0f;
 		}
@@ -122,7 +122,7 @@ void	Player::tick(float delta)
 	}
 }
 
-bool			Player::collide(Actor const &x)
+bool			Player::collide(Collider *x)
 {
 /*	Bonus const	*b;
 	Feeder const *f;
@@ -144,7 +144,7 @@ bool			Player::collide(Actor const &x)
 		if (dose > tolerance)
 			;//am->em.running = false;
 	}*/
-	if (dynamic_cast<Level const *>(&x))
+	if (dynamic_cast<Level const *>(x))
 		return (true);
 	return (false);
 }
@@ -158,9 +158,8 @@ bool	Player::fire()
 			Projectile *p = (Projectile *)am->create("Projectile", this, true);
 			p->ownerid = id;
 			p->dmg = dmg;
-			p->bdb->nextloc = bdb->nextloc;
-			p->bdb->loc = bdb->nextloc;
-			p->bdb->nextspd = dir * 512.0f;
+			p->body->position = body->position;
+			p->body->velocity = dir * 512.0f;
 		}
 		return (true);
 	}
