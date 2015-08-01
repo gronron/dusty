@@ -30,6 +30,7 @@ Projectile::~Projectile()
 
 void	Projectile::postinstanciation()
 {
+	Actor::postinstanciation();
 	am->pe->init_body(body);
 	if (am->graphic)
 	{

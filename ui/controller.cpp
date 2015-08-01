@@ -45,6 +45,7 @@ Controller::~Controller()
 
 void	Controller::postinstanciation()
 {
+	Actor::postinstanciation();
 	if (am->_controllermap.find(id) != am->_controllermap.end())
 		bind();
 }

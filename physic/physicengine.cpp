@@ -77,7 +77,7 @@ void		Physicengine::new_body(Body **link)
 void		Physicengine::init_body(Body *body)
 {
 	Aabb	aabb;
-	
+
 	body->shape->compute_aabb(aabb, body->position);
 	if (body->dynamic)
 		body->index = _dynamictree.add_aabb(aabb, (unsigned int)(body - _bodies));
@@ -115,15 +115,12 @@ void		Physicengine::tick(float delta)
 			_bodies[i].prevvelocity = _bodies[i].velocity;
 			_bodies[i].position = _bodies[i].position + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
 			_bodies[i].velocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
-			
-			
-			/*move aabb
+
 			_bodies[i].shape->compute_aabb(_bodies[i].aabb, _bodies[i].position);
 			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb);
-			*/
 		}
 	}
-	
+	/*
 	_pcount = 0;
 	for (unsigned int i = 0; i < _bsize; ++i)
 	{
@@ -134,12 +131,11 @@ void		Physicengine::tick(float delta)
 			_statictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
 		}
 	}
-	
 	for (unsigned int i = 0; i < _pcount; ++i)
 	{
-		_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
-		_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
-	}
+		//_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
+		//_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
+	}*/
 }
 
 void	Physicengine::_add_pair(int const index)

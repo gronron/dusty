@@ -49,8 +49,10 @@ struct		Node
 			int	left;
 			int	right;
 		};
-		unsigned int	data;	// id of the data
+		//unsigned int	data;	// id of the data
 	};
+	
+	unsigned int	data;
 
 	Aabb	aabb;
 	int		height;

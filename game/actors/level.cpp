@@ -47,6 +47,7 @@ Level::~Level()
 
 void	Level::postinstanciation()
 {
+	Actor::postinstanciation();
 	if (!am->master)
 		_generate_block();
 	if (am->graphic)

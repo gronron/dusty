@@ -39,6 +39,7 @@ Player::~Player()
 
 void	Player::postinstanciation()
 {
+	Actor::postinstanciation();
 	am->pe->init_body(body);
 	if (am->graphic)
 	{

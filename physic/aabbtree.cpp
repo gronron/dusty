@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "new.hpp"
 #include "math/vec_util.hpp"
 #include "aabbtree.hpp"
+#include <iostream>
 
 #define GAP 0.5f
 #define	MUL 2.0f
@@ -77,6 +78,10 @@ int		Aabbtree::add_aabb(Aabb const &aabb, int const data)
 	int	index;
 	
 	index = _allocate_node();
+	
+	_nodes[index].left = -1;
+	_nodes[index].right = -1;
+	_nodes[index].height = 0;
 	_nodes[index].aabb.bottom = aabb.bottom - GAP;
 	_nodes[index].aabb.top = aabb.top + GAP;
 	_nodes[index].data = data;
@@ -144,7 +149,6 @@ int		Aabbtree::_allocate_node()
 	
 	index = _free;
 	_free = _nodes[_free].next;
-	_nodes[index].right = -1;
 	return (index);
 }
 
@@ -160,7 +164,6 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 	{
 		_root = index;
 		_nodes[index].parent = -1;
-		_nodes[index].height = 0;
 		return;
 	}
 
@@ -194,7 +197,7 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 
 		if (cost < left_cost && cost < right_cost)
 			break;
-		i = left_cost <= right_cost ? left : right;
+		i = left_cost <= right_cost ? left : right;	
 	}
 
 	// Create a new parent.
@@ -219,8 +222,7 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 	}
 	else
 		_root = newparent;
-
-	_balance(i);
+	_balance(_nodes[index].parent);
 }
 
 void	Aabbtree::_remove_leaf(int const index)
@@ -247,7 +249,7 @@ void	Aabbtree::_remove_leaf(int const index)
 				_nodes[grandparent].right = sibling;
 			_nodes[sibling].parent = grandparent;
 			_free_node(parent);
-			_balance(index);
+			_balance(grandparent);
 		}
 	}
 }
@@ -282,48 +284,55 @@ void	Aabbtree::_balance(int const index)
 	}
 }
 
-void	Aabbtree::_rotate(int const index, int const up, int const down)
+void	Aabbtree::_rotate(int const up, int const down, int const sibling)
 {
-	int left = _nodes[up].left;
-	int right = _nodes[up].right;
+	int left = _nodes[down].left;
+	int right = _nodes[down].right;
 
-	_nodes[up].left = index;
-	_nodes[up].parent = _nodes[index].parent;
-	_nodes[index].parent = up;
+	_nodes[down].left = up;
+	_nodes[down].parent = _nodes[up].parent;
+	_nodes[up].parent = down;
 
-	if (_nodes[up].parent != -1)
+	if (_nodes[down].parent != -1)
 	{
-		if (_nodes[_nodes[up].parent].left == index)
-			_nodes[_nodes[up].parent].left = up;
+		if (_nodes[_nodes[down].parent].left == up)
+			_nodes[_nodes[down].parent].left = down;
 		else
-			_nodes[_nodes[up].parent].right = up;
+			_nodes[_nodes[down].parent].right = down;
 	}
 	else
-		_root = up;
+		_root = down;
 
 	if (_nodes[left].height > _nodes[right].height)
 	{
-		_nodes[up].right = left;
-		_nodes[index].left = right;
-		_nodes[right].parent = index;
+		_nodes[down].right = left;
+		if (_nodes[up].left == down)
+			_nodes[up].left = right;
+		else
+			_nodes[up].right = right;
+		_nodes[right].parent = up;
 		
-		merge_aabb(_nodes[index].aabb, _nodes[down].aabb, _nodes[right].aabb);
-		merge_aabb(_nodes[up].aabb, _nodes[index].aabb, _nodes[left].aabb);
+		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[right].aabb);
+		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[left].aabb);
 
-		_nodes[index].height = (_nodes[down].height > _nodes[right].height ? _nodes[down].height : _nodes[right].height) + 1;
-		_nodes[up].height = (_nodes[index].height > _nodes[left].height ? _nodes[index].height : _nodes[left].height) + 1;
+		_nodes[up].height = (_nodes[sibling].height > _nodes[right].height ? _nodes[sibling].height : _nodes[right].height) + 1;
+		_nodes[down].height = (_nodes[up].height > _nodes[left].height ? _nodes[up].height : _nodes[left].height) + 1;
 	}
 	else
 	{
-		_nodes[up].right = right;
-		_nodes[index].left = left;
-		_nodes[left].parent = index;
+		_nodes[down].right = right;
+		if (_nodes[up].left == down)
+			_nodes[up].left = left;
+		else
+			_nodes[up].right = left;
+		_nodes[up].left = left;
+		_nodes[left].parent = up;
 
-		merge_aabb(_nodes[index].aabb, _nodes[down].aabb, _nodes[left].aabb);
-		merge_aabb(_nodes[up].aabb, _nodes[index].aabb, _nodes[right].aabb);
+		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[left].aabb);
+		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[right].aabb);
 
 		
-		_nodes[index].height = (_nodes[down].height > _nodes[left].height ? _nodes[down].height : _nodes[left].height) + 1;
-		_nodes[up].height = (_nodes[index].height > _nodes[right].height ? _nodes[index].height : _nodes[right].height) + 1;
+		_nodes[up].height = (_nodes[sibling].height > _nodes[left].height ? _nodes[sibling].height : _nodes[left].height) + 1;
+		_nodes[down].height = (_nodes[up].height > _nodes[right].height ? _nodes[up].height : _nodes[right].height) + 1;
 	}
 }

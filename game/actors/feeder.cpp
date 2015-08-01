@@ -31,6 +31,7 @@ Feeder::~Feeder()
 
 void	Feeder::postinstanciation()
 {
+	Actor::postinstanciation();
 	am->pe->init_body(body);
 	if (am->graphic)
 	{
