@@ -107,7 +107,7 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)
 		if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
 		{
 			if (_nodes[index].right == -1)
-				(object->*callback)(index);
+				(object->*callback)(_nodes[index].data);
 			else
 			{
 				_nstack[top++] = _nodes[index].left;

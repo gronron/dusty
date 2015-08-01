@@ -197,7 +197,7 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 
 		if (cost < left_cost && cost < right_cost)
 			break;
-		i = left_cost <= right_cost ? left : right;	
+		i = left_cost <= right_cost ? left : right;
 	}
 
 	// Create a new parent.
@@ -325,13 +325,11 @@ void	Aabbtree::_rotate(int const up, int const down, int const sibling)
 			_nodes[up].left = left;
 		else
 			_nodes[up].right = left;
-		_nodes[up].left = left;
 		_nodes[left].parent = up;
 
 		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[left].aabb);
 		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[right].aabb);
 
-		
 		_nodes[up].height = (_nodes[sibling].height > _nodes[left].height ? _nodes[sibling].height : _nodes[left].height) + 1;
 		_nodes[down].height = (_nodes[up].height > _nodes[right].height ? _nodes[up].height : _nodes[right].height) + 1;
 	}

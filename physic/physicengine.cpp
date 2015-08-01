@@ -41,7 +41,10 @@ Physicengine::Physicengine() : _bsize(64), _bodies(0), _bfree(0), _pcount(0), _p
 	_pairs = new Pair[_psize];
 
 	for (unsigned int i = 0; i < _bsize - 1; ++i)
-			_bodies[i].next = i + 1;
+	{
+		_bodies[i].next = i + 1;
+		_bodies[i].index = -1;
+	}
 	_bodies[_bsize - 1].next = -1;
 }
 
@@ -57,13 +60,17 @@ void		Physicengine::new_body(Body **link)
 	if (_bfree == -1)
 	{
 		_bfree = _bsize;
-		_bodies = resize(_bodies, _bsize,_bsize << 1);
+		_bodies = resize(_bodies, _bsize, _bsize << 1);
 		_bsize <<= 1;
 		for (unsigned int i = 0; i < _bsize >> 1; ++i)
 			*_bodies[i].link = _bodies + i;
 		for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
+		{
 			_bodies[i].next = i + 1;
-		_bodies[_bsize - 1].next = -1;	
+			_bodies[i].index = -1;
+		}
+		_bodies[_bsize - 1].next = -1;
+		_bodies[_bsize - 1].index = -1;
 	}
 
 	body = _bodies + _bfree;
@@ -71,7 +78,6 @@ void		Physicengine::new_body(Body **link)
 	
 	body->link = link;
 	*body->link = body;
-	body->index = -1;
 }
 
 void		Physicengine::init_body(Body *body)
@@ -102,6 +108,7 @@ void		Physicengine::delete_body(Body *body)
 		body->index = -1;
 	}
 	body->next = _bfree;
+	body->index = -1;
 	_bfree = body - _bodies;
 }
 
@@ -120,7 +127,7 @@ void		Physicengine::tick(float delta)
 			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb);
 		}
 	}
-	/*
+	
 	_pcount = 0;
 	for (unsigned int i = 0; i < _bsize; ++i)
 	{
@@ -133,9 +140,9 @@ void		Physicengine::tick(float delta)
 	}
 	for (unsigned int i = 0; i < _pcount; ++i)
 	{
-		//_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
-		//_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
-	}*/
+		_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
+		_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
+	}
 }
 
 void	Physicengine::_add_pair(int const index)
