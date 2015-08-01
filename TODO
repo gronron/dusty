@@ -1,4 +1,3 @@
 -make the physic engine working, generic and efficient
--move from SFML to SDL2
 -specialise vec<4, float> for SSEx
 -create a voxel engine like this https://www.youtube.com/watch?v=3fOpHRrOBJQ
