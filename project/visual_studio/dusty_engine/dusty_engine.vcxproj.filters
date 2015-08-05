@@ -311,5 +311,8 @@
     <ClInclude Include="..\..\..\network\client.hpp">
       <Filter>Header Files\network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\thread\spinlock.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

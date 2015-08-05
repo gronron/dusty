@@ -152,6 +152,7 @@
     <ClInclude Include="..\..\..\libsrc\thread\conditionvariable.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\mutex.hpp" />
+    <ClInclude Include="..\..\..\libsrc\thread\spinlock.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\thread.hpp" />
     <ClInclude Include="..\..\..\libsrc\time\time.hpp" />
     <ClInclude Include="..\..\..\network\client.hpp" />
