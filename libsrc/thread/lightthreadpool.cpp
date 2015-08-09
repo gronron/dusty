@@ -85,7 +85,7 @@ Lightthreadpool::~Lightthreadpool()
 	delete [] _wrkrs;
 }
 
-void	Lightthreadpool::addtask(void *(*function)(void*), void *data)
+void	Lightthreadpool::add_task(void *(*function)(void*), void *data)
 {
 	if ((_wrkrs[_looper].front + 1) % _queuesize != _wrkrs[_looper].back)
 	{
