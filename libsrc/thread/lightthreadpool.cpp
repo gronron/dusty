@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "lightthreadpool.hpp"
 
-Lightthreadpool	&Lightthreadpool::get_instance()
+Lightthreadpool				&Lightthreadpool::get_instance()
 {
 	static	Lightthreadpool	instance(8, 4096);
 
@@ -48,7 +48,6 @@ void				*Lightthreadpool::_runthrd(void *data)
 		{
 			wrkr->tasks[wrkr->back].function(wrkr->tasks[wrkr->back].data);
 			wrkr->back = (wrkr->back + 1) % ltp->_queuesize;
-			
 		}
 		else
 		{
@@ -61,7 +60,7 @@ void				*Lightthreadpool::_runthrd(void *data)
 	return (0);
 }
 
-Lightthreadpool::Lightthreadpool(unsigned int n, unsigned int s) : _thrdnbr(n), _queuesize(s), _looper(0), _running(true)
+Lightthreadpool::Lightthreadpool(unsigned int const n, unsigned int const s) : _thrdnbr(n), _queuesize(s), _looper(0), _running(true)
 {
 	_wrkrs = new Worker[_thrdnbr];
 
@@ -87,18 +86,15 @@ Lightthreadpool::~Lightthreadpool()
 
 void	Lightthreadpool::add_task(void *(*function)(void*), void *data)
 {
-	if ((_wrkrs[_looper].front + 1) % _queuesize != _wrkrs[_looper].back)
-	{
-		_wrkrs[_looper].tasks[_wrkrs[_looper].front].function = function;
-		_wrkrs[_looper].tasks[_wrkrs[_looper].front].data = data;
-		_wrkrs[_looper].front = (_wrkrs[_looper].front + 1) % _queuesize;
-	}
-	else
+	if (!(_wrkrs[_looper].front + 1) % _queuesize != _wrkrs[_looper].back)
 		run();
+	_wrkrs[_looper].tasks[_wrkrs[_looper].front].function = function;
+	_wrkrs[_looper].tasks[_wrkrs[_looper].front].data = data;
+	_wrkrs[_looper].front = (_wrkrs[_looper].front + 1) % _queuesize;
 	_looper = (_looper + 1) % _thrdnbr;
 }
 
-void	Lightthreadpool::run()
+void		Lightthreadpool::run()
 {
 	bool	done = false;
 

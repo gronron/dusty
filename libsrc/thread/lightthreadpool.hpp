@@ -45,6 +45,15 @@ class	Lightthreadpool
 			void	*data;
 		};
 
+		template<class T, class U, class V>
+		struct				Taskset
+		{
+			unsigned int	size;
+			T				*data;
+			U				*function;
+			V				param;
+		};
+
 		struct				Worker
 		{
 			Thread			thrd;
@@ -54,8 +63,9 @@ class	Lightthreadpool
 			unsigned int	back;
 		};
 
-		static Lightthreadpool		&get_instance();
-		static	void				*_runthrd(void *);
+
+		static Lightthreadpool	&get_instance();
+		static void				*_runthrd(void *);
 
 
 		unsigned int		_thrdnbr;
@@ -70,7 +80,7 @@ class	Lightthreadpool
 		Conditionvariable	_scv;
 
 
-		Lightthreadpool(unsigned int thrdnbr, unsigned int queuesize);
+		Lightthreadpool(unsigned int const thrdnbr, unsigned int const queuesize);
 		~Lightthreadpool();
 
 		
@@ -78,43 +88,13 @@ class	Lightthreadpool
 		void	run();
 		
 		template<template<class, class, class>class F, class T, class U, class V>
-		void	run_tasks(unsigned int size, T *data, U *function, V param);
-};
-
-template<class T, class U, class V>
-struct				Tasks
-{
-	unsigned int	size;
-	T				*data;
-	U				*function;
-	V				param;
-};
-/*
-call_f
-call_fp
-
-call_m
-call_mp
-call_mpp
-*/
-template<class T, class U, class V>
-struct	bullshit
-{
-
-static void				*call(void *data)
-{
-	Tasks<T, U, V>	*tsks = (Tasks<T, U, V> *)data;
-
-	for (unsigned int i = 0; i < tsks->size; ++i)
-		tsks->function(*tsks->data + i);
-	return (0);
-}
+		void	run_tasks(unsigned int const size, T *data, U *function, V param);
 };
 
 template<template<class, class, class>class F, class T, class U, class V>
-void				Lightthreadpool::run_tasks(unsigned int size, T *data, U *function, V param)
+void					Lightthreadpool::run_tasks(unsigned int const size, T *data, U *function, V param)
 {
-	Tasks<T, U, V>	a[8];
+	Taskset<T, U, V>	a[8];
 
 	unsigned int chunk = size / _thrdnbr;
 	unsigned int left = size % _thrdnbr;
@@ -126,9 +106,7 @@ void				Lightthreadpool::run_tasks(unsigned int size, T *data, U *function, V pa
 		a[i].data = data + offset;
 		offset += a[i].size;
 		a[i].function = function;
-		_wrkrs[i].tasks[_wrkrs[i].front].function = &F<T, U, V>::call;
-		_wrkrs[i].tasks[_wrkrs[i].front].data = a + i;
-		_wrkrs[i].front = (_wrkrs[i].front + 1) % _queuesize;
+		add_task(&F<T, U, V>::caller, a + i);
 	}
 	run();
 }
