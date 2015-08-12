@@ -46,6 +46,7 @@ void	Feeder::destroy()
 	Actor::destroy();
 	if (am->graphic)
 	{
+		ps->stop();
 		am->ge->add(new Particlesystem(am->ge, 0.0f, "explosion", (vec<float, 3>)body->position));
 	}
 }

@@ -86,7 +86,7 @@ Lightthreadpool::~Lightthreadpool()
 
 void	Lightthreadpool::add_task(void *(*function)(void*), void *data)
 {
-	if (!(_wrkrs[_looper].front + 1) % _queuesize != _wrkrs[_looper].back)
+	if (!((_wrkrs[_looper].front + 1) % _queuesize != _wrkrs[_looper].back))
 		run();
 	_wrkrs[_looper].tasks[_wrkrs[_looper].front].function = function;
 	_wrkrs[_looper].tasks[_wrkrs[_looper].front].data = data;

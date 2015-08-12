@@ -10,18 +10,11 @@ class	Level : public Actor
 {
 	public:
 
-		struct Block
-		{
-			int				t;
-			vec<float, 2>	loc;
-			Body			*body;
-		};
-
+	
 		unsigned int		x;
 		unsigned int		y;
 		char				**map;
-
-		std::vector<Block>	_map;
+		Body				***bodies;
 
 		Axisboxshape	shape;
 		Leveldisplayer	*ld;

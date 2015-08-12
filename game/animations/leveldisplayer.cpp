@@ -16,16 +16,23 @@ bool	Leveldisplayer::tick(float)
 	return (true);
 }
 
-void									Leveldisplayer::draw()
+void				Leveldisplayer::draw()
 {
-	std::vector<Level::Block>::iterator	i;
-	vec<float, 4>						a, b;
-	vec<float, 2>						s;
+	vec<float, 4>	a, b;
+	vec<float, 2>	s;
+	vec<float, 2>	position;
 	a = 1.0f;
 	b = 0.33f;
 	b[3] = 1.0f;
 	s = 0.25f;
 
-	for (i = lvl->_map.begin(); i != lvl->_map.end(); ++i)
-		_ge->draw_texture(tex, i->loc, s, i->t ? a : b);
+	for (unsigned int j = 0; j < lvl->y; ++j)
+	{
+		for (unsigned int i = 0; i < lvl->x; ++i)
+		{
+			position[0] = i * 64.0f;
+			position[1] = j * 64.0f;
+			_ge->draw_texture(tex, position, s, lvl->map[j][i] ? a : b);
+		}
+	}
 }

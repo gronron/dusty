@@ -154,7 +154,6 @@ void	Physicengine::_add_pair(int const index)
 			_psize <<= 1;
 			_pairs = resize(_pairs, _pcount, _psize);
 		}
-	
 		_pairs[_pcount].a = _currentquery;
 		_pairs[_pcount].b = index;
 		++_pcount;

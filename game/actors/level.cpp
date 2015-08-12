@@ -35,11 +35,11 @@ Level::~Level()
 {
 	std::cout << "start ~level" << std::endl;
 	delete_matrix(map);
-	for (unsigned int i = 0; i < _map.size(); ++i)
-	{
-		if (_map[i].body)
-			am->pe->delete_body(_map[i].body);
-	}
+	for (unsigned int j = 0; j < y; ++j)
+		for (unsigned int i = 0; i < x; ++i)
+			if (bodies[j][i])
+				am->pe->delete_body(bodies[j][i]);
+	delete_matrix(bodies);
 	if (am->graphic)
 		am->ge->remove(ld);
 	std::cout << "done ~level" << std::endl;
@@ -105,27 +105,24 @@ bool	Level::increase_difficulty()
 
 void		Level::_generate_block()
 {
-	Block	blck;
-
 	shape.size = 64.0f;
+	bodies = new_matrix<Body *>(x, y);
 	for (unsigned int j = 0; j < y; ++j)
 	{
 		for (unsigned int i = 0; i < x; ++i)
 		{
-			blck.loc[0] = i * 64.0f;
-			blck.loc[1] = j * 64.0f;
-			if ((blck.t = map[j][i]))
+			if (map[j][i])
 			{
-				am->pe->new_body(&blck.body);
-				blck.body->collider = this;
-				blck.body->shape = &shape;
-				blck.body->dynamic = false;
-				blck.body->position = blck.loc;
-				am->pe->init_body(blck.body);
+				am->pe->new_body(&bodies[j][i]);
+				bodies[j][i]->collider = this;
+				bodies[j][i]->shape = &shape;
+				bodies[j][i]->dynamic = false;
+				bodies[j][i]->position[0] = i * 64.0f;
+				bodies[j][i]->position[1] = j * 64.0f;
+				am->pe->init_body(bodies[j][i]);
 			}
 			else
-				blck.body = 0;
-			_map.push_back(blck);
+				bodies[j][i] = 0;
 		}
 	}
 }

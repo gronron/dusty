@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "body.hpp"
 #include "aabbtree.hpp"
+#include "thread/spinlock.hpp"
 
 class	Physicengine
 {
