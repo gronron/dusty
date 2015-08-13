@@ -106,6 +106,7 @@ void					Lightthreadpool::run_tasks(unsigned int const size, T *data, U *functio
 		a[i].data = data + offset;
 		offset += a[i].size;
 		a[i].function = function;
+		a[i].param = param;
 		add_task(&F<T, U, V>::caller, a + i);
 	}
 	run();

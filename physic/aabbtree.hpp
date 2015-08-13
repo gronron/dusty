@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AABBTREE_H_
 #define AABBTREE_H_
 
+#include "malloc.h"
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
@@ -79,7 +80,7 @@ class	Aabbtree
 		bool	move_aabb(int const, Aabb const &, vec<float, 3> const &);
 
 		template<class T>
-		void	query(Aabb const &, T *, void (T::*)(int const));
+		void	query(Aabb const &, T *, void (T::*)(int const)) const;
 		void	raycast() const;
 
 		int		_allocate_node();
@@ -93,14 +94,15 @@ class	Aabbtree
 };
 
 template<class T>
-void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const))
+void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)) const
 {
 	int	top = 0;
+	int	*stack = new int[_nsize];
 	
-	_nstack[top++] = _root;
+	stack[top++] = _root;
 	while (top > 0)
 	{
-		int	index = _nstack[--top];
+		int	index = stack[--top];
 		if (index == -1)
 			continue;
 
@@ -110,11 +112,12 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)
 				(object->*callback)(_nodes[index].data);
 			else
 			{
-				_nstack[top++] = _nodes[index].left;
-				_nstack[top++] = _nodes[index].right;
+				stack[top++] = _nodes[index].left;
+				stack[top++] = _nodes[index].right;
 			}
 		}
 	}
+	delete [] stack;
 }
 
 #endif

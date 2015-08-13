@@ -66,6 +66,7 @@ Lightthreadpool::Lightthreadpool(unsigned int const n, unsigned int const s) : _
 
 	for (unsigned int i = 0; i < _thrdnbr; ++i)
 	{
+		_wrkrs[i].ltp = this;
 		_wrkrs[i].tasks = new Task[_queuesize];
 		_wrkrs[i].front = 0;
 		_wrkrs[i].back = 0;

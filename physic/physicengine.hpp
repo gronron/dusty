@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "body.hpp"
 #include "aabbtree.hpp"
-#include "thread/spinlock.hpp"
+#include "thread/mutex.hpp"
 
 class	Physicengine
 {
@@ -56,7 +56,8 @@ class	Physicengine
 		unsigned int	_pcount;
 		unsigned int	_psize;
 		Pair			*_pairs;
-		int				_currentquery;
+		//int				_currentquery;
+		Mutex		spinlock;
 
 
 		Physicengine();

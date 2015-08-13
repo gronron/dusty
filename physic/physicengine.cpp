@@ -30,12 +30,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "new.hpp"
 #include "math/vec_util.hpp"
+#include "thread/lightthreadpool.hpp"
+#include "thread/lightthreadpool_util.hpp"
 #include "actor.hpp"
 #include "physicengine.hpp"
 #include <iostream>
 #include <cstdlib>
 
-Physicengine::Physicengine() : _bsize(64), _bodies(0), _bfree(0), _pcount(0), _psize(64), _pairs(0), _currentquery(0)
+Physicengine::Physicengine() : _bsize(64), _bodies(0), _bfree(0), _pcount(0), _psize(64), _pairs(0)//, _currentquery(0)
 {
 	_bodies = new Body[_bsize];
 	_pairs = new Pair[_psize];
@@ -51,6 +53,7 @@ Physicengine::Physicengine() : _bsize(64), _bodies(0), _bfree(0), _pcount(0), _p
 Physicengine::~Physicengine()
 {
 	delete [] _bodies;
+	delete [] _pairs;
 }
 
 void		Physicengine::new_body(Body **link)
@@ -61,10 +64,11 @@ void		Physicengine::new_body(Body **link)
 	{
 		_bfree = _bsize;
 		_bodies = resize(_bodies, _bsize, _bsize << 1);
-		_bsize <<= 1;
-		for (unsigned int i = 0; i < _bsize >> 1; ++i)
+		unsigned int i = 0;
+		for (; i < _bsize; ++i)
 			*_bodies[i].link = _bodies + i;
-		for (unsigned int i = _bsize >> 1; i < _bsize - 1; ++i)
+		_bsize <<= 1;
+		for (; i < _bsize - 1; ++i)
 		{
 			_bodies[i].next = i + 1;
 			_bodies[i].index = -1;
@@ -108,8 +112,19 @@ void		Physicengine::delete_body(Body *body)
 		body->index = -1;
 	}
 	body->next = _bfree;
-	body->index = -1;
 	_bfree = body - _bodies;
+}
+
+thread_local int	_currentquery;
+
+void	_query(Body const *body, Physicengine *pe)
+{
+	if (body->index != -1 && body->dynamic)
+	{
+		_currentquery = body - pe->_bodies;
+		pe->_dynamictree.query(body->aabb, pe, &Physicengine::_add_pair);
+		pe->_statictree.query(body->aabb, pe, &Physicengine::_add_pair);
+	}
 }
 
 void		Physicengine::tick(float delta)
@@ -129,15 +144,16 @@ void		Physicengine::tick(float delta)
 	}
 	
 	_pcount = 0;
-	for (unsigned int i = 0; i < _bsize; ++i)
+	Lightthreadpool::get_instance().run_tasks<Caller_fa>(_bsize, _bodies, _query, this);
+	/*for (unsigned int i = 0; i < _bsize; ++i)
 	{
-		if (_bodies[i].index != -1)
+		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 		{
 			_currentquery = i;
 			_dynamictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
 			_statictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
 		}
-	}
+	}*/
 	for (unsigned int i = 0; i < _pcount; ++i)
 	{
 		_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
@@ -149,6 +165,7 @@ void	Physicengine::_add_pair(int const index)
 {
 	if (index > _currentquery || !_bodies[index].dynamic)
 	{
+		spinlock.lock();
 		if (_pcount >= _psize)
 		{
 			_psize <<= 1;
@@ -157,6 +174,7 @@ void	Physicengine::_add_pair(int const index)
 		_pairs[_pcount].a = _currentquery;
 		_pairs[_pcount].b = index;
 		++_pcount;
+		spinlock.unlock();
 	}
 }
 /*

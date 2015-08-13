@@ -54,7 +54,7 @@ struct	Caller_fa
 		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
-			taskset->function(taskset->data + i, param);
+			taskset->function(taskset->data + i, taskset->param);
 		return (0);
 	}
 };
@@ -80,7 +80,7 @@ struct	Caller_fpa
 		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
-			taskset->function(*(taskset->data + i), param);
+			taskset->function(*(taskset->data + i), taskset->param);
 		return (0);
 	}
 };

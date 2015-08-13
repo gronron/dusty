@@ -314,5 +314,8 @@
     <ClInclude Include="..\..\..\libsrc\thread\spinlock.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool_util.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
