@@ -34,13 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 
 template<class T>
-T		*resize(T *ptr, unsigned int oldsize, unsigned int newsize)
+T		*resize(T *ptr, unsigned int const oldsize, unsigned int const newsize)
 {
 	T	*a;
 
 	if (!(a = new T[newsize]))
 		exit(EXIT_FAILURE);
-	for (unsigned int i = 0; i < oldsize; ++i)
+	for (unsigned int i = 0; i < (oldsize < newsize ? oldsize : newsize); ++i)
 		a[i] = ptr[i];
 	delete [] ptr;
 

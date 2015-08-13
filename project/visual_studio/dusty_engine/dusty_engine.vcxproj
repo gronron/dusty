@@ -142,6 +142,7 @@
     <ClInclude Include="..\..\..\libsrc\endian\packet.hpp" />
     <ClInclude Include="..\..\..\libsrc\math\vec.hpp" />
     <ClInclude Include="..\..\..\libsrc\math\vec_util.hpp" />
+    <ClInclude Include="..\..\..\libsrc\new.hpp" />
     <ClInclude Include="..\..\..\libsrc\random\mt19937.hpp" />
     <ClInclude Include="..\..\..\libsrc\random\prbg.hpp" />
     <ClInclude Include="..\..\..\libsrc\stream\selector.hpp" />

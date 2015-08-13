@@ -317,5 +317,8 @@
     <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool_util.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\new.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
