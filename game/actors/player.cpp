@@ -21,10 +21,8 @@ FACTORYREG(Player);
 
 Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), dmg(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
 {
-	am->pe->new_body(&body);
-	body->collider = this;
+	am->pe->new_body(&body, &shape, this);
 	shape.radius = 32.0f;
-	body->shape = &shape;
 	body->dynamic = true;
 	body->position = 128.0f;
 	

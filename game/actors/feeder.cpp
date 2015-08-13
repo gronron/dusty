@@ -16,10 +16,8 @@ FACTORYREG(Feeder);
 
 Feeder::Feeder(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), body(0), hp(2.0f)
 {
-	am->pe->new_body(&body);
-	body->collider = this;
+	am->pe->new_body(&body, &shape, this);
 	shape.radius = 20.0f;
-	body->shape = &shape;
 	body->dynamic = true;
 	aim = 0.0f;
 }
@@ -93,11 +91,14 @@ bool	Feeder::targetsomeone()
 	return (true);
 }
 
+#include <iostream>
+
 bool	Feeder::collide(Collider *x)
 {
 	Projectile const	*prj;
 	//Bonus				*b;
 
+	destroy();
 	if ((prj = dynamic_cast<Projectile const *>(x)))
 	{
 		if (am->master && rp)

@@ -13,8 +13,6 @@
 #include "feeder.hpp"
 #include "level.hpp"
 
-#include <iostream>
-
 FACTORYREG(Level);
 
 Level::Level(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), nbr(0)
@@ -33,7 +31,6 @@ Level::Level(Actormanager *a, Replication *r, int i, short int t, Actor const *o
 
 Level::~Level()
 {
-	std::cout << "start ~level" << std::endl;
 	delete_matrix(map);
 	for (unsigned int j = 0; j < y; ++j)
 		for (unsigned int i = 0; i < x; ++i)
@@ -42,7 +39,6 @@ Level::~Level()
 	delete_matrix(bodies);
 	if (am->graphic)
 		am->ge->remove(ld);
-	std::cout << "done ~level" << std::endl;
 }
 
 void	Level::postinstanciation()
@@ -113,9 +109,7 @@ void		Level::_generate_block()
 		{
 			if (map[j][i])
 			{
-				am->pe->new_body(&bodies[j][i]);
-				bodies[j][i]->collider = this;
-				bodies[j][i]->shape = &shape;
+				am->pe->new_body(&bodies[j][i], &shape, this);
 				bodies[j][i]->dynamic = false;
 				bodies[j][i]->position[0] = i * 64.0f;
 				bodies[j][i]->position[1] = j * 64.0f;

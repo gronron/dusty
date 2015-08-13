@@ -51,11 +51,11 @@ struct	Body
 		Body		**link;
 		int			next;
 	};
-	
+
 	int				index;
 	Shape			*shape;
 	Collider		*collider;
-	
+
 	bool			dynamic;
 
 	vec<float, 4>	position;

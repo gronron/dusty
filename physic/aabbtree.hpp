@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AABBTREE_H_
 #define AABBTREE_H_
 
-#include "malloc.h"
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
@@ -50,13 +49,11 @@ struct		Node
 			int	left;
 			int	right;
 		};
-		//unsigned int	data;	// id of the data
+		unsigned int	data;
 	};
-	
-	unsigned int	data;
 
-	Aabb	aabb;
 	int		height;
+	Aabb	aabb;
 };
 
 class	Aabbtree
@@ -65,7 +62,6 @@ class	Aabbtree
 
 		unsigned int	_nsize;
 		Node			*_nodes;
-		int				*_nstack;
 
 		int				_root;
 		int				_free;
@@ -97,8 +93,8 @@ template<class T>
 void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)) const
 {
 	int	top = 0;
-	int	*stack = new int[_nsize];
-	
+	int	stack[32];
+
 	stack[top++] = _root;
 	while (top > 0)
 	{
@@ -117,7 +113,6 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)
 			}
 		}
 	}
-	delete [] stack;
 }
 
 #endif

@@ -56,14 +56,14 @@ class	Physicengine
 		unsigned int	_pcount;
 		unsigned int	_psize;
 		Pair			*_pairs;
-		//int				_currentquery;
-		Mutex		spinlock;
+		int				_currentquery;
+		Mutex			spinlock;
 
 
 		Physicengine();
 		~Physicengine();
 
-		void	new_body(Body **);
+		void	new_body(Body **, Shape *, Collider *);
 		void	init_body(Body *);
 		void	delete_body(Body *);
 

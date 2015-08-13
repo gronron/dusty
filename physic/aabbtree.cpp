@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "new.hpp"
 #include "math/vec_util.hpp"
 #include "aabbtree.hpp"
-#include <iostream>
 
 #define GAP 0.5f
 #define	MUL 2.0f
@@ -60,7 +59,6 @@ static float	merged_perimeter(Aabb const &x, Aabb const &y)
 Aabbtree::Aabbtree() : _nsize(64), _nodes(0), _root(-1), _free(0)
 {
 	_nodes = new Node[_nsize];
-	_nstack = new int[_nsize];
 	
 	for (unsigned int i = 0; i < _nsize - 1; ++i)
 		_nodes[i].next = i + 1;
@@ -70,7 +68,6 @@ Aabbtree::Aabbtree() : _nsize(64), _nodes(0), _root(-1), _free(0)
 Aabbtree::~Aabbtree()
 {
 	delete [] _nodes;
-	delete [] _nstack;
 }
 
 int		Aabbtree::add_aabb(Aabb const &aabb, int const data)
@@ -140,7 +137,6 @@ int		Aabbtree::_allocate_node()
 	{
 		_free = _nsize;
 		_nodes = resize(_nodes, _nsize, _nsize << 1);
-		_nstack = resize(_nstack, _nsize, _nsize << 1);
 		_nsize <<= 1;
 		for (unsigned int i = _nsize >> 1; i < _nsize - 1; ++i)
 			_nodes[i].next = i + 1;
@@ -158,7 +154,7 @@ void	Aabbtree::_free_node(int const index)
 	_free = index;
 }
 
-void	Aabbtree::_insert_leaf(int const index) // need to correct
+void	Aabbtree::_insert_leaf(int const index) //nedd correction
 {
 	if (_root == -1)
 	{
@@ -167,7 +163,6 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 		return;
 	}
 
-	// Find the best sibling for this node
 	Aabb leafaabb = _nodes[index].aabb;
 	int i = _root;
 	while (_nodes[i].right != -1)
@@ -177,9 +172,7 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 
 		float combinedArea = merged_perimeter(_nodes[i].aabb, leafaabb);
 
-		// Cost of creating a new parent for this node and the new leaf
 		float cost = 2.0f * combinedArea;
-		// Minimum cost of pushing the leaf further down the tree
 		float inheritanceCost = 2.0f * (combinedArea - perimeter(_nodes[i].aabb));
 
 		float left_cost;
@@ -200,7 +193,6 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 		i = left_cost <= right_cost ? left : right;
 	}
 
-	// Create a new parent.
 	int oldparent = _nodes[i].parent;
 	int newparent = _allocate_node();
 
@@ -214,7 +206,6 @@ void	Aabbtree::_insert_leaf(int const index) // need to correct
 
 	if (oldparent != -1)
 	{
-		// The i was not the root.
 		if (_nodes[oldparent].left == i)
 			_nodes[oldparent].left = newparent;
 		else
@@ -279,8 +270,8 @@ void	Aabbtree::_balance(int const index)
 		int left = _nodes[i].left;
 		int right = _nodes[i].right;
 
-		merge_aabb(_nodes[i].aabb, _nodes[left].aabb, _nodes[right].aabb);
 		_nodes[i].height = (_nodes[left].height > _nodes[right].height ? _nodes[left].height : _nodes[right].height) + 1;
+		merge_aabb(_nodes[i].aabb, _nodes[left].aabb, _nodes[right].aabb);
 	}
 }
 
@@ -312,11 +303,11 @@ void	Aabbtree::_rotate(int const up, int const down, int const sibling)
 			_nodes[up].right = right;
 		_nodes[right].parent = up;
 		
-		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[right].aabb);
-		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[left].aabb);
-
 		_nodes[up].height = (_nodes[sibling].height > _nodes[right].height ? _nodes[sibling].height : _nodes[right].height) + 1;
 		_nodes[down].height = (_nodes[up].height > _nodes[left].height ? _nodes[up].height : _nodes[left].height) + 1;
+		
+		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[right].aabb);
+		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[left].aabb);
 	}
 	else
 	{
@@ -327,10 +318,10 @@ void	Aabbtree::_rotate(int const up, int const down, int const sibling)
 			_nodes[up].right = left;
 		_nodes[left].parent = up;
 
-		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[left].aabb);
-		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[right].aabb);
-
 		_nodes[up].height = (_nodes[sibling].height > _nodes[left].height ? _nodes[sibling].height : _nodes[left].height) + 1;
 		_nodes[down].height = (_nodes[up].height > _nodes[right].height ? _nodes[up].height : _nodes[right].height) + 1;
+
+		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[left].aabb);
+		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[right].aabb);
 	}
 }
