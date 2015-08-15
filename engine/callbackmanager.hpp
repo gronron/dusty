@@ -28,48 +28,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PHYSICENGINE_H_
-#define PHYSICENGINE_H_
+#ifndef CALLBACKMANAGER_H_
+#define CALLBACKMANAGER_H_
 
-#include "body.hpp"
-#include "aabbtree.hpp"
-#include "thread/mutex.hpp"
+#include "actor.hpp"
 
-class	Physicengine
+class	Callbackmanager
 {
 	public:
 	
-		struct	Pair
+		struct	Callback
 		{
-			int	a;
-			int	b;
+			Actor	*actor;
+			bool	(Actor::*function)();
+			float	delta;
+			float	timer;
+			bool	loop;
+			int		next;
 		};
 
 
-		unsigned int	_bdsize;
-		int				_bdfree;
-		Body			*_bodies;
-
-		Aabbtree		_dynamictree;
-		Aabbtree		_statictree;
-
-		unsigned int	_prcount;
-		unsigned int	_prsize;
-		Pair			*_pairs;
-		int				_currentquery;
-		Mutex			spinlock;
+		unsigned int	_cbsize;
+		int				_cbfree;
+		Callback		*_callbacks;
 
 
-		Physicengine();
-		~Physicengine();
-
-		void	new_body(Body **, Shape *, Collider *);
-		void	init_body(Body *);
-		void	delete_body(Body *);
-
-		void	tick(float const);
+		Callbackmanager();
+		~Callbackmanager();
 		
-		void	_add_pair(int const);
+		void	tick(float const delta);
+		
+		void	start_callback(Actor *actor, bool (Actor::*function)(), float delta, bool loop);
+		void	stop_callback(int callback);
 };
 
 #endif

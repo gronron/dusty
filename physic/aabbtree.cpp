@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GAP 0.5f
 #define	MUL 2.0f
 
-static void		merge_aabb(Aabb &x, Aabb const &y, Aabb const &z)
+static void	merge_aabb(Aabb &x, Aabb const &y, Aabb const &z)
 {
 	x.bottom = min(y.bottom, z.bottom);
 	x.top = max(y.top, z.top);
@@ -49,14 +49,14 @@ static float	perimeter(Aabb const &x)
 
 static float	merged_perimeter(Aabb const &x, Aabb const &y)
 {
-	Aabb	a;
+	Aabb		a;
 	
 	a.bottom = min(x.bottom, y.bottom);
 	a.top = max(x.top, y.top);
 	return (sum(a.top - a.bottom) * 2.0f);
 }
 
-Aabbtree::Aabbtree() : _nsize(64), _nodes(0), _root(-1), _free(0)
+Aabbtree::Aabbtree() : _nsize(1024), _nodes(0), _root(-1), _free(0)
 {
 	_nodes = new Node[_nsize];
 	
