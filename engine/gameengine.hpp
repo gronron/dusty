@@ -28,48 +28,70 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CALLBACKMANAGER_H_
-#define CALLBACKMANAGER_H_
+#ifndef GAMEENGINE_H_
+#define GAMEENGINE_H_
+
+#include <map>
+#include <string>
 
 class	Actor;
+class	Replication;
+class	Controller;
+class	Console;
+class	Eventmanager;
+//class	Uimanager;
+class	Physicengine;
+class	Networkengine;
+class	Callbackmanager;
+class	Graphicengine;
 
-class	Callbackmanager
+class	Gameengine
 {
 	public:
 
-		struct	Callback
+		struct			Option
 		{
-			int		id;
-			Actor	*actor;
-			bool	(Actor::*function)();
-			float	delta;
-			float	timer;
-			bool	loop;
-			int		next;
+			bool		master;
+			bool		local;
+			bool		graphic;
+			bool		audio;
+			std::string	ip;
+			std::string	port;
+			std::string	level;
 		};
 
 
-		unsigned int	_cbsize;
-		int				_cbfree;
-		Callback		*_callbacks;
+		bool			master;
+		
+		unsigned int	_actsize;
+		Actor			**_actors;
+
+		Callbackmanager	*callback;
+		Physicengine	*physic;
+		Networkengine	*network;
 
 
-		Callbackmanager();
-		~Callbackmanager();
+		Console			*console;
+		Graphicengine	*graphic;
+		Eventmanager	*event;
+		//Uimanager		*um;
 
-		void	tick(float const delta);
+		std::string					controllerclass;
+		std::map<int, Controller *>	_controllermap;
 
-		void	start_callback(int const id, Actor *actor, bool (Actor::*function)(), float const delta, bool const loop);
-		void	stop_callback(int const id, Actor *actor);
 
-		bool	is_callback_started(int const id, Actor const *actor) const;
-		bool	update_callback(int const id, Actor const *actor, float const delta);
-		bool	update_callback(int const id, Actor const *actor, bool const loop);
-		bool	update_callback(int const id, Actor const *actor, float const delta, bool const loop);
+		Gameengine(Option const &);
+		~Gameengine();
 
-		void	stop_allcallbacks(Actor *actor);
+		Actor	*create(std::string const &, Actor const *, bool const need_replication);
+		Actor	*create(Replication *);
+		Actor	*find_actor(int const);
+		void	notify_owner(Actor *, bool const);
+		void	notify_owned(Actor *, bool const);
+		void	destroy(int const);
+		void	control(int const);
 
-		void	_stop_callback(int const callback);
+		void	tick(float const);
 };
 
 #endif

@@ -28,14 +28,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include "new.hpp"
+#include "actor.hpp"
 #include "callbackmanager.hpp"
 
-Callbackmanager::Callbackmanager() : _dbsize(1024), _dbfree(0), _callbacks(0)
+Callbackmanager::Callbackmanager() : _cbsize(1024), _cbfree(0), _callbacks(0)
 {
 	_callbacks = new Callback[_cbsize];
 	for (unsigned int i = 0; i < _cbsize - 1; ++i)
 		_callbacks[i].next = i + 1;
-	_callbacks[_cbsize - 1] = -1;
+	_callbacks[_cbsize - 1].next = -1;
 }
 
 Callbackmanager::~Callbackmanager()
@@ -49,21 +51,21 @@ void	Callbackmanager::tick(float const delta)
 	{
 		if (_callbacks[i].actor)
 		{
-			if (_callbacks[i].timer += delta) >= _callbacks[i].delta)
+			if ((_callbacks[i].timer += delta) >= _callbacks[i].delta)
 			{
-				if (_callbacks[i].actor->(_callbacks[i].function)() && _callbacks[i].loop)
+				if ((_callbacks[i].actor->*_callbacks[i].function)() && _callbacks[i].loop)
 					_callbacks[i].timer -= _callbacks[i].delta;
 				else
-					stop_callback(i);
+					_stop_callback(i);
 			}
 		}
 	}
 }
 
-void	Callbackmanager::start_callback(Actor *actor, bool (Actor::*fx)(), float const delta, bool const loop)
+void	Callbackmanager::start_callback(int const id, Actor *actor, bool (Actor::*function)(), float const delta, bool const loop)
 {
-	int	callback;
-	
+	int	cb;
+
 	if (_cbfree == -1)
 	{
 		_cbfree = _cbsize;
@@ -73,51 +75,114 @@ void	Callbackmanager::start_callback(Actor *actor, bool (Actor::*fx)(), float co
 		_callbacks[_cbsize].next = -1;
 	}
 	
-	callback = _cbfree;
+	cb = _cbfree;
 	_cbfree = _callbacks[_cbfree].next;
-	_callbacks[callback].next = actor->callbacks;
-	actor->callbacks = callback;
+	_callbacks[cb].next = actor->callbacks;
+	actor->callbacks = cb;
 
-	_callbacks[callback].actor = actor;
-	_callbacks[callback].function = function;
-	_callbacks[callback].delta = delta;
-	_callbacks[callback].loop = loop;
-	_callbacks[callback].timer = 0.0f;
+	_callbacks[cb].id = id;
+	_callbacks[cb].actor = actor;
+	_callbacks[cb].function = function;
+	_callbacks[cb].delta = delta;
+	_callbacks[cb].loop = id < 0 ? false : loop;
+	_callbacks[cb].timer = 0.0f;
 }
 
-void		Callbackmanager::stop_callback(int const callback)
+bool	Callbackmanager::is_callback_started(int const id, Actor const *actor) const
 {
-	Actor	*actor = _callback[callback].actor;
+	if (id >= 0)
+		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+			if (_callbacks[i].id == id)
+				return (true);
+	return (false);
+}
+
+bool	Callbackmanager::update_callback(int const id, Actor const *actor, float const delta)
+{
+	if (id >= 0)
+	{
+		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		{
+			if (_callbacks[i].id == id)
+			{
+				_callbacks[i].delta = delta;
+				return (true);
+			}
+		}
+	}
+	return (false);
+}
+
+bool	Callbackmanager::update_callback(int const id, Actor const *actor, bool const loop)
+{
+	if (id >= 0)
+	{
+		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		{
+			if (_callbacks[i].id == id)
+			{
+				_callbacks[i].loop = loop;
+				return (true);
+			}
+		}
+	}
+	return (false);
+}
+
+bool	Callbackmanager::update_callback(int const id, Actor const *actor, float const delta, bool const loop)
+{
+	if (id >= 0)
+	{
+		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		{
+			if (_callbacks[i].id == id)
+			{
+				_callbacks[i].delta = delta;
+				_callbacks[i].loop = loop;
+				return (true);
+			}
+		}
+	}
+	return (false);
+}
+
+void	Callbackmanager::stop_allcallbacks(Actor *actor)
+{
+	int	cbs = actor->callbacks;
+
+	if (cbs != -1)
+	{
+		int	cb;
+
+		actor->callbacks = -1;
+		for (unsigned int i = cbs; i != -1; i = _callbacks[i].next)
+		{
+			_callbacks[i].actor = 0;
+			cb = i;
+		}
+		_callbacks[cb].next = _cbfree;
+		_cbfree = cbs;
+	}
+}
+
+void		Callbackmanager::_stop_callback(int const cb)
+{
+	Actor	*actor = _callbacks[cb].actor;
 	
-	if (actor->callbacks == callback)
-		actor->callbacks = _callbacks[callback].next;
+	if (actor->callbacks == cb)
+		actor->callbacks = _callbacks[cb].next;
 	else
 	{
 		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
 		{
-			if (_callbacks[i].next == callback)
+			if (_callbacks[i].next == cb)
 			{
-				_callbacks[i].next = _callbacks[callback].next;
+				_callbacks[i].next = _callbacks[cb].next;
 				break;
 			}
 		}
 	}
-	_callbacks[callback].actor = 0;
-	_callbacks[callback].next = _cbfree;
-	_cbfree = callback;
+	_callbacks[cb].actor = 0;
+	_callbacks[cb].next = _cbfree;
+	_cbfree = cb;
 }
-
-/*
-void	Actor::update_callback(std::string const &name, float delta)
-{
-	std::map<std::string, Callback>::iterator	i;
-	
-	if ((i = _callbackmap.find(name)) != _callbackmap.end())
-		i->second.delta = delta;
-}
-
-bool	Actor::is_callback_started(std::string const &name)
-{
-	return (_callbackmap.find(name) != _callbackmap.end());
-}
-*/
