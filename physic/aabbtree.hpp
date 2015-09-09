@@ -60,7 +60,7 @@ class	Aabbtree
 {
 	public:
 
-		unsigned int	_nsize;
+		unsigned int	_size;
 		Node			*_nodes;
 
 		int				_root;
@@ -71,9 +71,10 @@ class	Aabbtree
 		~Aabbtree();
 
 		int		add_aabb(Aabb const &, int const data);
+		int		add_saabb(Aabb const &, int const data);
 		void	remove_aabb(int const);
-		bool	move_aabb(int const, Aabb const &);
-		bool	move_aabb(int const, Aabb const &, vec<float, 3> const &);
+		bool	move_aabb(int const, Aabb const &, vec<float, 4> const &);
+		bool	move_saabb(int const, Aabb const &);
 
 		template<class T>
 		void	query(Aabb const &, T *, void (T::*)(int const)) const;
@@ -92,27 +93,72 @@ class	Aabbtree
 template<class T>
 void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)) const
 {
-	int	top = 0;
-	int	stack[32];
-
-	stack[top++] = _root;
-	while (top > 0)
+	if (_root != -1)
 	{
-		int	index = stack[--top];
-		if (index == -1)
-			continue;
+		int	stack[32];
+		int	top = 0;
 
-		if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
+		stack[top++] = _root;
+		do
 		{
-			if (_nodes[index].right == -1)
-				(object->*callback)(_nodes[index].data);
-			else
+			int	index = stack[--top];
+
+			if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
 			{
-				stack[top++] = _nodes[index].left;
-				stack[top++] = _nodes[index].right;
+				if (_nodes[index].right == -1)
+					(object->*callback)(_nodes[index].data);
+				else
+				{
+					stack[top++] = _nodes[index].left;
+					stack[top++] = _nodes[index].right;
+				}
 			}
 		}
+		while (top);
 	}
 }
+/*
+bool	intersect_rayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
+{
+	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.dir;
+	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.dir;
+	vec<float, 3> const	tmin = min(tbot, ttop);
+	vec<float, 3> const	tmax = max(tbot, ttop);
 
+	tnear = max(max(tmin[0], tmin[1]), tmin[2]);
+	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
+
+	return (tfar >= 0 && tnear <= tfar);
+}
+
+template <class T>
+void	Aabbtree::raycast(Ray const &ray, T* object, void (T::*callback)(int const)) const
+{
+	if (_root != -1)
+	{
+		int	stack[32];
+		int	top = 0;
+
+		stack[top++] = _root;
+		do
+		{
+			int		index = stack[--top];
+			float	near;
+			float	far;
+			
+			if (intersect_rayaabb(ray, _nodes[index].aabb, near, far))
+			{
+				if (_nodes[index].right == -1)
+					(object->*callback)(_nodes[index].data, near, far);
+				else
+				{
+					stack[top++] = _nodes[index].left;
+					stack[top++] = _nodes[index].right;
+				}
+			}
+		}
+		while (top);
+	}
+}
+*/
 #endif

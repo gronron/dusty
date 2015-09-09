@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "aabbtree.hpp"
 
-#define GAP 0.5f
+#define GAP 0.2f
 #define	MUL 2.0f
 
 static void	merge_aabb(Aabb &x, Aabb const &y, Aabb const &z)
@@ -56,13 +56,13 @@ static float	merged_perimeter(Aabb const &x, Aabb const &y)
 	return (sum(a.top - a.bottom) * 2.0f);
 }
 
-Aabbtree::Aabbtree() : _nsize(1024), _nodes(0), _root(-1), _free(0)
+Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)
 {
-	_nodes = new Node[_nsize];
+	_nodes = new Node[_size];
 	
-	for (unsigned int i = 0; i < _nsize - 1; ++i)
+	for (unsigned int i = 0; i < _size - 1; ++i)
 		_nodes[i].next = i + 1;
-	_nodes[_nsize - 1].next = -1;
+	_nodes[_size - 1].next = -1;
 }
 
 Aabbtree::~Aabbtree()
@@ -86,25 +86,29 @@ int		Aabbtree::add_aabb(Aabb const &aabb, int const data)
 	return (index);
 }
 
+int		Aabbtree::add_saabb(Aabb const &aabb, int const data)
+{
+	int	index;
+	
+	index = _allocate_node();
+	
+	_nodes[index].left = -1;
+	_nodes[index].right = -1;
+	_nodes[index].height = 0;
+	_nodes[index].aabb.bottom = aabb.bottom;
+	_nodes[index].aabb.top = aabb.top;
+	_nodes[index].data = data;
+	_insert_leaf(index);
+	return (index);
+}
+
 void			Aabbtree::remove_aabb(int const index)
 {
 	_remove_leaf(index);
 	_free_node(index);
 }
 
-bool	Aabbtree::move_aabb(int const index, Aabb const &aabb)
-{
-	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
-		return (false);
-
-	_nodes[index].aabb = aabb;
-
-	_remove_leaf(index);
-	_insert_leaf(index);
-	return (true);
-}
-
-bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 3> const &velocity) // need to correct
+bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity) // need to correct
 {
 	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
 		return (false);
@@ -113,7 +117,7 @@ bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 3> const 
 	a.bottom -= GAP;
 	a.top += GAP;
 
-	vec<float, 3>	b = velocity * MUL;
+	vec<float, 4>	b = velocity * MUL;
 	
 	for (unsigned int i = 0; i < 3; ++i)
 	{
@@ -127,7 +131,19 @@ bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 3> const 
 	_remove_leaf(index);
 	_insert_leaf(index);
 	return (true);
-}	
+}
+
+bool	Aabbtree::move_saabb(int const index, Aabb const &aabb)
+{
+	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
+		return (false);
+
+	_nodes[index].aabb = aabb;
+
+	_remove_leaf(index);
+	_insert_leaf(index);
+	return (true);
+}
 
 int		Aabbtree::_allocate_node()
 {
@@ -135,12 +151,12 @@ int		Aabbtree::_allocate_node()
 
 	if (_free == -1)
 	{
-		_free = _nsize;
-		_nodes = resize(_nodes, _nsize, _nsize << 1);
-		_nsize <<= 1;
-		for (unsigned int i = _nsize >> 1; i < _nsize - 1; ++i)
+		_free = _size;
+		_nodes = resize(_nodes, _size, _size << 1);
+		_size <<= 1;
+		for (unsigned int i = _size >> 1; i < _size - 1; ++i)
 			_nodes[i].next = i + 1;
-		_nodes[_nsize - 1].next = -1;
+		_nodes[_size - 1].next = -1;
 	}
 	
 	index = _free;

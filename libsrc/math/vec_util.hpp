@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<class T, unsigned int U, unsigned int V>
 inline vec<T, (U > V ? V : U)>	min(vec<T, U> const &x, vec<T, V> const &y)
 {
-	vec<T, (U > V ? V : U)>	a;
+	vec<T, (U > V ? V : U)>		a;
 
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
 		a.ar[i] = x.ar[i] > y.ar[i] ? y.ar[i] : x.ar[i];
@@ -47,7 +47,7 @@ inline vec<T, (U > V ? V : U)>	min(vec<T, U> const &x, vec<T, V> const &y)
 template<class T, unsigned int U, unsigned int V>
 inline vec<T, (U > V ? V : U)>	max(vec<T, U> const &x, vec<T, V> const &y)
 {
-	vec<T, (U > V ? V : U)>	a;
+	vec<T, (U > V ? V : U)>		a;
 
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
 		a.ar[i] = x.ar[i] < y.ar[i] ? y.ar[i] : x.ar[i];
@@ -57,7 +57,7 @@ inline vec<T, (U > V ? V : U)>	max(vec<T, U> const &x, vec<T, V> const &y)
 template<class T, unsigned int U>
 inline vec<T, U>	abs(vec<T, U> const &x)
 {
-	vec<T, U>	a;
+	vec<T, U>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a.ar[i] = x.ar[i] < 0 ? -x.ar[i] : x.ar[i];
@@ -65,9 +65,9 @@ inline vec<T, U>	abs(vec<T, U> const &x)
 }
 
 template<class T, unsigned int U>
-inline T		sum(vec<T, U> const &x)
+inline T	sum(vec<T, U> const &x)
 {
-	T	a = 0;
+	T		a = 0;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a += x.ar[i];
@@ -75,9 +75,9 @@ inline T		sum(vec<T, U> const &x)
 }
 
 template<class T, unsigned int U>
-inline T		sqrnorm(vec<T, U> const &x)
+inline T	sqrnorm(vec<T, U> const &x)
 {
-	T	a = 0;
+	T		a = 0;
 
 	for (unsigned int i = 0; i < U; ++i)
 		a += x.ar[i] * x.ar[i];
@@ -85,28 +85,30 @@ inline T		sqrnorm(vec<T, U> const &x)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline T		dot(vec<T, U> const &x, vec<T, V> const &y)
+inline T	dot(vec<T, U> const &x, vec<T, V> const &y)
 {
-	T	a = 0;
+	T		a = 0;
 
 	for (unsigned int i = 0; i < (U > V ? V : U); ++i)
 		a += x.ar[i] * y.ar[i];
 	return (a);
 }
 
-template<class T>
-inline vec<T, 3>		cross(vec<T, 3> const &x, vec<T, 3> const &y)
+template<class T, unsigned int U>
+inline vec<T, U>	cross(vec<T, U> const &x, vec<T, U> const &y)
 {
-	vec<T, 3>	a;
+	vec<T, U>		a;
 
-	a.ar[0] = x.ar[0] * y.ar[1] - x.ar[1] * y.ar[0];
-	a.ar[1] = x.ar[1] * y.ar[2] - x.ar[2] * y.ar[1];
-	a.ar[2] = x.ar[2] * y.ar[0] - x.ar[0] * y.ar[2];
+	a.ar[0] = x.ar[1] * y.ar[2] - x.ar[2] * y.ar[1];
+	a.ar[1] = x.ar[2] * y.ar[0] - x.ar[0] * y.ar[2];
+	a.ar[2] = x.ar[0] * y.ar[1] - x.ar[1] * y.ar[0];
+	for (unsigned int i = 3; i < U; ++i)
+		a.ar[i] = (T)0;
 	return (a);
 }
 
 template<class T, unsigned int U>
-inline float		sqrt(vec<T, U> const &x)
+inline float	sqrt(vec<T, U> const &x)
 {
 	vec<T, U>	a;
 
@@ -115,30 +117,60 @@ inline float		sqrt(vec<T, U> const &x)
 	return (sqrt(a));
 }
 
+template<class T, class U, unsigned int V>
+inline T	norm(vec<U, V> const &x)
+{
+	T	a = 0;
+
+	for (unsigned int i = 0; i < V; ++i)
+		a += x.ar[i] * x.ar[i];
+	return ((T)sqrt(a));
+}
+
+template<class T, class U, unsigned int V>
+inline vec<U, V>	unit(vec<U, V> const &x)
+{
+	T	a = 0;
+
+	for (unsigned int i = 0; i < V; ++i)
+		a += x.ar[i] * x.ar[i];
+	a = (T)sqrt(a);
+	return (a ? x / a : x * a);
+}
+
+template<class T, class U, unsigned int V>
+inline vec<T, V>	project(vec<U, V> const &x, vec<U, V> const &y)
+{
+	vec<T, U> const	a = unit<T>(y);
+
+	return (x - a * dot(x, a));
+}
+
+template<class T, class U, unsigned int V>
+inline vec<T, V>	reflect(vec<U, V> const &x, vec<U, V> const &y)
+{
+	vec<T, V> const	a = unit<T>(y);
+
+	return (x - a * (dot(x, a) * 2.0f));
+}
+
+template<class T, class U>
+inline vec<U, 3>	rot(vec<U, 3> const &x, vec<U, 3> const &y, T const z)
+{
+	T const 	a = (T)cos(z);
+	T const 	b = (T)sin(z);
+	vec<U, 3> const	c = unit<T>(y);
+	vec<U, 3> const d = d * (1.0f - a);
+	vec<U, 3>		e;
+
+	e.ar[0] = x.ar[0] * (c.ar[0] * d.ar[0] + a) + x.ar[1] * (c.ar[0] * d.ar[1] - c.ar[2] * b) + x.ar[2] * (c.ar[0] * d.ar[2] + c.ar[1] * b),
+	e.ar[1] = x.ar[0] * (c.ar[1] * d.ar[0] + c.ar[2] * b) + x.ar[1] * (c.ar[1] * d.ar[1] + a) + x.ar[2] * (c.ar[1] * d.ar[2] - c.ar[0] * b),
+	e.ar[2] = x.ar[0] * (c.ar[2] * d.ar[0] - c.ar[1] * b) + x.ar[1] * (c.ar[2] * d.ar[1] + c.ar[0] * b) + x.ar[2] * (c.ar[2] * d.ar[2] + a);
+	return (e);
+}
+
 namespace Sgl
 {
-
-	template<class T, unsigned int U>
-	inline float		norm(vec<T, U> const &x)
-	{
-		float	a = 0.0f;
-
-		for (unsigned int i = 0; i < U; ++i)
-			a += x.ar[i] * x.ar[i];
-		return (sqrt(a));
-	}
-
-	template<class T, unsigned int U>
-	inline vec<T, U>	unit(vec<T, U> const &x)
-	{
-		float	a = 0.0f;
-
-		for (unsigned int i = 0; i < U; ++i)
-			a += x.ar[i] * x.ar[i];
-		a = sqrt(a);
-		return (a ? x / a : x * a);
-	}
-
 	template<class T>
 	inline float			ang(vec<T, 2> const &x)
 	{
@@ -196,21 +228,6 @@ namespace Sgl
 	}
 
 	template<class T>
-	inline vec<T, 3>	rot(vec<T, 3> const &x, vec<T, 3> const &y, float const z)
-	{
-		float const 	a = cos(z);
-		float const 	b = sin(z);
-		vec<T, 3> const	c = unit(y);
-		vec<T, 3> const d = d * (1.0f - a);
-		vec<T, 3>		e;
-
-		e.ar[0] = x.ar[0] * (c.ar[0] * d.ar[0] + a) + x.ar[1] * (c.ar[0] * d.ar[1] - c.ar[2] * b) + x.ar[2] * (c.ar[0] * d.ar[2] + c.ar[1] * b),
-		e.ar[1] = x.ar[0] * (c.ar[1] * d.ar[0] + c.ar[2] * b) + x.ar[1] * (c.ar[1] * d.ar[1] + a) + x.ar[2] * (c.ar[1] * d.ar[2] - c.ar[0] * b),
-		e.ar[2] = x.ar[0] * (c.ar[2] * d.ar[0] - c.ar[1] * b) + x.ar[1] * (c.ar[2] * d.ar[1] + c.ar[0] * b) + x.ar[2] * (c.ar[2] * d.ar[2] + a);
-		return (e);
-	}
-
-	template<class T>
 	inline vec<T, 3>	rotx(vec<T, 3> const &x, float const y)
 	{
 		float const 	a = cos(y);
@@ -247,22 +264,6 @@ namespace Sgl
 		c.ar[1] = x.ar[0] * b + x.ar[1] * a;
 		c.ar[2] = x.ar[2];
 		return (c);
-	}
-
-	template<class T, unsigned int U>
-	inline vec<T, U>	project(vec<T, U> const &x, vec<T, U> const &y)
-	{
-		vec<T, U> const	a = unit(y);
-
-		return (x - a * dot(x, a));
-	}
-
-	template<class T, unsigned int U>
-	inline vec<T, U>	reflect(vec<T, U> const &x, vec<T, U> const &y)
-	{
-		vec<T, U> const	a = unit(y);
-
-		return (x - a * (dot(x, a) * 2.0f));
 	}
 
 }
