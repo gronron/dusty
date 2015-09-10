@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SDL.h"
 #include "controller.hpp"
 
-class	Actormanager;
+class	Gameengine;
 
 class	Eventmanager
 {
@@ -53,7 +53,7 @@ class	Eventmanager
 		};
 
 
-		Actormanager				*am;
+		Gameengine				*engine;
 
 		std::map<int, Controller *>	_controllermap;
 
@@ -66,7 +66,7 @@ class	Eventmanager
 		Bind	_gamepadmoves[8];
 
 
-		Eventmanager(Actormanager *);
+		Eventmanager(Gameengine *);
 		~Eventmanager();
 
 		bool	bind(std::string const &, Controller *, Controller::BINDTYPE);

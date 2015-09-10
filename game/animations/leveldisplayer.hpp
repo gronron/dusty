@@ -2,9 +2,9 @@
 #define LEVELDISPLAYER_H_
 
 #include "animation.hpp"
-#include "graphicengine.hpp"
 
 class	Level;
+class	Gameengine;
 
 class	Leveldisplayer : public Animation
 {
@@ -13,7 +13,7 @@ class	Leveldisplayer : public Animation
 		Level					*lvl;
 		Graphicengine::Texture	*tex;
 
-		Leveldisplayer(Graphicengine *, float, Level *);
+		Leveldisplayer(Gameengine *, float, Level *);
 		virtual ~Leveldisplayer();
 
 		bool	tick(float);

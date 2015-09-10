@@ -76,9 +76,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\engine\actor.cpp" />
-    <ClCompile Include="..\..\..\engine\actormanager.cpp" />
+    <ClCompile Include="..\..\..\engine\callbackmanager.cpp" />
     <ClCompile Include="..\..\..\engine\configmanager.cpp" />
     <ClCompile Include="..\..\..\engine\factory.cpp" />
+    <ClCompile Include="..\..\..\engine\gameengine.cpp" />
     <ClCompile Include="..\..\..\game\actors\acontroller.cpp" />
     <ClCompile Include="..\..\..\game\actors\feeder.cpp" />
     <ClCompile Include="..\..\..\game\actors\labyrinth.cpp" />
@@ -122,9 +123,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\actor.hpp" />
-    <ClInclude Include="..\..\..\engine\actormanager.hpp" />
+    <ClInclude Include="..\..\..\engine\callbackmanager.hpp" />
     <ClInclude Include="..\..\..\engine\configmanager.hpp" />
     <ClInclude Include="..\..\..\engine\factory.hpp" />
+    <ClInclude Include="..\..\..\engine\gameengine.hpp" />
     <ClInclude Include="..\..\..\game\actors\acontroller.hpp" />
     <ClInclude Include="..\..\..\game\actors\feeder.hpp" />
     <ClInclude Include="..\..\..\game\actors\labyrinth.hpp" />

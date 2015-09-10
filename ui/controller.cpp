@@ -30,10 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "endian/packet.hpp"
 #include "replication.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "controller.hpp"
 
-Controller::Controller(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o)
+Controller::Controller(Gameengine *g, Replication *r, int i, short int t, Actor const *o) : Actor(g, r, i, t, o)
 {
 
 }
@@ -46,13 +46,13 @@ Controller::~Controller()
 void	Controller::postinstanciation()
 {
 	Actor::postinstanciation();
-	if (am->_controllermap.find(id) != am->_controllermap.end())
+	if (engine->_controllermap.find(id) != engine->_controllermap.end())
 		bind();
 }
 
 void	Controller::bind()
 {
-	am->_controllermap[id] = this;
-	if (!am->local)
+	engine->_controllermap[id] = this;
+	if (engine->network)
 		rp->authority += Replication::LOCAL;
 }

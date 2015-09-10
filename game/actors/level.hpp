@@ -1,7 +1,6 @@
 #ifndef LEVEL_H_
 #define LEVEL_H_
 
-#include <vector>
 #include "actor.hpp"
 #include "body.hpp"
 #include "leveldisplayer.hpp"
@@ -22,13 +21,13 @@ class	Level : public Actor
 		int		nbr;
 		float	spawnrate;
 
-		Level(Actormanager *, Replication *, int, short int, Actor const *);
+		Level(Gameengine *, Replication *, int const, short int const, Actor const *);
 		virtual ~Level();
 
 		void	postinstanciation();
 
-		void	get_replication(Packet &);
-		void	replicate(Packet &, float);
+		void	get_replication(Packet &) const;
+		void	replicate(Packet &, float const);
 
 		bool	spawn_feeder();
 		bool	increase_difficulty();

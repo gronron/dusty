@@ -1,3 +1,4 @@
+#include "graphicengine.hpp"
 #include "level.hpp"
 #include "leveldisplayer.hpp"
 

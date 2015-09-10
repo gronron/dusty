@@ -79,7 +79,7 @@ Particlesystem::Particlesystem(Graphicengine *ge, float d, std::string const &na
 		_particles[i].loc = v;
 		_particles[i].spd[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 		_particles[i].spd[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
-		_particles[i].spd = Sgl::unit(_particles[i].spd) * (float)MT().genrand_real1(speed[0], speed[1]);
+		_particles[i].spd = unit<float>(_particles[i].spd) * (float)MT().genrand_real1(speed[0], speed[1]);
 
 		if (attractor)
 		{
@@ -127,7 +127,7 @@ bool	Particlesystem::tick(float delta)
 			_particles[i].loc = (*body)->position;
 			_particles[i].spd[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			_particles[i].spd[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
-			_particles[i].spd = Sgl::unit(_particles[i].spd) * (float)MT().genrand_real1(speed[0], speed[1]);
+			_particles[i].spd = unit<float>(_particles[i].spd) * (float)MT().genrand_real1(speed[0], speed[1]);
 
 			if (attractor)
 			{

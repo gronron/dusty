@@ -18,14 +18,14 @@ class	Projectile : public Actor
 		Particlesystem	*ps;
 
 
-		Projectile(Actormanager *, Replication *, int, short int, Actor const *);
+		Projectile(Gameengine *, Replication *, int const, short int const, Actor const *);
 		virtual ~Projectile();
 
 		void	postinstanciation();
 		void	destroy();
 
-		void	get_replication(Packet &);
-		void	replicate(Packet &, float);
+		void	get_replication(Packet &) const;
+		void	replicate(Packet &, float const);
 
 		bool	collide(Collider *);
 

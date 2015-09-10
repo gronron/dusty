@@ -28,13 +28,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "eventmanager.hpp"
 #include "networkengine.hpp"
 #include "graphicengine.hpp"
 #include "console.hpp"
 
-Console::Console(Actormanager *a) : am(a), _blink(false), _blinktime(0.0f), _cursor(0), _text("")
+Console::Console(Gameengine *g) : engine(g), _blink(false), _blinktime(0.0f), _cursor(0), _text("")
 {
 
 }
@@ -64,22 +64,22 @@ void											Console::draw()
 	int											j;
 
 	color = 1.0f;
-	loc = vec<float, 2>::cast(am->ge->screensize) / -2.0f;
+	loc = vec<float, 2>::cast(engine->graphic->screensize) / -2.0f;
 	loc[1] += _history.size() < 4 ? _history.size() * 32.0f : 128.0f;
 	s = 0.5f;
-	if (am->em->typing)
+	if (engine->event->typing)
 	{
 		text = _text;
 		if (_blink)
 			text.replace(_cursor, 1, 1, '_');
-		//am->ge->draw_text(text, loc + *am->ge->cam, s, color);
+		//engine->ge->draw_text(text, loc + *engine->ge->cam, s, color);
 	}
 	j = 0;
 	for (i = _history.rbegin(); i != _history.rend() && j < 4; ++i)
 	{
 		loc[1] -= 32;
 		j++;
-		//am->ge->draw_text(*i, loc + *am->ge->cam, s, color);
+		//engine->ge->draw_text(*i, loc + *engine->ge->cam, s, color);
 	}
 }
 
@@ -107,13 +107,13 @@ void	Console::putchar(char c)
 	{
 		if (_text.length() != 0)
 		{
-			if (am->master)
+			if (engine->master)
 				puttext(_text);
 			else
-				am->ne->sendtextmsg(_text);
+				engine->network->sendtextmsg(_text);
 			_text.clear();
 		}
-		am->em->toogletyping();
+		engine->event->toogletyping();
 		_cursor = 0;
 	}
 	else if (c == '\b')
@@ -129,7 +129,7 @@ void	Console::putchar(char c)
 
 void	Console::puttext(std::string const &str)
 {
-	if (!am->local && am->master)
-		am->ne->sendtextmsg(str);
+	if (engine->network && engine->master)
+		engine->network->sendtextmsg(str);
 	_history.push_back(str);
 }

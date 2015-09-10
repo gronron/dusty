@@ -66,7 +66,7 @@ Graphicengine::Graphicengine() : assetsdir(), screensize(), _window(), _glcontex
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	
-	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screensize[0], screensize[1], SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
+	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screensize[0], screensize[1], SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	_glcontext = SDL_GL_CreateContext(_window);
 
 	glewExperimental = GL_TRUE;

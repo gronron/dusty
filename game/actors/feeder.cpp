@@ -3,7 +3,7 @@
 #include "random/mt19937.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
 
@@ -14,9 +14,9 @@
 
 FACTORYREG(Feeder);
 
-Feeder::Feeder(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), body(0), hp(2.0f)
+Feeder::Feeder(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), body(0), hp(2.0f)
 {
-	am->pe->new_body(&body, &shape, this);
+	engine->physic->new_body(&body, &shape, this);
 	shape.radius = 20.0f;
 	body->dynamic = true;
 	aim = 0.0f;
@@ -24,17 +24,17 @@ Feeder::Feeder(Actormanager *a, Replication *r, int i, short int t, Actor const 
 
 Feeder::~Feeder()
 {
-	am->pe->delete_body(body);
+	engine->physic->delete_body(body);
 }
 
 void	Feeder::postinstanciation()
 {
 	Actor::postinstanciation();
-	am->pe->init_body(body);
-	if (am->graphic)
+	engine->physic->init_body(body);
+	if (engine->graphic)
 	{
-		ps = new Particlesystem(am->ge, 0.0f, "feeder", &body);
-		am->ge->add(ps);
+		ps = new Particlesystem(engine->graphic, 0.0f, "feeder", &body);
+		engine->graphic->add(ps);
 	}
 	start_callback("TP", 0.3f, true, (bool (Actor::*)())&Feeder::targetsomeone);
 }		
@@ -42,14 +42,14 @@ void	Feeder::postinstanciation()
 void	Feeder::destroy()
 {
 	Actor::destroy();
-	if (am->graphic)
+	if (engine->graphic)
 	{
 		ps->stop();
-		am->ge->add(new Particlesystem(am->ge, 0.0f, "explosion", (vec<float, 3>)body->position));
+		engine->graphic->add(new Particlesystem(engine->graphic, 0.0f, "explosion", (vec<float, 3>)body->position));
 	}
 }
 
-void	Feeder::get_replication(Packet &pckt)
+void	Feeder::get_replication(Packet &pckt) const
 {
 	Actor::get_replication(pckt);
 	pckt.write(aim);
@@ -57,7 +57,7 @@ void	Feeder::get_replication(Packet &pckt)
 	body->get_replication(pckt);
 }
 
-void	Feeder::replicate(Packet &pckt, float p)
+void	Feeder::replicate(Packet &pckt, float const p)
 {
 	Actor::replicate(pckt, p);
 	pckt.read(aim);
@@ -74,11 +74,11 @@ bool	Feeder::targetsomeone()
 	aim = 0.0f;
 	max = 0.0f;
 	cur = 0.0f;
-	for (unsigned int i = 0; i < am->_asize; ++i)
+	for (unsigned int i = 0; i < engine->_actsize; ++i)
 	{
-		if (am->_actors[i] && (plr = dynamic_cast<Player *>(am->_actors[i])))
+		if (engine->_actors[i] && (plr = dynamic_cast<Player *>(engine->_actors[i])))
 		{
-			cur = Sgl::norm(body->position - plr->body->position);
+			cur = norm<float>(body->position - plr->body->position);
 			if (cur > max)
 			{
 				max = cur;
@@ -86,12 +86,10 @@ bool	Feeder::targetsomeone()
 			}
 		}
 	}
-	dir = Sgl::unit(aim - body->position);
+	dir = unit<float>(aim - body->position);
 	body->velocity = dir * 150.0f;
 	return (true);
 }
-
-#include <iostream>
 
 bool	Feeder::collide(Collider *x)
 {
@@ -101,18 +99,18 @@ bool	Feeder::collide(Collider *x)
 	destroy();
 	if ((prj = dynamic_cast<Projectile const *>(x)))
 	{
-		if (am->master && rp)
+		if (engine->master && rp)
 			rp->needupdate = true;
 		if ((hp -= prj->dmg) <= 0.0f)
 		{
-			/*if (am->master && !(MT().genrand_int32() % 7))
+			/*if (engine->master && !(MT().genrand_int32() % 7))
 			{
-				b = (Bonus *)am->create("Bonus", 0);
+				b = (Bonus *)engine->create("Bonus", 0);
 				b->bd.loc = bd.loc;
 				b->dmg = 0.2f;
 				b->firerate = 1.0f;
 			}
-			/*Player *plr = (Player *)am->findactor(x.ownerid);
+			/*Player *plr = (Player *)engine->findactor(x.ownerid);
 			if (plr)
 				plr->score++;*/
 			destroy();

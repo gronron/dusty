@@ -42,9 +42,6 @@
     <ClCompile Include="..\..\..\engine\actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\engine\actormanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\engine\configmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -171,12 +168,15 @@
     <ClCompile Include="..\..\..\network\client.cpp">
       <Filter>Source Files\network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\engine\callbackmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\engine\gameengine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\actor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\engine\actormanager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">
@@ -319,6 +319,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\new.hpp">
       <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\callbackmanager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\gameengine.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

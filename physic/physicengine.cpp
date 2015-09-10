@@ -142,7 +142,7 @@ void		Physicengine::tick(float delta)
 			_bodies[i].velocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
 
 			_bodies[i].shape->compute_aabb(_bodies[i].aabb, _bodies[i].position);
-			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb);
+			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb, _bodies[i].velocity);
 		}
 	}
 

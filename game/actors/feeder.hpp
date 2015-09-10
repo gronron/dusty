@@ -19,14 +19,14 @@ class	Feeder : public Actor
 		Particlesystem	*ps;
 
 
-		Feeder(Actormanager *, Replication *, int, short int, Actor const *);
+		Feeder(Gameengine *, Replication *, int const, short int const, Actor const *);
 		virtual ~Feeder();
 
 		void	postinstanciation();
 		void	destroy();
 
-		void	get_replication(Packet &);
-		void	replicate(Packet &, float);
+		void	get_replication(Packet &) const;
+		void	replicate(Packet &, float const);
 
 		bool	collide(Collider *);
 

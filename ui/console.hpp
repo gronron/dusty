@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <list>
 
-class	Actormanager;
+class	Gameengine;
 
 class	Console
 {
@@ -49,7 +49,7 @@ class	Console
 		};
 
 
-		Actormanager	*am;
+		Gameengine	*engine;
 
 		bool		_blink;
 		float		_blinktime;
@@ -60,7 +60,7 @@ class	Console
 		std::list<Recentmessage>	_recentmsg;
 
 
-		Console(Actormanager *);
+		Console(Gameengine *);
 		~Console();
 
 		void	tick(float);

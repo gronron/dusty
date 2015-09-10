@@ -4,7 +4,7 @@
 #include "random/mt19937.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
 
@@ -15,9 +15,9 @@
 
 FACTORYREG(Level);
 
-Level::Level(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), nbr(0)
+Level::Level(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), nbr(0)
 {
-	if (am->master)
+	if (engine->master)
 	{
 		x = 16 * 4 + 1;
 		y = x;
@@ -35,25 +35,25 @@ Level::~Level()
 	for (unsigned int j = 0; j < y; ++j)
 		for (unsigned int i = 0; i < x; ++i)
 			if (bodies[j][i])
-				am->pe->delete_body(bodies[j][i]);
+				engine->physic->delete_body(bodies[j][i]);
 	delete_matrix(bodies);
-	if (am->graphic)
-		am->ge->remove(ld);
+	if (engine->graphic)
+		engine->graphic->remove(ld);
 }
 
 void	Level::postinstanciation()
 {
 	Actor::postinstanciation();
-	if (!am->master)
+	if (!engine->master)
 		_generate_block();
-	if (am->graphic)
+	if (engine->graphic)
 	{
-		ld = new Leveldisplayer(am->ge, -1.0f, this);
-		am->ge->add(ld);
+		ld = new Leveldisplayer(engine->graphic, -1.0f, this);
+		engine->graphic->add(ld);
 	}
 }
 
-void	Level::get_replication(Packet &pckt)
+void	Level::get_replication(Packet &pckt) const
 {
 	pckt.write(ownerid);
 	pckt.write(x);
@@ -61,7 +61,7 @@ void	Level::get_replication(Packet &pckt)
 	pckt.write(x * y, &map[0][0]);
 }
 
-void	Level::replicate(Packet &pckt, float p)
+void	Level::replicate(Packet &pckt, float const p)
 {
 	ping = p;
 	pckt.read(ownerid);
@@ -70,22 +70,23 @@ void	Level::replicate(Packet &pckt, float p)
 	pckt.read(x * y, &map[0][0]);
 }
 
-bool							Level::spawn_feeder()
+bool		Level::spawn_feeder()
 {
 	Player	*plr;
 	Feeder	*fdr;
 
-	for (unsigned int i = 0; i < am->_asize; ++i)
+	for (unsigned int i = 0; i < engine->_actsize; ++i)
 	{
-		if (am->_actors[i] && (plr = dynamic_cast<Player *>(am->_actors[i])))
+		if (engine->_actors[i] && (plr = dynamic_cast<Player *>(engine->_actors[i])))
 		{
 			vec<float, 2>	loc;
 
-			fdr = (Feeder *)am->create("Feeder", 0, true);
+			fdr = (Feeder *)engine->create("Feeder", 0, true);
 			fdr->hp = 1.0f + nbr / 10;
 			loc[0] = (float)MT().genrand_real1(-1.0, 1.0);
 			loc[1] = (float)MT().genrand_real1(-1.0, 1.0);
-			fdr->body->position = plr->body->position + Sgl::unit(loc) * (float)MT().genrand_real1(512.0, 1024.0);
+			fdr->body->position = plr->body->position + unit<float>(loc) * (float)MT().genrand_real1(512.0, 1024.0);
+			break;
 		}
 	}
 	nbr++;
@@ -109,11 +110,11 @@ void		Level::_generate_block()
 		{
 			if (map[j][i])
 			{
-				am->pe->new_body(&bodies[j][i], &shape, this);
+				engine->physic->new_body(&bodies[j][i], &shape, this);
 				bodies[j][i]->dynamic = false;
 				bodies[j][i]->position[0] = i * 64.0f;
 				bodies[j][i]->position[1] = j * 64.0f;
-				am->pe->init_body(bodies[j][i]);
+				engine->physic->init_body(bodies[j][i]);
 			}
 			else
 				bodies[j][i] = 0;

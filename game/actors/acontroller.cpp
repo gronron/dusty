@@ -2,7 +2,7 @@
 #include "endian/packet.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "eventmanager.hpp"
 #include "acontroller.hpp"
 #include "graphicengine.hpp"
@@ -11,7 +11,7 @@
 
 FACTORYREG(AController);
 
-AController::AController(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Controller(a, r, i, t, o)
+AController::AController(Gameengine *g, Replication *r, int i, short int t, Actor const *o) : Controller(g, r, i, t, o)
 {
 	controlled = 0;
 	firing = false;
@@ -29,10 +29,10 @@ AController::~AController()
 void	AController::postinstanciation()
 {
 	Controller::postinstanciation();
-	if (am->master)
-		controlled = (Player *)am->create("Player", this, true);
-	if (!am->master)
-		am->notify_owned(this, true);
+	if (engine->master)
+		controlled = (Player *)engine->create("Player", this, true);
+	if (!engine->master)
+		engine->notify_owned(this, true);
 }
 
 void	AController::notified_by_owned(Actor *a, bool l)
@@ -40,7 +40,7 @@ void	AController::notified_by_owned(Actor *a, bool l)
 	if (l)
 	{
 		controlled = (Player *)a;
-		if (am->graphic && am->_controllermap.find(id) != am->_controllermap.end())
+		if (engine->graphic && engine->_controllermap.find(id) != engine->_controllermap.end())
 		{
 			//am->ge->set_camera(&controlled->bd.loc);
 			//am->ge->add(controlled->hud);
@@ -50,7 +50,7 @@ void	AController::notified_by_owned(Actor *a, bool l)
 		controlled = 0;
 }
 
-void	AController::get_replication(Packet &pckt)
+void	AController::get_replication(Packet &pckt) const
 {
 	Controller::get_replication(pckt);
 	pckt.write(firing);
@@ -81,53 +81,37 @@ void	AController::tick(float delta)
 		controlled->loadingfire = loadingfire;
 		controlled->dir = aim;
 		//beware
-		am->ge->cam_loc = controlled->body->position;
+		engine->graphic->cam_loc = controlled->body->position;
 	}
 }
 
 void	AController::bind()
 {
 	Controller::bind();
-	if (am->graphic && controlled)
+	if (engine->graphic && controlled)
 	{
 		//am->ge->add(controlled->hud);
 	}
-	am->em->_keys[SDL_SCANCODE_E].ctrl = this;
-	am->em->_keys[SDL_SCANCODE_E].fx = (BINDTYPE)&AController::forward;
+	engine->event->_keys[SDL_SCANCODE_E].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_E].fx = (BINDTYPE)&AController::forward;
 
-	am->em->_keys[SDL_SCANCODE_D].ctrl = this;
-	am->em->_keys[SDL_SCANCODE_D].fx = (BINDTYPE)&AController::backward;
+	engine->event->_keys[SDL_SCANCODE_D].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_D].fx = (BINDTYPE)&AController::backward;
 
-	am->em->_keys[SDL_SCANCODE_S].ctrl = this;
-	am->em->_keys[SDL_SCANCODE_S].fx = (BINDTYPE)&AController::left;
+	engine->event->_keys[SDL_SCANCODE_S].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_S].fx = (BINDTYPE)&AController::left;
 
-	am->em->_keys[SDL_SCANCODE_F].ctrl = this;
-	am->em->_keys[SDL_SCANCODE_F].fx = (BINDTYPE)&AController::right;
+	engine->event->_keys[SDL_SCANCODE_F].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_F].fx = (BINDTYPE)&AController::right;
 
-	am->em->_mousemove.ctrl = this;
-	am->em->_mousemove.fx = (BINDTYPE)&AController::aimloc;
+	engine->event->_mousemove.ctrl = this;
+	engine->event->_mousemove.fx = (BINDTYPE)&AController::aimloc;
 
-	am->em->_mousebuttons[SDL_BUTTON_LEFT].ctrl = this;
-	am->em->_mousebuttons[SDL_BUTTON_LEFT].fx = (BINDTYPE)&AController::fire;
+	engine->event->_mousebuttons[SDL_BUTTON_LEFT].ctrl = this;
+	engine->event->_mousebuttons[SDL_BUTTON_LEFT].fx = (BINDTYPE)&AController::fire;
 
-	am->em->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = this;
-	am->em->_mousebuttons[SDL_BUTTON_RIGHT].fx = (BINDTYPE)&AController::strongfire;
-
-/*
-	am->em->_joymovevector[0].ctrl = this;
-	am->em->_joymovevector[0].fx = (BINDTYPE)&AController::movex;
-
-	am->em->_joymovevector[1].ctrl = this;
-	am->em->_joymovevector[1].fx = (BINDTYPE)&AController::movey;
-
-	am->em->_joymovevector[2].ctrl = this;
-	am->em->_joymovevector[2].fx = (BINDTYPE)&AController::aimdirx;
-
-	am->em->_joymovevector[3].ctrl = this;
-	am->em->_joymovevector[3].fx = (BINDTYPE)&AController::aimdiry;
-
-	am->em->_joybuttonvector[5].ctrl = this;
-	am->em->_joybuttonvector[5].fx = (BINDTYPE)&AController::fire;*/
+	engine->event->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = this;
+	engine->event->_mousebuttons[SDL_BUTTON_RIGHT].fx = (BINDTYPE)&AController::strongfire;
 }
 
 void	AController::forward(int size, float *data)
@@ -204,7 +188,7 @@ void	AController::fire(int size, float *data)
 		firing = *data;
 		aim[0] = data[1];
 		aim[1] = data[2];
-		aim = Sgl::unit(aim - vec<float, 4>::cast(am->ge->screensize) / 2.0f);
+		aim = unit<float>(aim - vec<float, 4>::cast(engine->graphic->screensize) / 2.0f);
 	}
 }
 
@@ -226,7 +210,7 @@ void	AController::aimloc(int size, float *data)
 			rp->needupdate = true;
 		aim[0] = data[0];
 		aim[1] = data[1];
-		aim = Sgl::unit(aim - vec<float, 4>::cast(am->ge->screensize) / 2.0f);
+		aim = unit<float>(aim - vec<float, 4>::cast(engine->graphic->screensize) / 2.0f);
 	}
 }
 

@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 #include <cstdlib>
 #include "time/time.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "eventmanager.hpp"
 
-bool	parse_option(char ac, char **av, Actormanager::Option &opt)
+bool	parse_option(char ac, char **av, Gameengine::Option &opt)
 {
 	opt.master = true;
 	opt.local = true;
@@ -67,7 +67,7 @@ bool	parse_option(char ac, char **av, Actormanager::Option &opt)
 
 int			main(int ac, char **av)
 {
-	Actormanager::Option	opt;
+	 Gameengine::Option	opt;
 	double	c;
 	double	d;
 	double	l;
@@ -77,14 +77,14 @@ int			main(int ac, char **av)
 	if (!parse_option(ac, av, opt))
 		return (EXIT_FAILURE);
 
-	Actormanager	am(opt);
+	Gameengine	engine(opt);
 
 	c = src::clock();
-	while (am.em->running)
+	while (engine.event->running)
 	{
 		l = c;
 		d = (c = src::clock()) - l;
-		am.tick((float)d);
+		engine.tick((float)d);
 		++i;
 		if ((t += d) > 1.0f)
 		{

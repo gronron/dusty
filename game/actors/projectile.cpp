@@ -2,7 +2,7 @@
 #include "endian/packet.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
 /*
@@ -12,28 +12,28 @@
 
 FACTORYREG(Projectile);
 
-Projectile::Projectile(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), body(0)
+Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), body(0)
 {
 	dmg = 1.0f;
 	dir = 0.0f;
-	am->pe->new_body(&body, &shape, this);
+	engine->physic->new_body(&body, &shape, this);
 	shape.radius = 20.0f;
 	body->dynamic = true;
 }
 
 Projectile::~Projectile()
 {
-	am->pe->delete_body(body);
+	engine->physic->delete_body(body);
 }
 
 void	Projectile::postinstanciation()
 {
 	Actor::postinstanciation();
-	am->pe->init_body(body);
-	if (am->graphic)
+	engine->physic->init_body(body);
+	if (engine->graphic)
 	{
-		ps = new Particlesystem(am->ge, 1.0f, "projectile", &body);
-		am->ge->add(ps);
+		ps = new Particlesystem(engine->graphic, 1.0f, "projectile", &body);
+		engine->graphic->add(ps);
 	}
 	start_callback("Destroy", 8.0f, false, (bool (Actor::*)())&Projectile::selfdestroy);
 }
@@ -41,11 +41,11 @@ void	Projectile::postinstanciation()
 void	Projectile::destroy()
 {
 	Actor::destroy();
-	if (am->graphic)
+	if (engine->graphic)
 		ps->stop();
 }
 
-void	Projectile::get_replication(Packet &pckt)
+void	Projectile::get_replication(Packet &pckt) const
 {
 	Actor::get_replication(pckt);
 	pckt.write(dmg);
@@ -53,7 +53,7 @@ void	Projectile::get_replication(Packet &pckt)
 	body->get_replication(pckt);
 }
 
-void	Projectile::replicate(Packet &pckt, float p)
+void	Projectile::replicate(Packet &pckt, float const p)
 {
 	Actor::replicate(pckt, p);
 	pckt.read(dmg);

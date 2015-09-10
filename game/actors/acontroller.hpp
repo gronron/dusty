@@ -16,17 +16,17 @@ class	AController : public Controller
 		vec<float, 4>	move;
 
 
-		AController(Actormanager *, Replication *, int, short int, Actor const *);
+		AController(Gameengine *, Replication *, int const, short int const, Actor const *);
 		virtual ~AController();
 
 		void	postinstanciation();
 
-		void	notified_by_owned(Actor *, bool);
+		void	notified_by_owned(Actor *, bool const);
 
-		void	get_replication(Packet &);
-        void	replicate(Packet &, float);
+		void	get_replication(Packet &) const;
+        void	replicate(Packet &, float const);
 
-		void	tick(float delta);
+		void	tick(float const delta);
 
 		void	bind();
 

@@ -72,26 +72,26 @@ short int									Factory::get_type(std::string const &name) const
 	}
 }
 
-Actor										*Factory::create(Actormanager *am, Replication *r) const
+Actor										*Factory::create(Gameengine *g, Replication *r) const
 {
 	std::map<std::string, Class>::const_iterator	i;
 
 	for (i = _classmap.begin(); i != _classmap.end(); ++i)
 	{
 		if (i->second.type == r->type)
-			return (i->second.cf(am, r, r->id, r->type, 0));
+			return (i->second.cf(g, r, r->id, r->type, 0));
 	}
 	std::cerr << "Error: Factory::create() fails to find id: " << r->type << std::endl;
 	exit(EXIT_FAILURE);
 	return (0);
 }
 
-Actor												*Factory::create(Actormanager *am, Replication *r, int id, std::string const &name, Actor const *owner) const
+Actor												*Factory::create(Gameengine *g, Replication *r, int id, std::string const &name, Actor const *owner) const
 {
 	std::map<std::string, Class>::const_iterator	i;
 
 	if ((i = _classmap.find(name)) != _classmap.end())
-		return (i->second.cf(am, r, id, i->second.type, owner));
+		return (i->second.cf(g, r, id, i->second.type, owner));
 	else
     {
 		std::cerr << "Error: Factory::create() fails to find class: " << name << std::endl;

@@ -37,14 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FACTORYREG(name) Factoryregister<name> const	reg_##name(#name)
 
 class	Actor;
-class	Actormanager;
+class	Gameengine;
 class	Replication;
 
 class	Factory
 {
 	public:
 
-		typedef Actor *(*CF)(Actormanager *, Replication *, int, short int, Actor const *);
+		typedef Actor *(*CF)(Gameengine *, Replication *, int, short int, Actor const *);
 
 		struct	Class
 		{
@@ -64,12 +64,12 @@ class	Factory
 
 		short int	get_type(std::string const &) const;
 
-		Actor		*create(Actormanager *, Replication *) const;
-		Actor		*create(Actormanager *, Replication *, int, std::string const&, Actor const *) const;
+		Actor		*create(Gameengine *, Replication *) const;
+		Actor		*create(Gameengine *, Replication *, int, std::string const&, Actor const *) const;
 };
 
 template<class T>
-Actor	*create(Actormanager *am, Replication *r, int i, short int t, Actor const *o)
+Actor	*create(Gameengine *am, Replication *r, int i, short int t, Actor const *o)
 {
 	return (new T(am, r, i, t, o));
 }

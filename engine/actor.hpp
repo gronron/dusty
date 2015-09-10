@@ -31,12 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ACTOR_H_
 #define ACTOR_H_
 
-#include <string>
-#include <map>
 #include "endian/packet.hpp"
 #include "body.hpp"
 
-class	Actormanager;
+class	Gameengine;
 class	Replication;
 
 class	Actor : public Collider
@@ -45,20 +43,10 @@ class	Actor : public Collider
 	
 		enum	State { CREATED, OK, DESTROYED };
 
-		struct	Callback
-		{
-			float	delta;
-			float	timer;
-			bool	loop;
-			bool	(Actor::*fx)();
-		};
 
-
-		int								_callbackid;
-		std::map<std::string, Callback>	_callbackmap;
-
-		Actormanager	*am;
+		Gameengine		*engine;
 		Replication		*rp;
+		int				callbacks;
 
 		short int	type;
 		int			id;
@@ -67,26 +55,20 @@ class	Actor : public Collider
 		float		ping;
 
 
-		Actor(Actormanager *, Replication *, int, short int, Actor const *);
+		Actor(Gameengine *, Replication *, int const, short int const, Actor const *);
 		virtual ~Actor();
 
 		virtual void	postinstanciation();
 		virtual void	destroy();
 
-		virtual void	notified_by_owner(Actor *, bool);
-		virtual void	notified_by_owned(Actor *, bool);
+		virtual void	notified_by_owner(Actor *, bool const);
+		virtual void	notified_by_owned(Actor *, bool const);
 
 		virtual void	get_replication(Packet &) const;
-        virtual void	replicate(Packet &, float);
+        virtual void	replicate(Packet &, float const);
 
-		virtual void	tick(float);
+		virtual void	tick(float const);
 		virtual bool	collide(Collider *);
-
-		virtual void	start_callback(std::string const &, float, bool, bool (Actor::*)());
-		virtual void	start_callback(float, bool (Actor::*)());
-		virtual void	stop_callback(std::string const &);
-		virtual void	update_callback(std::string const &, float);
-		virtual bool	is_callback_started(std::string const &);
 };
 
 #endif

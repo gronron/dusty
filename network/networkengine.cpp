@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "client.hpp"
 #include "server.hpp"
 #include "actor.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "console.hpp"
 #include "networkengine.hpp"
 
@@ -67,15 +67,13 @@ void				*Networkengine::runthrd(void *data)
 	return (0);
 }
 
-Networkengine::Networkengine(Actormanager *a) : am(a), master(a->master)
+Networkengine::Networkengine(Gameengine *g) : engine(g), master(g->master)
 {
 
 }
 
 Networkengine::~Networkengine()
 {
-	std::map<int, Replication *>::iterator	i;
-
 	running = false;
 	delete [] _replications;
 	thrd.wait();
@@ -98,7 +96,7 @@ Replication		*Networkengine::new_replication(int const id)
 	return (_replications + id);
 }
 
-void								Networkengine::tick(float delta)
+void								Networkengine::tick(float const delta)
 {
 	std::map<int, int>::iterator	j;
 	Messagequeue::Message			*msg;
@@ -115,7 +113,7 @@ void								Networkengine::tick(float delta)
 			{
 				Replication	*r = new_replication(id);
 				r->init(msg->pckt, msg->ping);
-				r->actor = am->create(r);
+				r->actor = engine->create(r);
 				r->actor->replicate(msg->pckt, msg->ping);
 			}
 		}
@@ -127,7 +125,7 @@ void								Networkengine::tick(float delta)
 		}
 		else if (msg->type == Messagequeue::CONNECTION)
 		{
- 			id = am->create(am->controllerclass, 0, true)->id;
+ 			id = engine->create(engine->controllerclass, 0, true)->id;
 			_playeridmap[msg->cltid] = id;
 			mq.push_out_cnt(msg->cltid, id);
 		}
@@ -138,9 +136,9 @@ void								Networkengine::tick(float delta)
 					_replications[j->second].actor->destroy();
 		}
 		else if (msg->type == Messagequeue::CONTROL)
-			am->control(msg->actid);
+			engine->control(msg->actid);
 		else if (msg->type == Messagequeue::TEXTMSG)
-			am->cl->puttext(std::string(msg->pckt.get_data(), msg->pckt.get_size()));
+			engine->console->puttext(std::string(msg->pckt.get_data(), msg->pckt.get_size()));
 		mq.pop_in();
 	}
 

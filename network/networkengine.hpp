@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "messagequeue.hpp"
 #include "thread/thread.hpp"
 
-class	Actormanager;
+class	Gameengine;
 class	Client;
 class	Server;
 
@@ -48,7 +48,7 @@ class	Networkengine
 		static	void	*runthrd(void *);
 
 
-		Actormanager	*am;
+		Gameengine	*engine;
 
 		bool	master;
 		std::string	ip;
@@ -67,12 +67,12 @@ class	Networkengine
 		bool	running;
 
 
-		Networkengine(Actormanager *);
+		Networkengine(Gameengine *);
 		~Networkengine();
 
 		Replication		*new_replication(int const id);
 		
-		void	tick(float);
+		void	tick(float const);
 
 		void	connect(std::string const &, std::string const &);
 

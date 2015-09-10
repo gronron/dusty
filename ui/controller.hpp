@@ -40,7 +40,7 @@ class	Controller : public Actor
 		typedef	void (Controller::*BINDTYPE)(int, float *);
 
 
-		Controller(Actormanager *, Replication *, int, short int, Actor const *);
+		Controller(Gameengine *, Replication *, int, short int, Actor const *);
 		virtual ~Controller();
 
 		virtual void	postinstanciation();

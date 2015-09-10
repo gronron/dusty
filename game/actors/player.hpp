@@ -55,18 +55,18 @@ class	Player : public Actor
 		//Hud				*hud;
 
 
-		Player(Actormanager *, Replication *, int, short int, Actor const *);
+		Player(Gameengine *, Replication *, int const, short int const, Actor const *);
 		virtual ~Player();
 
 		void	postinstanciation();
 		void	destroy();
 
-		void	notified_by_owner(Actor *, bool);
+		void	notified_by_owner(Actor *, bool const);
 
-		void	get_replication(Packet &);
-		void	replicate(Packet &, float);
+		void	get_replication(Packet &) const;
+		void	replicate(Packet &, float const);
 
-		void	tick(float);
+		void	tick(float const);
 
 		bool	collide(Collider *);
 

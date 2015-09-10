@@ -3,7 +3,7 @@
 #include "random/mt19937.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
-#include "actormanager.hpp"
+#include "gameengine.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
 #include "projectile.hpp"
@@ -19,9 +19,9 @@
 
 FACTORYREG(Player);
 
-Player::Player(Actormanager *a, Replication *r, int i, short int t, Actor const *o) : Actor(a, r, i, t, o), dmg(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
+Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), dmg(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
 {
-	am->pe->new_body(&body, &shape, this);
+	engine->physic->new_body(&body, &shape, this);
 	shape.radius = 32.0f;
 	body->dynamic = true;
 	body->position = 128.0f;
@@ -38,39 +38,39 @@ Player::~Player()
 void	Player::postinstanciation()
 {
 	Actor::postinstanciation();
-	am->pe->init_body(body);
-	if (am->graphic)
+	engine->physic->init_body(body);
+	if (engine->graphic)
 	{
-		ps = new Particlesystem(am->ge, 1.0f, "player", &body);
-		am->ge->add(ps);
+		ps = new Particlesystem(engine->graphic, 1.0f, "player", &body);
+		engine->graphic->add(ps);
 		//hud = new Hud(1.0f, &cleared, this);
 	}
-	if (!am->master)
-		am->notify_owner(this, true);
+	if (!engine->master)
+		engine->notify_owner(this, true);
 
 }
 
 void	Player::destroy()
 {
 	Actor::destroy();
-	am->pe->delete_body(body);
-	if (am->graphic)
-		am->ge->remove(ps);
+	engine->physic->delete_body(body);
+	if (engine->graphic)
+		engine->graphic->remove(ps);
 }
 
-void	Player::notified_by_owner(Actor *a, bool)
+void	Player::notified_by_owner(Actor *a, bool const)
 {
 	AController	*c = (AController *)a;
 
 	c->controlled = this;
-	if (am->graphic && am->_controllermap.find(c->id) != am->_controllermap.end())
+	if (engine->graphic && engine->_controllermap.find(c->id) != engine->_controllermap.end())
 	{
-		//am->ge->cam_pos = bdb->loc;
-		//am->ge->add(hud);
+		//engine->graphic->cam_pos = bdb->loc;
+		//engine->graphic->add(hud);
 	}
 }
 
-void	Player::get_replication(Packet &pckt)
+void	Player::get_replication(Packet &pckt) const
 {
 	Actor::get_replication(pckt);
 	pckt.write(dir);
@@ -78,7 +78,7 @@ void	Player::get_replication(Packet &pckt)
 	body->get_replication(pckt);
 }
 
-void	Player::replicate(Packet &pckt, float p)
+void	Player::replicate(Packet &pckt, float const p)
 {
 	Actor::replicate(pckt, p);
 	pckt.read(dir);
@@ -86,10 +86,10 @@ void	Player::replicate(Packet &pckt, float p)
 	body->replicate(pckt, p);
 }
 
-void	Player::tick(float delta)
+void	Player::tick(float const delta)
 {
 	Actor::tick(delta);
-	if (am->master)
+	if (engine->master)
 	{
 		if (loadingfire)
 		{
@@ -102,18 +102,18 @@ void	Player::tick(float delta)
 			for (float i = 0.0f; i < a; ++i)
 			{
 				vec<float, 2>	a;
-				Projectile		*p = (Projectile *)am->create("Projectile", this, true);
+				Projectile		*p = (Projectile *)engine->create("Projectile", this, true);
 
 				p->ownerid = id;
 				p->dmg = dmg;
 				p->body->position = body->position;
-				a[0] = MT().genrand_real1(-1.0, 1.0);
-				a[1] = MT().genrand_real1(-1.0, 1.0);
-				p->body->velocity = Sgl::unit(a) * 512.0f;
+				a[0] = (float)MT().genrand_real1(-1.0, 1.0);
+				a[1] = (float)MT().genrand_real1(-1.0, 1.0);
+				p->body->velocity = unit<float>(a) * 512.0f;
 			}
 			loadingtime = 0.0f;
 		}
-		else if (firing && !is_callback_started("fire"))
+		else if (firing && !engine->callback->is_callback_started("fire"))
 		{
 			fire();
 			start_callback("fire", 1.0f / firerate, true, (bool (Actor::*)())&Player::fire);
@@ -134,14 +134,14 @@ bool			Player::collide(Collider *x)
 	}
 	else if ((f = dynamic_cast<Feeder const *>(&x)))
 	{
-		if (am->graphic)
-			am->ge->add(new Particlesystem(0.0f, "damage", bd.loc));
+		if (engine->graphic)
+			engine->graphic->add(new Particlesystem(0.0f, "damage", bd.loc));
 		dose += 1;
 		start_callback(3.0f, (bool (Actor::*)())&Player::down);
 		if (!high && dose == tolerance)
 			high = true;
 		if (dose > tolerance)
-			;//am->em.running = false;
+			;//engine->em.running = false;
 	}*/
 	if (dynamic_cast<Level const *>(x))
 		return (true);
@@ -152,9 +152,9 @@ bool	Player::fire()
 {
 	if (firing)
 	{
-		if (am->master)
+		if (engine->master)
 		{
-			Projectile *p = (Projectile *)am->create("Projectile", this, true);
+			Projectile *p = (Projectile *)engine->create("Projectile", this, true);
 			p->ownerid = id;
 			p->dmg = dmg;
 			p->body->position = body->position;
