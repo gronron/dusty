@@ -4,6 +4,7 @@
 #include "replication.hpp"
 #include "factory.hpp"
 #include "gameengine.hpp"
+#include "callbackmanager.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
 #include "projectile.hpp"
@@ -98,7 +99,7 @@ void	Player::tick(float const delta)
 		}
 		else if (loadingtime > 0.0f)
 		{
-			float	a = loadingtime * pow(log(firerate + M_E), 3);
+			float	a = loadingtime * (float)pow(log(firerate + M_E), 3);
 			for (float i = 0.0f; i < a; ++i)
 			{
 				vec<float, 2>	a;
@@ -113,10 +114,10 @@ void	Player::tick(float const delta)
 			}
 			loadingtime = 0.0f;
 		}
-		else if (firing && !engine->callback->is_callback_started("fire"))
+		else if (firing && !engine->callback->is_callback_started(1, this))
 		{
 			fire();
-			start_callback("fire", 1.0f / firerate, true, (bool (Actor::*)())&Player::fire);
+			engine->callback->start_callback(1, this, (bool (Actor::*)())&Player::fire, 1.0f / firerate, true);
 		}
 	}
 }

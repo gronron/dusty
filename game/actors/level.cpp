@@ -4,6 +4,7 @@
 #include "random/mt19937.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
+#include "callbackmanager.hpp"
 #include "gameengine.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
@@ -24,8 +25,8 @@ Level::Level(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		map = generate_labyrinth(16, 16);
 		_generate_block();
 		spawnrate = 1.0f;
-		start_callback("spawn_feeder", 1.0f / spawnrate, true, (bool (Actor::*)())&Level::spawn_feeder);
-		start_callback("increase_difficulty", 8.0f, true, (bool (Actor::*)())&Level::increase_difficulty);
+		engine->callback->start_callback(1, this, (bool (Actor::*)())&Level::spawn_feeder, 1.0f / spawnrate, true);
+		engine->callback->start_callback(2, this, (bool (Actor::*)())&Level::increase_difficulty, 8.0f, true);
 	}
 }
 
@@ -96,7 +97,7 @@ bool		Level::spawn_feeder()
 bool	Level::increase_difficulty()
 {
 	spawnrate += 0.1f;
-	update_callback("spawn_feeder", 1.0f / spawnrate);
+	engine->callback->update_callback(1, this, 1.0f / spawnrate);
 	return (true);
 }
 

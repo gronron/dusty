@@ -3,6 +3,7 @@
 #include "random/mt19937.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
+#include "callbackmanager.hpp"
 #include "gameengine.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
@@ -36,7 +37,7 @@ void	Feeder::postinstanciation()
 		ps = new Particlesystem(engine->graphic, 0.0f, "feeder", &body);
 		engine->graphic->add(ps);
 	}
-	start_callback("TP", 0.3f, true, (bool (Actor::*)())&Feeder::targetsomeone);
+	engine->callback->start_callback(1, this, (bool (Actor::*)())&Feeder::targetsomeone, 0.3f, true);
 }		
 
 void	Feeder::destroy()

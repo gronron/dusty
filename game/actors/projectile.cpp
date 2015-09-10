@@ -3,6 +3,7 @@
 #include "replication.hpp"
 #include "factory.hpp"
 #include "gameengine.hpp"
+#include "callbackmanager.hpp"
 #include "physicengine.hpp"
 #include "graphicengine.hpp"
 /*
@@ -35,7 +36,7 @@ void	Projectile::postinstanciation()
 		ps = new Particlesystem(engine->graphic, 1.0f, "projectile", &body);
 		engine->graphic->add(ps);
 	}
-	start_callback("Destroy", 8.0f, false, (bool (Actor::*)())&Projectile::selfdestroy);
+	engine->callback->start_callback(1, this, (bool (Actor::*)())&Projectile::selfdestroy, 8.0f, false);
 }
 
 void	Projectile::destroy()

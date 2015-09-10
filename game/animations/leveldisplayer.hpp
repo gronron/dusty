@@ -4,7 +4,6 @@
 #include "animation.hpp"
 
 class	Level;
-class	Gameengine;
 
 class	Leveldisplayer : public Animation
 {
@@ -13,7 +12,7 @@ class	Leveldisplayer : public Animation
 		Level					*lvl;
 		Graphicengine::Texture	*tex;
 
-		Leveldisplayer(Gameengine *, float, Level *);
+		Leveldisplayer(Graphicengine *, float, Level *);
 		virtual ~Leveldisplayer();
 
 		bool	tick(float);
