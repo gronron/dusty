@@ -25,8 +25,8 @@ Level::Level(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		map = generate_labyrinth(16, 16);
 		_generate_block();
 		spawnrate = 1.0f;
-		engine->callback->start_callback(1, this, (bool (Actor::*)())&Level::spawn_feeder, 1.0f / spawnrate, true);
-		engine->callback->start_callback(2, this, (bool (Actor::*)())&Level::increase_difficulty, 8.0f, true);
+		//engine->callback->start_callback(42, this, (bool (Actor::*)())&Level::spawn_feeder, 1.0f / spawnrate, true);
+		//engine->callback->start_callback(50, this, (bool (Actor::*)())&Level::increase_difficulty, 8.0f, true);
 	}
 }
 

@@ -31,14 +31,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SHADER_H_
 #define SHADER_H_
 
-class	Shader
+GLuint	create_shader(char const *filename, GLenum const shadertype);
+void	delete_shader(GLuint shader);
+
+class	Shaderprogram
 {
 	public:
 	
-		GLuint shader;
-	
-		Shader(std::string const &filename);
-		~Shader();
+		GLuint	program;
+
+
+		Shaderprogram();
+		Shaderprogram(GLuint const, GLuint const, GLuint const);
+		~Shaderprogram();
+		
+		bool	is_good();
+
+		void	use();
 };
 
 #endif

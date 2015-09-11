@@ -30,15 +30,103 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shader.hpp"
 
-Shader::Shader(std::string const &filename)
+static char			*read_file(char const *filename)
 {
-	shader = glCreateShader(GLenum shaderType);
-	
-	glShaderSource(shader, GLsizei count, const GLchar **string, const GLint *length);
-	glCompileShader(shader);
+	std::ifstream	is(filename);
+	int				length;
+	char			*buffer = 0;
+
+	if (is)
+	{
+		is.seekg(0, is.end);
+		length = is.tellg();
+		is.seekg(0, is.beg);
+		buffer = new char[length];
+
+		if (!is.read(buffer, length))
+		{
+			std::cerr << "create_shader() can't read file: " << filename << std::endl;
+			delete [] buffer;
+			buffer = 0;
+		}
+		is.close();
+	}
+	else
+		std::cerr << "create_shader() can't open file: " << filename << std::endl;
+
+	return (buffer);
 }
 
-Shader::~Shader()
+GLuint		create_shader(char const *filename, GLenum const shadertype)
 {
+	char	*buffer
+	GLuint	shader;
+	GLint	error;
+	GLchar	info[512];
 
+	if (!buffer = read_file(filename))
+		return (0);
+
+	shader = glCreateShader(shadertype);
+	glShaderSource(shader, 1, &buffer, 0);
+	glCompileShader(shader);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &error);
+	if (error)
+	{
+		glGetShaderInfoLog(shader, 512, 0, info);
+		std::cerr << "create_shader(): compilaion failed on file " << filename << ":\n\t" << info << std::endl;
+		glDeleteShader(shader);
+		shader = 0;
+	}
+
+	delete [] buffer;
+	return (shader);
+}
+
+void	delete_shader(GLuint shader)
+{
+	glDeleteShader(shader);
+}
+
+Shaderprogram::Shaderprogram()
+{
+	
+}
+
+Shaderprogram::Shaderprogram(GLuint const vertex, GLuint const geometry, GLuint const fragment)
+{
+	GLint	error;
+	GLchar	info[512];
+
+	program = glCreateProgram();
+
+	if (vertex)
+		glAttachShader(program, vertex);
+	if (geometry)
+		glAttachShader(program, geometry);
+	if (fragment)
+		glAttachShader(program, fragment);
+	
+	glLinkProgram(program);
+	glGetProgramiv(program, GL_LINK_STATUS, &error);
+	if (error)
+	{
+		glGetProgramInfoLog(program, 512, 0, info);
+		std::cerr << "create_programshader(): linking failed:\n\t" << info << std::endl;
+	}
+}
+
+Shaderprogram::~Shaderprogram()
+{
+	
+}
+
+bool	Shaderprogram::is_good()
+{
+	
+}
+
+void	Shaderprogram::use()
+{
+	glUseProgram(program);
 }

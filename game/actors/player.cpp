@@ -117,7 +117,7 @@ void	Player::tick(float const delta)
 		else if (firing && !engine->callback->is_callback_started(1, this))
 		{
 			fire();
-			engine->callback->start_callback(1, this, (bool (Actor::*)())&Player::fire, 1.0f / firerate, true);
+			//engine->callback->start_callback(1, this, (bool (Actor::*)())&Player::fire, 1.0f / firerate, true);
 		}
 	}
 }

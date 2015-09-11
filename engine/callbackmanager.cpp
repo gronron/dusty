@@ -31,12 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "new.hpp"
 #include "actor.hpp"
 #include "callbackmanager.hpp"
+#include <iostream>
 
 Callbackmanager::Callbackmanager() : _cbsize(1024), _cbfree(0), _callbacks(0)
 {
 	_callbacks = new Callback[_cbsize];
 	for (unsigned int i = 0; i < _cbsize - 1; ++i)
+	{
+		_callbacks[i].actor = 0;
 		_callbacks[i].next = i + 1;
+	}
+	_callbacks[_cbsize - 1].actor = 0;
 	_callbacks[_cbsize - 1].next = -1;
 }
 
@@ -56,7 +61,10 @@ void	Callbackmanager::tick(float const delta)
 				if ((_callbacks[i].actor->*_callbacks[i].function)() && _callbacks[i].loop)
 					_callbacks[i].timer -= _callbacks[i].delta;
 				else
+				{
+					std::cout << "cb stoped" << _callbacks[i].id << " " << _callbacks[i].loop <<std::endl;
 					_stop_callback(i);
+				}
 			}
 		}
 	}
@@ -66,13 +74,19 @@ void	Callbackmanager::start_callback(int const id, Actor *actor, bool (Actor::*f
 {
 	int	cb;
 
-	if (_cbfree == -1)
+	std::cout << true << std::endl;
+	if (_cbfree < 0)
 	{
 		_cbfree = _cbsize;
-		_callbacks = resize(_callbacks, _cbsize, _cbsize << 1);
-		for (unsigned int i = _cbsize; i < _cbsize - 1; ++i)
+		_cbsize <<= 1;
+		_callbacks = resize(_callbacks, _cbfree, _cbsize);
+		for (unsigned int i = _cbfree; i < _cbsize - 1; ++i)
+		{
+			_callbacks[i].actor = 0;
 			_callbacks[i].next = i + 1;
-		_callbacks[_cbsize].next = -1;
+		}
+		_callbacks[_cbsize - 1].actor = 0;
+		_callbacks[_cbsize - 1].next = -1;
 	}
 	
 	cb = _cbfree;
@@ -85,6 +99,7 @@ void	Callbackmanager::start_callback(int const id, Actor *actor, bool (Actor::*f
 	_callbacks[cb].function = function;
 	_callbacks[cb].delta = delta;
 	_callbacks[cb].loop = id < 0 ? false : loop;
+	std::cout << _callbacks[cb].loop << " " << loop << " " << id <<std::endl;
 	_callbacks[cb].timer = 0.0f;
 }
 
