@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CALLBACKMANAGER_H_
 #define CALLBACKMANAGER_H_
 
-class	Actor;
+#include "actor.hpp"
 
 class	Callbackmanager
 {
@@ -39,13 +39,13 @@ class	Callbackmanager
 
 		struct	Callback
 		{
-			int		id;
-			Actor	*actor;
-			bool	(Actor::*function)();
-			float	delta;
-			float	timer;
-			bool	loop;
-			int		next;
+			int			id;
+			Actor		*actor;
+			bool		(Actor::*function)();
+			float		delta;
+			float		timer;
+			bool		loop;
+			int			next;
 		};
 
 
@@ -59,7 +59,7 @@ class	Callbackmanager
 
 		void	tick(float const delta);
 
-		void	start_callback(int const id, Actor *actor, bool (Actor::*function)(), float const delta, bool const loop);
+		void	start_callback(int const id, Actor *actor, bool (Actor::*)(), float const delta, bool const loop);
 		void	stop_callback(int const id, Actor *actor);
 
 		bool	is_callback_started(int const id, Actor const *actor) const;

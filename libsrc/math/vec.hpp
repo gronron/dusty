@@ -93,8 +93,8 @@ vec<T, U>::operator vec<V, W>()
 {
 	vec<V, W>	a;
 
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = i < W ? (V)ar[i] : 0;
+	for (unsigned int i = 0; i < W; ++i)
+		a.ar[i] = (V)(i < U ? ar[i] : 0);
 	return (a);
 }
 

@@ -29,9 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include "new.hpp"
-#include "actor.hpp"
 #include "callbackmanager.hpp"
-#include <iostream>
 
 Callbackmanager::Callbackmanager() : _cbsize(1024), _cbfree(0), _callbacks(0)
 {
@@ -60,11 +58,8 @@ void	Callbackmanager::tick(float const delta)
 			{
 				if ((_callbacks[i].actor->*_callbacks[i].function)() && _callbacks[i].loop)
 					_callbacks[i].timer -= _callbacks[i].delta;
-				else
-				{
-					std::cout << "cb stoped" << _callbacks[i].id << " " << _callbacks[i].loop <<std::endl;
+				else if (_callbacks[i].actor)
 					_stop_callback(i);
-				}
 			}
 		}
 	}
@@ -74,7 +69,6 @@ void	Callbackmanager::start_callback(int const id, Actor *actor, bool (Actor::*f
 {
 	int	cb;
 
-	std::cout << true << std::endl;
 	if (_cbfree < 0)
 	{
 		_cbfree = _cbsize;
@@ -99,7 +93,6 @@ void	Callbackmanager::start_callback(int const id, Actor *actor, bool (Actor::*f
 	_callbacks[cb].function = function;
 	_callbacks[cb].delta = delta;
 	_callbacks[cb].loop = id < 0 ? false : loop;
-	std::cout << _callbacks[cb].loop << " " << loop << " " << id <<std::endl;
 	_callbacks[cb].timer = 0.0f;
 }
 
