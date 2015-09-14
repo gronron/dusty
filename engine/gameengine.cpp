@@ -105,7 +105,7 @@ Gameengine::~Gameengine()
 	delete console;
 }
 
-Actor		*Gameengine::create(std::string const &name, Actor const *owner, bool need_replication)
+Actor		*Gameengine::create(std::string const &name, Actor const *owner, bool const need_replication)
 {
 	int		id = -1;
 
@@ -140,13 +140,13 @@ Actor	*Gameengine::find_actor(int const id)
 	return (id < (int)_actsize ? _actors[id] : 0);
 }
 
-void	Gameengine::notify_owner(Actor *a, bool l)
+void	Gameengine::notify_owner(Actor *a, bool const l)
 {
 	if (a->ownerid < (int)_actsize && _actors[a->ownerid])
 		_actors[a->ownerid]->notified_by_owned(a, l);
 }
 
-void	Gameengine::notify_owned(Actor *a, bool l)
+void	Gameengine::notify_owned(Actor *a, bool const l)
 {
 	for	(unsigned int i = 0; i < _actsize; ++i)
 	{
@@ -165,7 +165,7 @@ void			Gameengine::control(int const id)
 		_controllermap[id] = ctrl;
 }
 
-void				Gameengine::tick(float delta)
+void				Gameengine::tick(float const delta)
 {
 	//std::cout << "em" << std::endl;
 	if (event)

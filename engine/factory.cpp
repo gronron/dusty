@@ -86,7 +86,7 @@ Actor										*Factory::create(Gameengine *g, Replication *r) const
 	return (0);
 }
 
-Actor												*Factory::create(Gameengine *g, Replication *r, int id, std::string const &name, Actor const *owner) const
+Actor												*Factory::create(Gameengine *g, Replication *r, int const id, std::string const &name, Actor const *owner) const
 {
 	std::map<std::string, Class>::const_iterator	i;
 

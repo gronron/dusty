@@ -44,7 +44,7 @@ class	Factory
 {
 	public:
 
-		typedef Actor *(*CF)(Gameengine *, Replication *, int, short int, Actor const *);
+		typedef Actor *(*CF)(Gameengine *, Replication *, int const, short int const, Actor const *);
 
 		struct	Class
 		{
@@ -65,11 +65,11 @@ class	Factory
 		short int	get_type(std::string const &) const;
 
 		Actor		*create(Gameengine *, Replication *) const;
-		Actor		*create(Gameengine *, Replication *, int, std::string const&, Actor const *) const;
+		Actor		*create(Gameengine *, Replication *, int const, std::string const&, Actor const *) const;
 };
 
 template<class T>
-Actor	*create(Gameengine *am, Replication *r, int i, short int t, Actor const *o)
+Actor	*create(Gameengine *am, Replication *r, int const i, short int const t, Actor const *o)
 {
 	return (new T(am, r, i, t, o));
 }
