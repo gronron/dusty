@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "thread/lightthreadpool.hpp"
 #include "thread/lightthreadpool_util.hpp"
-#include "actor.hpp"
+#include "shape.hpp"
+#include "collider.hpp"
 #include "physicengine.hpp"
 #include <iostream>
 #include <cstdlib>

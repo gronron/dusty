@@ -36,12 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GAP 0.2f
 #define	MUL 2.0f
 
-static void	merge_aabb(Aabb &x, Aabb const &y, Aabb const &z)
-{
-	x.bottom = min(y.bottom, z.bottom);
-	x.top = max(y.top, z.top);
-}
-
 static float	perimeter(Aabb const &x)
 {
 	return (sum(x.top - x.bottom) * 2.0f);
@@ -110,7 +104,7 @@ void			Aabbtree::remove_aabb(int const index)
 
 bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity) // need to correct
 {
-	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
+	if (_nodes[index].aabb.is_containing(aabb))
 		return (false);
 
 	Aabb	a = aabb;
@@ -135,7 +129,7 @@ bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const 
 
 bool	Aabbtree::move_saabb(int const index, Aabb const &aabb)
 {
-	if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
+	if (_nodes[index].aabb.is_containing(aabb))
 		return (false);
 
 	_nodes[index].aabb = aabb;
@@ -213,7 +207,7 @@ void	Aabbtree::_insert_leaf(int const index) //nedd correction
 	int newparent = _allocate_node();
 
 	_nodes[newparent].parent = oldparent;
-	merge_aabb(_nodes[newparent].aabb, leafaabb, _nodes[i].aabb);
+	_nodes[newparent].aabb.merge(leafaabb, _nodes[i].aabb);
 	_nodes[newparent].height = _nodes[i].height + 1;
 	_nodes[newparent].left = i;
 	_nodes[newparent].right = index;
@@ -287,7 +281,7 @@ void	Aabbtree::_balance(int const index)
 		int right = _nodes[i].right;
 
 		_nodes[i].height = (_nodes[left].height > _nodes[right].height ? _nodes[left].height : _nodes[right].height) + 1;
-		merge_aabb(_nodes[i].aabb, _nodes[left].aabb, _nodes[right].aabb);
+		_nodes[i].aabb.merge(_nodes[left].aabb, _nodes[right].aabb);
 	}
 }
 
@@ -322,8 +316,8 @@ void	Aabbtree::_rotate(int const up, int const down, int const sibling)
 		_nodes[up].height = (_nodes[sibling].height > _nodes[right].height ? _nodes[sibling].height : _nodes[right].height) + 1;
 		_nodes[down].height = (_nodes[up].height > _nodes[left].height ? _nodes[up].height : _nodes[left].height) + 1;
 		
-		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[right].aabb);
-		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[left].aabb);
+		_nodes[up].aabb.merge(_nodes[sibling].aabb, _nodes[right].aabb);
+		_nodes[down].aabb.merge(_nodes[up].aabb, _nodes[left].aabb);
 	}
 	else
 	{
@@ -337,7 +331,7 @@ void	Aabbtree::_rotate(int const up, int const down, int const sibling)
 		_nodes[up].height = (_nodes[sibling].height > _nodes[left].height ? _nodes[sibling].height : _nodes[left].height) + 1;
 		_nodes[down].height = (_nodes[up].height > _nodes[right].height ? _nodes[up].height : _nodes[right].height) + 1;
 
-		merge_aabb(_nodes[up].aabb, _nodes[sibling].aabb, _nodes[left].aabb);
-		merge_aabb(_nodes[down].aabb, _nodes[up].aabb, _nodes[right].aabb);
+		_nodes[up].aabb.merge(_nodes[sibling].aabb, _nodes[left].aabb);
+		_nodes[down].aabb.merge(_nodes[up].aabb, _nodes[right].aabb);
 	}
 }

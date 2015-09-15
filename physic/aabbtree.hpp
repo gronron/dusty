@@ -103,7 +103,7 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)
 		{
 			int	index = stack[--top];
 
-			if (_nodes[index].aabb.bottom <= aabb.top && _nodes[index].aabb.top >= aabb.bottom)
+			if (aabb.is_overlapping(_nodes[index].aabb))
 			{
 				if (_nodes[index].right == -1)
 					(object->*callback)(_nodes[index].data);

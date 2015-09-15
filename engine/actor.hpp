@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ACTOR_H_
 
 #include "endian/packet.hpp"
-#include "body.hpp"
+#include "collider.hpp"
 
 class	Gameengine;
 class	Replication;

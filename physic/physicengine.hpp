@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "aabbtree.hpp"
 #include "thread/mutex.hpp"
 
+class	Shape;
+class	Collider;
+
 class	Physicengine
 {
 	public:

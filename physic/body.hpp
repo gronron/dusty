@@ -33,16 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 #include "endian/packet.hpp"
-#include "shape.hpp"
+#include "aabb.hpp"
 
-class	Collider
-{
-	public:
-	
-		virtual bool	collide(Collider *) = 0;
-		/*virtual bool	touch() = 0;
-		virtual bool	untouch() = 0;*/
-};
+class	Shape;
+class	Collider;
 
 struct	Body
 {

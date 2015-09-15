@@ -28,44 +28,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef AABB_H_
-#define AABB_H_
+#ifndef COLLIDER_H_
+#define COLLIDER_H_
 
-#include "math/vec.hpp"
-#include "math/vec_util.hpp"
-
-struct				Ray
+class	Collider
 {
-	vec<float, 4>	origin;
-	vec<float, 4>	direction;
-};
-
-struct				Aabb
-{
-	vec<float, 4>	bottom;
-	vec<float, 4>	top;
+	public:
 	
-	Aabb	&merge(Aabb const &, Aabb const &);
-	
-	bool	is_overlapping(Aabb const &x) const;
-	bool	is_containing(Aabb const &inner) const;
+		virtual bool	collide(Collider *) = 0;
+		/*virtual bool	touch() = 0;
+		virtual bool	untouch() = 0;*/
 };
-
-inline Aabb	&Aabb::merge(Aabb const &x, Aabb const &y)
-{
-	bottom = min(x.bottom, y.bottom);
-	top = max(x.top, y.top);
-	return (*this);
-}
-
-inline bool	Aabb::is_overlapping(Aabb const &x) const
-{
-	return ((vec<float, 3>)bottom <= x.top && (vec<float, 3>)top >= x.bottom);
-}
-
-inline bool	Aabb::is_containing(Aabb const &inner) const
-{
-	return ((vec<float, 3>)bottom <= inner.bottom && (vec<float, 3>)top >= inner.top);
-}
 
 #endif
