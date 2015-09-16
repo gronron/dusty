@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "console.hpp"
 #include "physicengine.hpp"
 #include "networkengine.hpp"
-#include "graphicengine.hpp"
+#include "raytracer.hpp"
 #include "eventmanager.hpp"
 #include "callbackmanager.hpp"
 #include "gameengine.hpp"
@@ -67,14 +67,14 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _act
 	console = new Console(this);
 	if (opt.graphic)
 	{
-		graphic = new Graphicengine();
+		graphic = new Raytracer(1024, 768);
 		event = new Eventmanager(this);
 	}
 
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
 	if (master)
-		create(opt.level, 0, true);
+		create("World", 0, true);
 	if (!network)
 	{
 		Controller *ctrl = (Controller *)create(controllerclass, 0, true);

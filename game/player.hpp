@@ -28,19 +28,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CHUNK_H_
-#define CHUNK_H_
+#ifndef PLAYER_H_
+#define PLAYER_H_
 
-#include "math/vec.hpp"
+#include "actor.hpp"
+#include "shape.hpp"
+//#include "particlesystem.hpp"
+//#include "hud.hpp"
 
-#define CHUNK_SIZE 16
+struct	Body;
 
-struct	Chunk
+class	Player : public Actor
 {
-	vec<unsigned int, 4>	location;
-	unsigned char			blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-};
+	public:
 
-void	generate_chunk(Chunk *);
+		Body			*body;
+		Sphereshape		shape;
+
+		float			dmg;
+		float			firerate;
+		float			score;
+		float			loadingtime;
+
+		bool			firing;
+		bool			loadingfire;
+		vec<float, 2>	dir;
+
+		//Particlesystem	*ps;
+		//Hud				*hud;
+
+
+		Player(Gameengine *, Replication *, int const, short int const, Actor const *);
+		virtual ~Player();
+
+		void	postinstanciation();
+		void	destroy();
+
+		void	notified_by_owner(Actor *, bool const);
+
+		void	get_replication(Packet &) const;
+		void	replicate(Packet &, float const);
+
+		void	tick(float const);
+
+		bool	collide(Collider *);
+
+		bool	fire();
+};
 
 #endif

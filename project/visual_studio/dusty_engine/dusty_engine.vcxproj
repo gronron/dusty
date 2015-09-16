@@ -48,11 +48,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game\actors;$(SolutionDir)..\..\game\animations;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game\actors;$(SolutionDir)..\..\game\animations;$(AMDAPPSDKROOT)\include;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;Opengl32.lib;glew32.lib;freetype255.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;Opengl32.lib;glew32.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -63,13 +63,13 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game\actors;$(SolutionDir)..\..\game\animations;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game\actors;$(SolutionDir)..\..\game\animations;$(AMDAPPSDKROOT)\include;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;Opengl32.lib;glew32.lib;freetype255.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;Opengl32.lib;glew32.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -80,17 +80,11 @@
     <ClCompile Include="..\..\..\engine\configmanager.cpp" />
     <ClCompile Include="..\..\..\engine\factory.cpp" />
     <ClCompile Include="..\..\..\engine\gameengine.cpp" />
-    <ClCompile Include="..\..\..\game\actors\acontroller.cpp" />
-    <ClCompile Include="..\..\..\game\actors\feeder.cpp" />
-    <ClCompile Include="..\..\..\game\actors\labyrinth.cpp" />
-    <ClCompile Include="..\..\..\game\actors\level.cpp" />
-    <ClCompile Include="..\..\..\game\actors\player.cpp" />
-    <ClCompile Include="..\..\..\game\actors\projectile.cpp" />
-    <ClCompile Include="..\..\..\game\animations\leveldisplayer.cpp" />
-    <ClCompile Include="..\..\..\game\animations\particlesystem.cpp" />
-    <ClCompile Include="..\..\..\graphic\animation.cpp" />
-    <ClCompile Include="..\..\..\graphic\graphicengine.cpp" />
-    <ClCompile Include="..\..\..\graphic\image.cpp" />
+    <ClCompile Include="..\..\..\game\acontroller.cpp" />
+    <ClCompile Include="..\..\..\game\chunk.cpp" />
+    <ClCompile Include="..\..\..\game\player.cpp" />
+    <ClCompile Include="..\..\..\game\world.cpp" />
+    <ClCompile Include="..\..\..\graphic\raytracer.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_node.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp" />
     <ClCompile Include="..\..\..\libsrc\endian\endian.cpp" />
@@ -124,20 +118,16 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\actor.hpp" />
     <ClInclude Include="..\..\..\engine\callbackmanager.hpp" />
+    <ClInclude Include="..\..\..\engine\common.hpp" />
     <ClInclude Include="..\..\..\engine\configmanager.hpp" />
     <ClInclude Include="..\..\..\engine\factory.hpp" />
     <ClInclude Include="..\..\..\engine\gameengine.hpp" />
-    <ClInclude Include="..\..\..\game\actors\acontroller.hpp" />
-    <ClInclude Include="..\..\..\game\actors\feeder.hpp" />
-    <ClInclude Include="..\..\..\game\actors\labyrinth.hpp" />
-    <ClInclude Include="..\..\..\game\actors\level.hpp" />
-    <ClInclude Include="..\..\..\game\actors\player.hpp" />
-    <ClInclude Include="..\..\..\game\actors\projectile.hpp" />
-    <ClInclude Include="..\..\..\game\animations\leveldisplayer.hpp" />
-    <ClInclude Include="..\..\..\game\animations\particlesystem.hpp" />
-    <ClInclude Include="..\..\..\graphic\animation.hpp" />
-    <ClInclude Include="..\..\..\graphic\graphicengine.hpp" />
-    <ClInclude Include="..\..\..\graphic\image.hpp" />
+    <ClInclude Include="..\..\..\game\acontroller.hpp" />
+    <ClInclude Include="..\..\..\game\chunk.hpp" />
+    <ClInclude Include="..\..\..\game\player.hpp" />
+    <ClInclude Include="..\..\..\game\world.hpp" />
+    <ClInclude Include="..\..\..\graphic\opencl_error.hpp" />
+    <ClInclude Include="..\..\..\graphic\raytracer.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_node.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_parser.hpp" />
     <ClInclude Include="..\..\..\libsrc\endian\endian.hpp" />

@@ -37,6 +37,12 @@
     <Filter Include="Source Files\network">
       <UniqueIdentifier>{2f56fb09-059e-477c-8435-19a04ae13a16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphic">
+      <UniqueIdentifier>{5f6f96c3-2d0c-423a-9c6b-758a761e8a94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphic">
+      <UniqueIdentifier>{76418ee6-b9bb-4d2d-96f3-89f5c303d835}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\engine\actor.cpp">
@@ -102,41 +108,8 @@
     <ClCompile Include="..\..\..\ui\eventmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\graphic\animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\graphic\graphicengine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\graphic\image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\actors\player.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\actors\acontroller.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\animations\particlesystem.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\actors\projectile.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\actors\feeder.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\actors\level.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\animations\leveldisplayer.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\actors\labyrinth.cpp">
-      <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\physic\aabbtree.cpp">
       <Filter>Source Files\physic</Filter>
@@ -173,6 +146,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\engine\gameengine.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\raytracer.cpp">
+      <Filter>Source Files\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\chunk.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\world.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\acontroller.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\player.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,39 +236,6 @@
     <ClInclude Include="..\..\..\ui\eventmanager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\graphic\animation.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\graphic\graphicengine.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\graphic\image.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\actors\acontroller.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\actors\player.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\animations\particlesystem.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\actors\projectile.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\actors\feeder.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\actors\level.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\animations\leveldisplayer.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\actors\labyrinth.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\physic\aabbtree.hpp">
       <Filter>Header Files\physic</Filter>
     </ClInclude>
@@ -325,6 +280,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\engine\gameengine.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\opencl_error.hpp">
+      <Filter>Header Files\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\raytracer.hpp">
+      <Filter>Header Files\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\chunk.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\world.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\common.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\acontroller.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\player.hpp">
+      <Filter>Header Files\game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

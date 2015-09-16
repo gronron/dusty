@@ -28,19 +28,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CHUNK_H_
-#define CHUNK_H_
+#include "chunk.hpp"
 
-#include "math/vec.hpp"
-
-#define CHUNK_SIZE 16
-
-struct	Chunk
+void	generate_chunk(Chunk *chunk)
 {
-	vec<unsigned int, 4>	location;
-	unsigned char			blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-};
-
-void	generate_chunk(Chunk *);
-
-#endif
+	for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
+	{
+		for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
+		{
+			int	height = (x * y + x + y) % 7 + 3;
+			for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
+			{
+				chunk->blocks[x][y][z] = z <= height ? 1 : 0;
+			}
+		}
+	}
+}

@@ -43,7 +43,8 @@ class	Eventmanager;
 class	Physicengine;
 class	Networkengine;
 class	Callbackmanager;
-class	Graphicengine;
+//class	Graphicengine;
+class	Raytracer;
 
 class	Gameengine
 {
@@ -72,7 +73,8 @@ class	Gameengine
 
 
 		Console			*console;
-		Graphicengine	*graphic;
+		//Graphicengine	*graphic;
+		Raytracer		*graphic;
 		Eventmanager	*event;
 		//Uimanager		*um;
 

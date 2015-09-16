@@ -28,19 +28,56 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CHUNK_H_
-#define CHUNK_H_
+#include "common.hpp"
+#include "world.hpp"
+#include <iostream>
 
-#include "math/vec.hpp"
+FACTORYREG(World);
 
-#define CHUNK_SIZE 16
-
-struct	Chunk
+World::World(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o)
 {
-	vec<unsigned int, 4>	location;
-	unsigned char			blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-};
+	chunks = new Chunk;
+	
+	if (engine->graphic)
+	{
+		engine->graphic->new_light(&light);
+		light->position = 0.0f;
+		light->color = 1.0f;
+		light->power = 1000.0f;
+		
+		engine->graphic->materials_count = 2;
+		engine->graphic->materials[0].color = { 1.0f, 1.0f, 1.0f };
+		engine->graphic->materials[1].color = { 1.0f, 0.8f, 0.2f };
 
-void	generate_chunk(Chunk *);
+		for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
+		{
+			for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
+			{
+				int	height = (x * y + x + y) % 7 + 3;
+				for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
+				{
+					Aabb	aabb;
+					
+					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
+					aabb.top = aabb.bottom + 1.0f;
+					
+					if (chunks->blocks[x][y][z])
+						engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
+				}
+			}
+		}
+	}
+}
 
-#endif
+World::~World()
+{
+	delete chunks;
+}
+
+void	World::tick(float const delta)
+{
+	time += delta;
+	
+	light->position[0] = sin(time) * 1000.0f;
+	light->position[1] = cos(time) * 1000.0f;
+}

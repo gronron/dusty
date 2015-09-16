@@ -152,7 +152,7 @@ int		Aabbtree::_allocate_node()
 			_nodes[i].next = i + 1;
 		_nodes[_size - 1].next = -1;
 	}
-	
+
 	index = _free;
 	_free = _nodes[_free].next;
 	return (index);
