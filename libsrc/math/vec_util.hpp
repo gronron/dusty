@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include "vec.hpp"
 
+#undef min
+#undef max
+
 template<class T, unsigned int U, unsigned int V>
 inline vec<T, (U > V ? V : U)>	min(vec<T, U> const &x, vec<T, V> const &y)
 {

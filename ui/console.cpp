@@ -31,7 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gameengine.hpp"
 #include "eventmanager.hpp"
 #include "networkengine.hpp"
-#include "graphicengine.hpp"
+//#include "graphicengine.hpp"
+#include "raytracer.hpp"
 #include "console.hpp"
 
 Console::Console(Gameengine *g) : engine(g), _blink(false), _blinktime(0.0f), _cursor(0), _text("")
@@ -64,7 +65,7 @@ void											Console::draw()
 	int											j;
 
 	color = 1.0f;
-	loc = vec<float, 2>::cast(engine->graphic->screensize) / -2.0f;
+	//loc = vec<float, 2>::cast(engine->graphic->screensize) / -2.0f;
 	loc[1] += _history.size() < 4 ? _history.size() * 32.0f : 128.0f;
 	s = 0.5f;
 	if (engine->event->typing)

@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "gameengine.hpp"
 #include "console.hpp"
-#include "graphicengine.hpp"
+//#include "graphicengine.hpp"
+#include "raytracer.hpp"
 #include "eventmanager.hpp"
 
 Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(false)
@@ -69,7 +70,7 @@ void			Eventmanager::event()
 			case SDL_APP_DIDENTERFOREGROUND:
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-					engine->graphic->resize(event.window.data1, event.window.data2);
+					engine->graphic->set_resolution(event.window.data1, event.window.data2);
 				break;
 			case SDL_SYSWMEVENT:
 				break;
