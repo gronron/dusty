@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 
-#define CHUNK_SIZE 16
+#define CHUNK_SIZE 3
 
 struct	Chunk
 {

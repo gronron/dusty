@@ -17,7 +17,7 @@ Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Ac
 	engine->physic->new_body(&body, &shape, this);
 	shape.radius = 32.0f;
 	body->dynamic = true;
-	body->position = 128.0f;
+	body->position = 20.0f;
 	
 	firing = true;
 	loadingfire = false;

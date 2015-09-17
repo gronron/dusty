@@ -53,16 +53,14 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		{
 			for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
 			{
-				int	height = (x * y + x + y) % 7 + 3;
 				for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
 				{
 					Aabb	aabb;
 					
 					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
 					aabb.top = aabb.bottom + 1.0f;
-					
-					if (chunks->blocks[x][y][z])
-						engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
+
+					engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
 				}
 			}
 		}
@@ -78,6 +76,6 @@ void	World::tick(float const delta)
 {
 	time += delta;
 	
-	light->position[0] = sin(time) * 1000.0f;
-	light->position[1] = cos(time) * 1000.0f;
+	light->position[1] = sin(time) * delta * 40000.0f;
+	light->position[2] = cos(time) * delta * 40000.0f;
 }

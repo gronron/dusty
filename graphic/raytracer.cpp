@@ -85,6 +85,8 @@ Raytracer::Raytracer(unsigned int const width, unsigned int const height) : mate
 	cl_uint 		devices_count;
 	cl_device_id	*devices;
 	
+	camera.fov = 1.5f;
+	
 	materials = new Material[materials_size];
 	
 	_lights = new Light[_lights_size];
@@ -152,10 +154,14 @@ Raytracer::Raytracer(unsigned int const width, unsigned int const height) : mate
 	check_error(error, "clCreateKernel()");
 
 	set_resolution(width, height);
+	
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 Raytracer::~Raytracer()
 {
+	SDL_SetRelativeMouseMode(SDL_FALSE);
+	
 	delete [] materials;
 	
 	delete [] _lights;
@@ -243,6 +249,8 @@ void	Raytracer::_render()
 	_compute_camera(cm);
 	_set_buffer();
 
+	//std::cout << cm.position[0] << " "  << cm.position[1] << std::endl;
+	
 	unsigned int	argc = 0;
 	check_error(clSetKernelArg(kernel, argc++, sizeof(Computedcamera), &cm), "clSetKernelArg()0");
 	check_error(clSetKernelArg(kernel, argc++, sizeof(int), &aabbtree._root), "clSetKernelArg()1");
@@ -269,11 +277,19 @@ void	Raytracer::_render()
 void	Raytracer::_compute_camera(Computedcamera &cm)
 {
 	vec<float, 4>	direction;
+	
+	int	x;
+	int	y;
+	SDL_GetRelativeMouseState(&x, &y);
+	camera.spherical_coord[0] -= x / 200.0f;
+	camera.spherical_coord[1] -= y / 200.0f;
 
 	direction[0] = cos(camera.spherical_coord[1]) * cos(camera.spherical_coord[0]);
 	direction[1] = cos(camera.spherical_coord[1]) * sin(camera.spherical_coord[0]);
 	direction[2] = sin(camera.spherical_coord[1]);
 	direction[3] = 0.0f;
+	
+	//camera.position += direction * 0.1f;
 
 	cm.position = camera.position;
 	cm.forward = (direction * (float)camera.resolution[0]) / (tan(camera.fov / 2.0f) * 2.0f);

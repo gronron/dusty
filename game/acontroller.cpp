@@ -70,20 +70,26 @@ void	AController::tick(float delta)
 	Controller::tick(delta);
 	if (controlled)
 	{
-		controlled->body->velocity = move * 256.0f;
+		//controlled->body->velocity = move * 256.0f;
 		controlled->firing = firing;
 		controlled->loadingfire = loadingfire;
 		controlled->dir = aim;
 		//beware
-		vec<float, 4> direction;
-		direction[0] = cos(aim[1]) * cos(aim[0]);
-		direction[1] = cos(aim[1]) * sin(aim[0]);
-		direction[2] = sin(aim[1]);
+		
+		vec<float, 4>	direction;
+		vec<float, 4>	right;
+	
+		direction[0] = cos(engine->graphic->camera.spherical_coord[1]) * cos(engine->graphic->camera.spherical_coord[0]);
+		direction[1] = cos(engine->graphic->camera.spherical_coord[1]) * sin(engine->graphic->camera.spherical_coord[0]);
+		direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
 		direction[3] = 0.0f;
 		
-		
-		engine->graphic->camera.spherical_coord = aim;
-		controlled->body->velocity = direction * move[0];
+		right[0] = sin(engine->graphic->camera.spherical_coord[0]);
+		right[1] = -cos(engine->graphic->camera.spherical_coord[0]);
+		right[2] = 0.0f;
+		right[3] = 0.0f;
+	
+		controlled->body->velocity = (direction * -move[1] + right * move[0]) * delta * 1000.0f;
 		engine->graphic->camera.position = controlled->body->position;
 	}
 }
