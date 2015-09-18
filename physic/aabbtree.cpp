@@ -36,18 +36,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GAP 0.2f
 #define	MUL 2.0f
 
-static float	perimeter(Aabb const &x)
+inline float	perimeter(Aabb const &x)
 {
-	return (sum(x.top - x.bottom) * 2.0f);
+	return (sum(x.top - x.bottom));
+	//return (sum(x.top - x.bottom) * 2.0f);
 }
 
-static float	merged_perimeter(Aabb const &x, Aabb const &y)
+inline float	merged_perimeter(Aabb const &x, Aabb const &y)
 {
 	Aabb		a;
 	
 	a.bottom = min(x.bottom, y.bottom);
 	a.top = max(x.top, y.top);
-	return (sum(a.top - a.bottom) * 2.0f);
+	return (sum(a.top - a.bottom));
+	//return (sum(a.top - a.bottom) * 2.0f);
 }
 
 Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)
@@ -180,27 +182,29 @@ void	Aabbtree::_insert_leaf(int const index) //nedd correction
 		int left = _nodes[i].left;
 		int right = _nodes[i].right;
 
-		float combinedArea = merged_perimeter(_nodes[i].aabb, leafaabb);
-
+		float	cost = merged_perimeter(_nodes[i].aabb, leafaabb);
+		float	inheritance_cost = cost - perimeter(_nodes[i].aabb);
+		
+		/*float combinedArea = merged_perimeter(_nodes[i].aabb, leafaabb);
 		float cost = 2.0f * combinedArea;
-		float inheritanceCost = 2.0f * (combinedArea - perimeter(_nodes[i].aabb));
+		float inheritance_cost = 2.0f * (combinedArea - perimeter(_nodes[i].aabb));*/
 
 		float left_cost;
 		float right_cost;
 		
 		if (_nodes[left].right == -1)
-			left_cost = merged_perimeter(_nodes[left].aabb, leafaabb) + inheritanceCost;
+			left_cost = merged_perimeter(_nodes[left].aabb, leafaabb) + inheritance_cost;
 		else
-			left_cost = (merged_perimeter(_nodes[left].aabb, leafaabb) - perimeter(_nodes[left].aabb)) + inheritanceCost;
+			left_cost = (merged_perimeter(_nodes[left].aabb, leafaabb) - perimeter(_nodes[left].aabb)) + inheritance_cost;
 
 		if (_nodes[right].right == -1)
-			right_cost = merged_perimeter(_nodes[right].aabb, leafaabb) + inheritanceCost;
+			right_cost = merged_perimeter(_nodes[right].aabb, leafaabb) + inheritance_cost;
 		else
-			right_cost = (merged_perimeter(_nodes[right].aabb, leafaabb) - perimeter(_nodes[right].aabb)) + inheritanceCost;
+			right_cost = (merged_perimeter(_nodes[right].aabb, leafaabb) - perimeter(_nodes[right].aabb)) + inheritance_cost;
 
 		if (cost < left_cost && cost < right_cost)
 			break;
-		i = left_cost <= right_cost ? left : right;
+		i = left_cost < right_cost ? left : right;
 	}
 
 	int oldparent = _nodes[i].parent;
