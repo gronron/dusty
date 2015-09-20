@@ -37,6 +37,7 @@ FACTORYREG(World);
 World::World(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o)
 {
 	chunks = new Chunk;
+	generate_chunk(chunks);
 	
 	if (engine->graphic)
 	{
@@ -45,9 +46,13 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		light->color = 1.0f;
 		light->power = 1000.0f;
 		
-		engine->graphic->materials_count = 2;
-		engine->graphic->materials[0].color = { 1.0f, 1.0f, 1.0f };
+		engine->graphic->materials_count = 3;
+		engine->graphic->materials[0].color = { 0.0f, 1.0f, 1.0f };
+		engine->graphic->materials[0].transparency = 1.0f;
 		engine->graphic->materials[1].color = { 1.0f, 0.8f, 0.2f };
+		engine->graphic->materials[1].transparency = 1.0f;
+		engine->graphic->materials[2].color = { 1.0f, 0.0f, 1.0f };
+		engine->graphic->materials[2].transparency = 1.0f;
 
 		for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
 		{
@@ -55,12 +60,14 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 			{
 				for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
 				{
-					Aabb	aabb;
-					
-					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
-					aabb.top = aabb.bottom + 1.0f;
+					//if (chunks->blocks[x][y][z])
+					{
+						Aabb	aabb;
 
-					engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
+						aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
+						aabb.top = aabb.bottom + 1.0f;
+						engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
+					}
 				}
 			}
 		}
@@ -76,6 +83,7 @@ void	World::tick(float const delta)
 {
 	time += delta;
 	
+	time = 1.0f;
 	light->position[1] = sin(time) * delta * 40000.0f;
 	light->position[2] = cos(time) * delta * 40000.0f;
 }
