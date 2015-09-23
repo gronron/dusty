@@ -141,16 +141,28 @@ inline vec<U, V>	unit(vec<U, V> const &x)
 	return (a ? x / a : x * a);
 }
 
+template<class T, unsigned int U>
+inline vec<T, U>	project(vec<T, U> const &x, vec<T, U> const &y)
+{
+	return (x - y * dot(x, y));
+}
+
 template<class T, class U, unsigned int V>
-inline vec<T, V>	project(vec<U, V> const &x, vec<U, V> const &y)
+inline vec<T, V>	unit_project(vec<U, V> const &x, vec<U, V> const &y)
 {
 	vec<T, U> const	a = unit<T>(y);
 
 	return (x - a * dot(x, a));
 }
 
+template<class T, unsigned int U>
+inline vec<T, U>	reflect(vec<T, U> const &x, vec<T, U> const &y)
+{
+	return (x - y * (dot(x, y) * 2.0f));
+}
+
 template<class T, class U, unsigned int V>
-inline vec<T, V>	reflect(vec<U, V> const &x, vec<U, V> const &y)
+inline vec<T, V>	unit_reflect(vec<U, V> const &x, vec<U, V> const &y)
 {
 	vec<T, V> const	a = unit<T>(y);
 

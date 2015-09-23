@@ -33,14 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "aabbtree.hpp"
 
-#include <iostream>
-
 #define GAP 0.2f
 #define	MUL 2.0f
 
 inline float	perimeter(Aabb const &x)
 {
-	//return (sum(x.top - x.bottom));
 	return (sum(x.top - x.bottom) * 2.0f);
 }
 
@@ -50,7 +47,6 @@ inline float	merged_perimeter(Aabb const &x, Aabb const &y)
 	
 	a.bottom = min(x.bottom, y.bottom);
 	a.top = max(x.top, y.top);
-	//return (sum(a.top - a.bottom));
 	return (sum(a.top - a.bottom) * 2.0f);
 }
 
@@ -179,7 +175,7 @@ void	Aabbtree::_insert_leaf(int const index)
 	{
 		int const	left = _nodes[i].left;
 		int const	right = _nodes[i].right;
-
+		
 		float const	cost = merged_perimeter(_nodes[i].aabb, leafaabb) * 2.0f;
 		float const	inheritance_cost = cost - perimeter(_nodes[i].aabb) * 2.0f;
 
