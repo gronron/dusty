@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AABBTREE_H_
 #define AABBTREE_H_
 
+#include <cmath>
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
@@ -69,6 +70,9 @@ class	Aabbtree
 
 		Aabbtree();
 		~Aabbtree();
+		
+		void	reset();
+		void	rebuild();
 
 		int		add_aabb(Aabb const &, int const data);
 		int		add_saabb(Aabb const &, int const data);
@@ -78,7 +82,10 @@ class	Aabbtree
 
 		template<class T>
 		void	query(Aabb const &, T *, void (T::*)(int const)) const;
-		void	raycast() const;
+		template <class T>
+		void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
+		template <class T>
+		void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
 
 		int		_allocate_node();
 		void	_free_node(int const);
@@ -89,6 +96,8 @@ class	Aabbtree
 		void	_balance(int const);
 		void	_rotate(int const, int const, int const);
 };
+
+///////////////////////////////////////
 
 template<class T>
 void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)) const
@@ -117,27 +126,15 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)
 		while (top);
 	}
 }
-/*
-bool	intersect_rayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
-{
-	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.dir;
-	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.dir;
-	vec<float, 3> const	tmin = min(tbot, ttop);
-	vec<float, 3> const	tmax = max(tbot, ttop);
-
-	tnear = max(max(tmin[0], tmin[1]), tmin[2]);
-	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
-
-	return (tfar >= 0 && tnear <= tfar);
-}
 
 template <class T>
-void	Aabbtree::raycast(Ray const &ray, T* object, void (T::*callback)(int const)) const
+void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const
 {
 	if (_root != -1)
 	{
-		int	stack[32];
-		int	top = 0;
+		Ray	const	invray = { ray.origin, 1.0f / ray.direction };
+		int			stack[32];
+		int			top = 0;
 
 		stack[top++] = _root;
 		do
@@ -146,10 +143,10 @@ void	Aabbtree::raycast(Ray const &ray, T* object, void (T::*callback)(int const)
 			float	near;
 			float	far;
 			
-			if (intersect_rayaabb(ray, _nodes[index].aabb, near, far))
+			if (intersect_invrayaabb(invray, _nodes[index].aabb, near, far))
 			{
 				if (_nodes[index].right == -1)
-					(object->*callback)(_nodes[index].data, near, far);
+					(object->*callback)(index, _nodes[index].data, near, far);
 				else
 				{
 					stack[top++] = _nodes[index].left;
@@ -160,5 +157,74 @@ void	Aabbtree::raycast(Ray const &ray, T* object, void (T::*callback)(int const)
 		while (top);
 	}
 }
-*/
+
+template <class T>
+void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const //need correction
+{
+	if (_root != -1)
+	{
+		Ray	const	invray = { ray.origin, 1.0f / ray.direction };
+		int			stack[32];
+		float		near_stack[32];
+		int			top = 0;
+		float		near = INFINITY;
+
+		stack[top] = _root;
+		near_stack[top++] = 0.0f;		
+		do
+		{
+			if (near_stack[--top] < near)
+			{
+				int const	index = stack[top];
+
+				if (_nodes[index].right == -1)
+				{
+					if (!(object->*callback)(index, _nodes[index].data, near_stack[top], 0.0f))
+						break;
+				}
+				else
+				{
+					float	lnear;
+					float	lfar;
+					float	rnear;
+					float	rfar;
+
+					int const	left = _nodes[index].left;
+					int const	right = _nodes[index].right;
+					bool const	ltrue = intersect_rayaabb(ray, _nodes[left].aabb, lnear, lfar);
+					bool const	rtrue = intersect_rayaabb(ray, _nodes[right].aabb, rnear, rfar);
+
+					if (lnear > rnear)
+					{
+						if (ltrue)
+						{
+							near_stack[top] = lnear;
+							stack[top++] = left;
+						}
+						if (rtrue)
+						{
+							near_stack[top] = rnear;
+							stack[top++] = right;
+						}
+					}
+					else
+					{
+						if (rtrue)
+						{
+							near_stack[top] = rnear;
+							stack[top++] = right;
+						}
+						if (ltrue)
+						{
+							near_stack[top] = lnear;
+							stack[top++] = left;
+						}
+					}
+				}
+			}
+		}
+		while (top);
+	}
+}
+
 #endif

@@ -85,6 +85,8 @@ Raytracer::Raytracer(unsigned int const width, unsigned int const height) : mate
 	cl_uint 		devices_count;
 	cl_device_id	*devices;
 	
+	camera.spherical_coord[0] = -2.2f;
+	camera.spherical_coord[1] = -0.7f;
 	camera.fov = 1.5f;
 	
 	materials = new Material[materials_size];
@@ -194,6 +196,7 @@ void		Raytracer::_set_buffer()
 		_nodes_mem_size = aabbtree._size;
 		nodes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _nodes_mem_size * sizeof(Node), 0, &error);
 		check_error(error, "clCreateBuffer()");
+		check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
 	}
 	if (_materials_mem_size < materials_size)
 	{
@@ -211,7 +214,7 @@ void		Raytracer::_set_buffer()
 		lights_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _lights_mem_size * sizeof(Light), 0, &error);
 		check_error(error, "clCreateBuffer()");
 	}
-	check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
+	//check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clEnqueueWriteBuffer(queue, materials_mem, CL_TRUE, 0, materials_count * sizeof(Material), (void *)materials, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clEnqueueWriteBuffer(queue, lights_mem, CL_TRUE, 0, _lights_count * sizeof(Light), (void *)_lights, 0, 0, 0), "clEnqueueWriteBuffer()");
 }
@@ -248,8 +251,6 @@ void	Raytracer::_render()
 
 	_compute_camera(cm);
 	_set_buffer();
-
-	//std::cout << cm.position[0] << " "  << cm.position[1] << std::endl;
 	
 	unsigned int	argc = 0;
 	check_error(clSetKernelArg(kernel, argc++, sizeof(Computedcamera), &cm), "clSetKernelArg()0");
@@ -263,11 +264,11 @@ void	Raytracer::_render()
 
 	unsigned int	local_work_size = 64;
 	check_error(clEnqueueNDRangeKernel(queue, kernel, 2, 0, (size_t *)&camera.resolution, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
-	
+
 	size_t const	origin[3] = { 0, 0, 0 };
 	size_t const	region[3] = { camera.resolution[0], camera.resolution[1], 1 };
 	check_error(clEnqueueReadImage(queue, image_mem, CL_TRUE, origin, region, 0, 0, image->pixels, 0, 0, 0), "clEnqueueReadImage()");
-	
+
 	SDL_Texture	*texture = SDL_CreateTextureFromSurface(renderer, image);
 	SDL_RenderCopy(renderer, texture, 0, 0);
 	SDL_DestroyTexture(texture);
@@ -297,8 +298,8 @@ void	Raytracer::_compute_camera(Computedcamera &cm)
 	cm.right[1] = -cos(camera.spherical_coord[0]);
 	cm.right[2] = 0.0f;
 	cm.right[3] = 0.0f;
-	cm.right = unit<float>(cm.right);
-	cm.up = unit<float>(cross(direction, cm.right));
+	cm.right = vunit<float>(cm.right);
+	cm.up = vunit<float>(vcross(direction, cm.right));
 	
 	cm.half_resolution = (vec<float, 2>)camera.resolution / 2.0f;
 }

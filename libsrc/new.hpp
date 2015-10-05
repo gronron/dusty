@@ -52,9 +52,9 @@ T		**new_matrix(unsigned int const x, unsigned int const y)
 {
 	T	**a;
 
-	if (!(a = new T*[y]) || !(*a = new T[x * y]))
+	if (!(a = new T*[x]) || !(*a = new T[x * y]))
 		exit(EXIT_FAILURE);
-	for (unsigned int i = 1; i < y; ++i)
+	for (unsigned int i = 1; i < x; ++i)
 		a[i] = *a + i * x;
 
 	return (a);
@@ -63,6 +63,31 @@ T		**new_matrix(unsigned int const x, unsigned int const y)
 template<class T>
 void	delete_matrix(T **a)
 {
+	delete [] *a;
+	delete [] a;
+}
+
+template<class T>
+T		***new_space(unsigned int const x, unsigned int const y, unsigned int const z)
+{
+	T	***a;
+
+	if (!(a = new T**[x]) || !(*a = new T*[x * y]) || !(**a = new T[x * y * z]))
+		exit(EXIT_FAILURE);
+	for (unsigned int j = 1; j < x; ++j)
+	{
+		unsigned int const	b = j * x * y;
+		a[j] = *a + j * x;
+		for (unsigned int i = 1; i < y; ++i)
+			a[j][i] = **a + b + i * y;
+	}
+	return (a);
+}
+
+template<class T>
+void	delete_space(T ***a)
+{
+	delete [] **a;
 	delete [] *a;
 	delete [] a;
 }

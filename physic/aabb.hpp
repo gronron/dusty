@@ -53,8 +53,8 @@ struct				Aabb
 
 inline Aabb	&Aabb::merge(Aabb const &x, Aabb const &y)
 {
-	bottom = min(x.bottom, y.bottom);
-	top = max(x.top, y.top);
+	bottom = vmin(x.bottom, y.bottom);
+	top = vmax(x.top, y.top);
 	return (*this);
 }
 
@@ -66,6 +66,90 @@ inline bool	Aabb::is_overlapping(Aabb const &x) const
 inline bool	Aabb::is_containing(Aabb const &inner) const
 {
 	return ((vec<float, 3>)bottom <= inner.bottom && (vec<float, 3>)top >= inner.top);
+}
+
+inline	bool	intersect_rayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
+{
+	vec<float, 3> const	invdir = 1.0f / ray.direction;
+	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
+	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
+	vec<float, 3> const	tmin = vmin(tbot, ttop);
+	vec<float, 3> const	tmax = vmax(tbot, ttop);
+
+	tnear = max(max(tmin[0], tmin[1]), tmin[2]);
+	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
+
+	return (tfar >= 0 && tnear <= tfar);
+}
+
+inline	bool	intersect_invrayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
+{
+	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
+	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
+	vec<float, 3> const	tmin = vmin(tbot, ttop);
+	vec<float, 3> const	tmax = vmax(tbot, ttop);
+
+	tnear = max(max(tmin[0], tmin[1]), tmin[2]);
+	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
+
+	return (tfar >= 0 && tnear <= tfar);
+}
+
+inline	bool	intersect_rayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)
+{
+	vec<float, 3> const	invdir = 1.0f / ray.direction;
+	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
+	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
+	vec<float, 3> const	tmin = vmin(tbot, ttop);
+	vec<float, 3> const	tmax = vmax(tbot, ttop);
+	
+	if (tmin[0] > tmin[1])
+	{
+		if (tmin[1] > tmin[2])
+			normal = { invdir[0] >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f, 0.0f };
+		else
+			normal = { 0.0f, 0.0f, invdir[2] >= 0.0f ? -1.0f : 1.0f, 0.0f };
+	}
+	else
+	{
+		if (tmin[1] > tmin[2])
+			normal = { 0.0f, invdir[1] >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f };
+		else
+			normal = { 0.0f, 0.0f, invdir[2] >= 0.0f ? -1.0f : 1.0f, 0.0f };
+	}
+
+	tnear = max(max(tmin[0], tmin[1]), tmin[2]);
+	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
+
+	return (tfar >= 0 && tnear <= tfar);
+}
+
+inline	bool	intersect_invrayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)
+{
+	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
+	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
+	vec<float, 3> const	tmin = vmin(tbot, ttop);
+	vec<float, 3> const	tmax = vmax(tbot, ttop);
+	
+	if (tmin[0] > tmin[1])
+	{
+		if (tmin[1] > tmin[2])
+			normal = { ray.direction[0] >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f, 0.0f };
+		else
+			normal = { 0.0f, 0.0f, ray.direction[2] >= 0.0f ? -1.0f : 1.0f, 0.0f };
+	}
+	else
+	{
+		if (tmin[1] > tmin[2])
+			normal = { 0.0f, ray.direction[1] >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f };
+		else
+			normal = { 0.0f, 0.0f, ray.direction[2] >= 0.0f ? -1.0f : 1.0f, 0.0f };
+	}
+
+	tnear = max(max(tmin[0], tmin[1]), tmin[2]);
+	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
+
+	return (tfar >= 0 && tnear <= tfar);
 }
 
 #endif

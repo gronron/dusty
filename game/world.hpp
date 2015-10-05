@@ -32,13 +32,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define WORLD_H_
 
 #include "actor.hpp"
-#include "chunk.hpp"
+#include "math/vec.hpp"
+
+#define CHUNK_SIZE 32
 
 class	World : public Actor
 {
 	public:
+
+		struct	Chunk
+		{
+			unsigned char	blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+		};
 	
-		Chunk	*chunks;
+		vec<unsigned int, 4>	size;
+		Chunk					***chunks;
 		Light	*light;
 		double	time;
 	
@@ -52,6 +60,14 @@ class	World : public Actor
 		//virtual void	replicate(Packet &, float);
 		
 		virtual void	tick(float const);
+		
+		///////////////////////////////
+		
+		bool	load(char const *filename);
+		bool	save(char const *filename);
+		void	fill(vec<int, 4> const &start, vec<int, 4> const &end, char const value);
+		bool	create_block(Ray const &ray, char value);
+		bool	destroy_block(Ray const &ray);
 };
 
 #endif

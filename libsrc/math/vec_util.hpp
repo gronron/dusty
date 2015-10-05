@@ -37,8 +37,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef min
 #undef max
 
+template<class T, unsigned int U>
+inline vec<T, U>	vcall(T (*f)(T), vec<T, U> const &x)
+{
+	vec<T, U>		a;
+
+	for (unsigned int i = 0; i < U; ++i)
+		a = f(x.ar[i]);
+	return (a);
+}
+
+template<class T>
+inline T const	&min(T const &x, T const &y)
+{
+	return ((x > y) ? y : x);
+}
+
+template<class T>
+inline T const	&max(T const &x, T const &y)
+{
+	return ((x < y) ? y : x);
+}
+
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	min(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	vmin(vec<T, U> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -48,7 +70,7 @@ inline vec<T, (U > V ? V : U)>	min(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline vec<T, (U > V ? V : U)>	max(vec<T, U> const &x, vec<T, V> const &y)
+inline vec<T, (U > V ? V : U)>	vmax(vec<T, U> const &x, vec<T, V> const &y)
 {
 	vec<T, (U > V ? V : U)>		a;
 
@@ -58,7 +80,7 @@ inline vec<T, (U > V ? V : U)>	max(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	abs(vec<T, U> const &x)
+inline vec<T, U>	vabs(vec<T, U> const &x)
 {
 	vec<T, U>		a;
 
@@ -68,7 +90,17 @@ inline vec<T, U>	abs(vec<T, U> const &x)
 }
 
 template<class T, unsigned int U>
-inline T	sum(vec<T, U> const &x)
+inline vec<T, U>	vsqrt(vec<T, U> const &x)
+{
+	vec<T, U>		a;
+
+	for (unsigned int i = 0; i < U; ++i)
+		a.ar[i] = (T)sqrt(x.ar[i]);
+	return (a);
+}
+
+template<class T, unsigned int U>
+inline T	vsum(vec<T, U> const &x)
 {
 	T		a = 0;
 
@@ -78,7 +110,7 @@ inline T	sum(vec<T, U> const &x)
 }
 
 template<class T, unsigned int U>
-inline T	sqrnorm(vec<T, U> const &x)
+inline T	vsqrnorm(vec<T, U> const &x)
 {
 	T		a = 0;
 
@@ -88,7 +120,7 @@ inline T	sqrnorm(vec<T, U> const &x)
 }
 
 template<class T, unsigned int U, unsigned int V>
-inline T	dot(vec<T, U> const &x, vec<T, V> const &y)
+inline T	vdot(vec<T, U> const &x, vec<T, V> const &y)
 {
 	T		a = 0;
 
@@ -98,7 +130,7 @@ inline T	dot(vec<T, U> const &x, vec<T, V> const &y)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	cross(vec<T, U> const &x, vec<T, U> const &y)
+inline vec<T, U>	vcross(vec<T, U> const &x, vec<T, U> const &y)
 {
 	vec<T, U>		a;
 
@@ -110,18 +142,8 @@ inline vec<T, U>	cross(vec<T, U> const &x, vec<T, U> const &y)
 	return (a);
 }
 
-template<class T, unsigned int U>
-inline float	sqrt(vec<T, U> const &x)
-{
-	vec<T, U>	a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = sqrt(x.ar[i]);
-	return (sqrt(a));
-}
-
 template<class T, class U, unsigned int V>
-inline T	norm(vec<U, V> const &x)
+inline T	vnorm(vec<U, V> const &x)
 {
 	T	a = 0;
 
@@ -131,7 +153,7 @@ inline T	norm(vec<U, V> const &x)
 }
 
 template<class T, class U, unsigned int V>
-inline vec<U, V>	unit(vec<U, V> const &x)
+inline vec<U, V>	vunit(vec<U, V> const &x)
 {
 	T	a = 0;
 
@@ -142,39 +164,39 @@ inline vec<U, V>	unit(vec<U, V> const &x)
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	project(vec<T, U> const &x, vec<T, U> const &y)
+inline vec<T, U>	vproject(vec<T, U> const &x, vec<T, U> const &y)
 {
 	return (x - y * dot(x, y));
 }
 
 template<class T, class U, unsigned int V>
-inline vec<T, V>	unit_project(vec<U, V> const &x, vec<U, V> const &y)
+inline vec<T, V>	vunit_project(vec<U, V> const &x, vec<U, V> const &y)
 {
-	vec<T, U> const	a = unit<T>(y);
+	vec<T, U> const	a = vunit<T>(y);
 
 	return (x - a * dot(x, a));
 }
 
 template<class T, unsigned int U>
-inline vec<T, U>	reflect(vec<T, U> const &x, vec<T, U> const &y)
+inline vec<T, U>	vreflect(vec<T, U> const &x, vec<T, U> const &y)
 {
 	return (x - y * (dot(x, y) * 2.0f));
 }
 
 template<class T, class U, unsigned int V>
-inline vec<T, V>	unit_reflect(vec<U, V> const &x, vec<U, V> const &y)
+inline vec<T, V>	vunit_reflect(vec<U, V> const &x, vec<U, V> const &y)
 {
-	vec<T, V> const	a = unit<T>(y);
+	vec<T, V> const	a = vunit<T>(y);
 
 	return (x - a * (dot(x, a) * 2.0f));
 }
 
 template<class T, class U>
-inline vec<U, 3>	rot(vec<U, 3> const &x, vec<U, 3> const &y, T const z)
+inline vec<U, 3>	vrot(vec<U, 3> const &x, vec<U, 3> const &y, T const z)
 {
 	T const 	a = (T)cos(z);
 	T const 	b = (T)sin(z);
-	vec<U, 3> const	c = unit<T>(y);
+	vec<U, 3> const	c = vunit<T>(y);
 	vec<U, 3> const d = d * (1.0f - a);
 	vec<U, 3>		e;
 

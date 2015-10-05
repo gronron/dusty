@@ -28,39 +28,74 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include <fstream>
 #include "common.hpp"
 #include "world.hpp"
 #include <iostream>
 
+#include "new.hpp"
+#include "aabb.hpp"
+
 FACTORYREG(World);
+
+#undef far
+#undef near
+
+struct		Result
+{
+	int		bodyindex;
+	int		aabbindex;
+	float	near;
+	float	far;
+	
+	bool	callback(int const aabbidx, int const bdidx, float const nr, float const fr)
+	{
+		if (bdidx == bodyindex && nr < near)
+		{
+			aabbindex = aabbidx;
+			near = nr;
+			far = fr;
+		}
+	}
+};
 
 World::World(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o)
 {
-	chunks = new Chunk;
-	generate_chunk(chunks);
+	size = 2;
+	chunks = new_space<Chunk>(2, 2, 2);
+	
+	vec<int, 4>	start;
+	vec<int, 4>	end;
+	start = 0;
+	end = 64;
+	fill(start, end, 0);
+	end = 24;
+	fill(start, end, 1);
+
+	//generate_chunk(chunks);
 	
 	if (engine->graphic)
 	{
 		engine->graphic->new_light(&light);
 		light->position = 0.0f;
-		light->color = 1.0f;
-		light->power = 1000.0f;
+		light->color = { 0.6f, 1.0f, 1.0f };
+		light->power = 1000000.0f;
 		
 		engine->graphic->materials_count = 3;
-		engine->graphic->materials[0].color = { 0.0f, 1.0f, 1.0f };
+		engine->graphic->materials[0].color = { 1.0f, 1.0f, 1.0f };
 		engine->graphic->materials[0].transparency = 1.0f;
-		engine->graphic->materials[1].color = { 1.0f, 0.8f, 0.2f };
+		engine->graphic->materials[1].color = { 1.0f, 1.0f, 1.0f };
 		engine->graphic->materials[1].transparency = 1.0f;
-		engine->graphic->materials[2].color = { 1.0f, 0.0f, 1.0f };
+		engine->graphic->materials[2].color = { 0.6f, 1.0f, 1.0f };
 		engine->graphic->materials[2].transparency = 1.0f;
-
+		/*
 		for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
 		{
 			for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
 			{
 				for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
 				{
-					//if (chunks->blocks[x][y][z])
+					if (chunks->blocks[x][y][z])
 					{
 						Aabb	aabb;
 
@@ -70,13 +105,13 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 					}
 				}
 			}
-		}
+		}*/
 	}
 }
 
 World::~World()
 {
-	delete chunks;
+	delete_space(chunks);
 }
 
 void	World::tick(float const delta)
@@ -86,4 +121,114 @@ void	World::tick(float const delta)
 	time = 1.0f;
 	light->position[1] = sin(time) * delta * 40000.0f;
 	light->position[2] = cos(time) * delta * 40000.0f;
+}
+
+bool				World::load(char const *filename)
+{
+	std::ifstream	is(filename);
+
+	if (is.good())
+	{
+		is.read((char *)&size, sizeof(vec<unsigned int, 4>));
+		chunks = new_space<Chunk>(size[0], size[1], size[2]);
+		
+		unsigned int const	buffer_size = size[0] * size[1] * size[2] * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
+		is.read((char *)chunks[0][0], buffer_size);
+		return (true);
+	}
+	else
+		return (false);
+}
+
+bool				World::save(char const *filename)
+{
+	std::ofstream	os(filename);
+
+	if (os.good())
+	{
+		os.write((char *)&size, sizeof(vec<unsigned int, 4>));
+
+		unsigned int const	buffer_size = size[0] * size[1] * size[2] * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
+		os.write((char *)chunks[0][0], buffer_size);
+		return (true);
+	}
+	else
+		return (false);
+}
+
+void					World::fill(vec<int, 4> const &start, vec<int, 4> const &end, char const value)
+{
+	vec<int, 4> const	bottom = vmin(start, end);
+	vec<int, 4> const	top = vmax(start, end);
+	
+	for (int k = bottom[0]; k < top[0]; ++k)
+	{
+		int const	ck = k / CHUNK_SIZE;
+		int const	bk = k % CHUNK_SIZE;
+		for (int j = bottom[1]; j < top[1]; ++j)
+		{
+			int const	cj = j / CHUNK_SIZE;
+			int const	bj = j % CHUNK_SIZE;
+			for (int i = bottom[2]; i < top[2]; ++i)
+			{
+				int const	bi = i / CHUNK_SIZE;
+				int const	ci = i % CHUNK_SIZE;
+				chunks[ck][cj][ci].blocks[bk][bj][bi] = value;
+			}
+		}
+	}
+}
+
+bool	World::create_block(Ray const &ray, char const value)
+{
+	Result	result = { id, -1, INFINITY, INFINITY };
+	
+	engine->physic->_statictree.raycast(ray, &result, &Result::callback);
+	if (result.aabbindex)
+	{
+		vec<float, 4>	normal;
+		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
+
+		vec<float, 4> const	position = engine->physic->_statictree._nodes[result.aabbindex].aabb.bottom + normal;
+		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
+		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
+		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = value;
+		return (true);
+	}
+	else
+		return (false);
+}
+
+bool	World::destroy_block(Ray const &ray)
+{
+	
+}
+
+void	World::_cull_world()
+{
+	for (unsigned int x = 0; x < size; ++x)
+		for (unsigned int y = 0; y < size; ++y)
+			for (unsigned int z = 0; z < size; ++z)
+				_cull_chunk(chunks[x][y][z]);
+}
+
+void	World::_cull_chunk(Chunk &chunk)
+{
+	for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
+	{
+		for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
+		{
+			for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
+			{
+				if (chunks->blocks[x][y][z]) // is on the surface
+				{
+					Aabb	aabb;
+
+					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
+					aabb.top = aabb.bottom + 1.0f;
+					engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
+				}
+			}
+		}
+	}
 }

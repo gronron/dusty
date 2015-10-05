@@ -33,12 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "aabbtree.hpp"
 
+#include <iostream>
+
 #define GAP 0.2f
 #define	MUL 2.0f
 
 inline float	perimeter(Aabb const &x)
 {
-	return (sum(x.top - x.bottom) * 2.0f);
+	return (vsum(x.top - x.bottom) * 2.0f);
 }
 
 inline float	merged_perimeter(Aabb const &x, Aabb const &y)
@@ -47,7 +49,7 @@ inline float	merged_perimeter(Aabb const &x, Aabb const &y)
 	
 	a.bottom = min(x.bottom, y.bottom);
 	a.top = max(x.top, y.top);
-	return (sum(a.top - a.bottom) * 2.0f);
+	return (vsum(a.top - a.bottom) * 2.0f);
 }
 
 Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)
@@ -55,13 +57,30 @@ Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)
 	_nodes = new Node[_size];
 	
 	for (unsigned int i = 0; i < _size - 1; ++i)
+	{
 		_nodes[i].next = i + 1;
+		_nodes[i].height = -1;
+	}
 	_nodes[_size - 1].next = -1;
+	_nodes[_size - 1].height = -1;
 }
 
 Aabbtree::~Aabbtree()
 {
 	delete [] _nodes;
+}
+
+void	Aabbtree::reset()
+{
+	_root = -1;
+	_free = 0;
+	for (unsigned int i = 0; i < _size - 1; ++i)
+	{
+		_nodes[i].next = i + 1;
+		_nodes[i].height = -1;
+	}
+	_nodes[_size - 1].next = -1;
+	_nodes[_size - 1].height = -1;
 }
 
 int				Aabbtree::add_aabb(Aabb const &aabb, int const data)
@@ -98,7 +117,7 @@ void			Aabbtree::remove_aabb(int const index)
 	_free_node(index);
 }
 
-bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity) // need to correct
+bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity)
 {
 	if (_nodes[index].aabb.is_containing(aabb))
 		return (false);
@@ -156,6 +175,7 @@ int		Aabbtree::_allocate_node()
 
 void	Aabbtree::_free_node(int const index)
 {
+	_nodes[index].height = -1;
 	_nodes[index].next = _free;
 	_free = index;
 }
@@ -175,20 +195,23 @@ void	Aabbtree::_insert_leaf(int const index)
 	{
 		int const	left = _nodes[i].left;
 		int const	right = _nodes[i].right;
+				
+		//float const	cost = merged_perimeter(_nodes[i].aabb, leafaabb) * 2.0f;
+		//float const	inheritance_cost = cost - perimeter(_nodes[i].aabb) * 2.0f;
+
+		float left_cost = merged_perimeter(_nodes[left].aabb, leafaabb);// + inheritance_cost;
+		float right_cost = merged_perimeter(_nodes[right].aabb, leafaabb);// + inheritance_cost;
 		
-		float const	cost = merged_perimeter(_nodes[i].aabb, leafaabb) * 2.0f;
-		float const	inheritance_cost = cost - perimeter(_nodes[i].aabb) * 2.0f;
-
-		float left_cost = merged_perimeter(_nodes[left].aabb, leafaabb) + inheritance_cost;
-		float right_cost = merged_perimeter(_nodes[right].aabb, leafaabb) + inheritance_cost;
-
 		if (_nodes[left].right != -1)
 			left_cost -= perimeter(_nodes[left].aabb);
 		if (_nodes[right].right != -1)
 			right_cost -= perimeter(_nodes[right].aabb);
 
-		if (cost < left_cost && cost < right_cost)
+		/*if (_nodes[i].height > 1 && cost < left_cost && cost < right_cost)
+		{
+			std::cout << "pa: " << merged_perimeter(_nodes[i].aabb, leafaabb) << std::endl;
 			break;
+		}*/
 		i = left_cost < right_cost ? left : right;
 	}
 	
@@ -293,6 +316,8 @@ void			Aabbtree::_rotate(int const up, int const down, int const sibling)
 	else
 		_root = down;
 
+	if (_nodes[left].height == _nodes[right].height)
+		std::cout << "Aabbtree::_rotate eq" << std::endl;
 	if (_nodes[left].height > _nodes[right].height)
 	{
 		_nodes[down].right = left;
@@ -323,4 +348,67 @@ void			Aabbtree::_rotate(int const up, int const down, int const sibling)
 		_nodes[up].aabb.merge(_nodes[sibling].aabb, _nodes[left].aabb);
 		_nodes[down].aabb.merge(_nodes[up].aabb, _nodes[right].aabb);
 	}
+}
+
+void	Aabbtree::rebuild()
+{
+	int	*nodes = new int[_size];
+	int	count = 0;
+
+	for (unsigned int i = 0; i < _size; ++i)
+	{
+		if (_nodes[i].height < 0)
+			continue;
+
+		if (_nodes[i].right == -1)
+		{
+			_nodes[i].parent = -1;
+			nodes[count++] = i;
+		}
+		else
+			_free_node(i);
+	}
+
+	while (count > 1)
+	{
+		float	mincost = INFINITY;
+		int		mini = -1;
+		int		minj = -1;
+		
+		for (int j = 0; j < count; ++j)
+		{
+			Aabb const	aabbj = _nodes[nodes[j]].aabb;
+
+			for (int i = j + 1; i < count; ++i)
+			{
+				Aabb const	aabbi = _nodes[nodes[i]].aabb;
+				float const	cost = merged_perimeter(aabbi, aabbj);
+	
+				if (cost < mincost)
+				{
+					mincost = cost;
+					mini = i;
+					minj = j;
+				}
+			}
+		}
+
+		int const	left = nodes[minj];
+		int const	right = nodes[mini];
+		int const	parent = _allocate_node();
+		_nodes[parent].parent = -1;
+		_nodes[parent].left = left;
+		_nodes[parent].right = right;
+		_nodes[parent].height = max(_nodes[left].height, _nodes[left].height) + 1;
+		_nodes[parent].aabb.merge(_nodes[left].aabb, _nodes[right].aabb);
+
+		_nodes[left].parent = parent;
+		_nodes[left].parent = parent;
+
+		nodes[minj] = parent;
+		nodes[mini] = nodes[--count];
+	}
+
+	_root = nodes[0];
+	delete [] nodes;
 }
