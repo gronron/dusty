@@ -50,12 +50,14 @@ struct		Result
 	
 	bool	callback(int const aabbidx, int const bdidx, float const nr, float const fr)
 	{
-		if (bdidx == bodyindex && nr < near)
+		std::cout << aabbidx << std::endl;
+		if (/*bdidx == bodyindex && */nr > 0.0f && nr < near)
 		{
 			aabbindex = aabbidx;
 			near = nr;
 			far = fr;
 		}
+		return (true);
 	}
 };
 
@@ -69,7 +71,9 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 	start = 0;
 	end = 64;
 	fill(start, end, 0);
-	end = 24;
+	end[0] = 64;
+	end[1] = 64;
+	end[2] = 1;
 	fill(start, end, 1);
 
 	//generate_chunk(chunks);
@@ -88,24 +92,8 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		engine->graphic->materials[1].transparency = 1.0f;
 		engine->graphic->materials[2].color = { 0.6f, 1.0f, 1.0f };
 		engine->graphic->materials[2].transparency = 1.0f;
-		/*
-		for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
-		{
-			for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
-			{
-				for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
-				{
-					if (chunks->blocks[x][y][z])
-					{
-						Aabb	aabb;
-
-						aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
-						aabb.top = aabb.bottom + 1.0f;
-						engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
-					}
-				}
-			}
-		}*/
+		
+		_cull_world();
 	}
 }
 
@@ -171,8 +159,8 @@ void					World::fill(vec<int, 4> const &start, vec<int, 4> const &end, char cons
 			int const	bj = j % CHUNK_SIZE;
 			for (int i = bottom[2]; i < top[2]; ++i)
 			{
-				int const	bi = i / CHUNK_SIZE;
-				int const	ci = i % CHUNK_SIZE;
+				int const	ci = i / CHUNK_SIZE;
+				int const	bi = i % CHUNK_SIZE;
 				chunks[ck][cj][ci].blocks[bk][bj][bi] = value;
 			}
 		}
@@ -183,16 +171,22 @@ bool	World::create_block(Ray const &ray, char const value)
 {
 	Result	result = { id, -1, INFINITY, INFINITY };
 	
-	engine->physic->_statictree.raycast(ray, &result, &Result::callback);
-	if (result.aabbindex)
+	engine->graphic->aabbtree.raycast(ray, &result, &Result::callback);
+	if (result.aabbindex != -1)
 	{
 		vec<float, 4>	normal;
-		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
+		intersect_rayaabb_n(ray, engine->graphic->aabbtree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
 
-		vec<float, 4> const	position = engine->physic->_statictree._nodes[result.aabbindex].aabb.bottom + normal;
+		vec<float, 4> const	position = engine->graphic->aabbtree._nodes[result.aabbindex].aabb.bottom + normal;
 		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
 		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
 		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = value;
+		
+		Aabb	aabb;
+
+		aabb.bottom = position;
+		aabb.top = aabb.bottom + 1.0f;
+		engine->graphic->aabbtree.add_saabb(aabb, value);
 		return (true);
 	}
 	else
@@ -201,7 +195,7 @@ bool	World::create_block(Ray const &ray, char const value)
 
 bool	World::destroy_block(Ray const &ray)
 {
-	
+	return (true);
 }
 
 void	World::_cull_world()
@@ -209,10 +203,10 @@ void	World::_cull_world()
 	for (unsigned int x = 0; x < size; ++x)
 		for (unsigned int y = 0; y < size; ++y)
 			for (unsigned int z = 0; z < size; ++z)
-				_cull_chunk(chunks[x][y][z]);
+				_cull_chunk(chunks[x][y][z], { (float)x * CHUNK_SIZE, (float)y * CHUNK_SIZE, (float)z * CHUNK_SIZE, 0.0f });
 }
 
-void	World::_cull_chunk(Chunk &chunk)
+void	World::_cull_chunk(Chunk &chunk, vec<float, 4> const &position)
 {
 	for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
 	{
@@ -220,13 +214,17 @@ void	World::_cull_chunk(Chunk &chunk)
 		{
 			for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
 			{
-				if (chunks->blocks[x][y][z]) // is on the surface
+				if (chunk.blocks[x][y][z])/* &&
+					(!chunk.blocks[x - 1][y][z] || !chunk.blocks[x + 1][y][z] ||
+					!chunk.blocks[x][y - 1][z] || !chunk.blocks[x][y + 1][z] ||
+					!chunk.blocks[x][y][z - 1] || !chunk.blocks[x][y][z + 1]))*/
 				{
 					Aabb	aabb;
 
 					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
+					aabb.bottom += position;
 					aabb.top = aabb.bottom + 1.0f;
-					engine->graphic->aabbtree.add_saabb(aabb, chunks->blocks[x][y][z]);
+					engine->graphic->aabbtree.add_saabb(aabb, chunk.blocks[x][y][z]);
 				}
 			}
 		}

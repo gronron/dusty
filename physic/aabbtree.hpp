@@ -72,7 +72,6 @@ class	Aabbtree
 		~Aabbtree();
 		
 		void	reset();
-		void	rebuild();
 
 		int		add_aabb(Aabb const &, int const data);
 		int		add_saabb(Aabb const &, int const data);
@@ -191,8 +190,8 @@ void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const,
 
 					int const	left = _nodes[index].left;
 					int const	right = _nodes[index].right;
-					bool const	ltrue = intersect_rayaabb(ray, _nodes[left].aabb, lnear, lfar);
-					bool const	rtrue = intersect_rayaabb(ray, _nodes[right].aabb, rnear, rfar);
+					bool const	ltrue = intersect_invrayaabb(invray, _nodes[left].aabb, lnear, lfar);
+					bool const	rtrue = intersect_invrayaabb(invray, _nodes[right].aabb, rnear, rfar);
 
 					if (lnear > rnear)
 					{

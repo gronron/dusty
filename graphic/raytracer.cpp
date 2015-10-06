@@ -133,7 +133,7 @@ Raytracer::Raytracer(unsigned int const width, unsigned int const height) : mate
 	program = clCreateProgramWithSource(context, 1, &source, source_length, &error);
 	check_error(error, "clCreateProgramWithSource()");
 	
-	error = clBuildProgram(program, 1, &devices[0], "", 0, 0);
+	error = clBuildProgram(program, 1, &devices[0], "-w", 0, 0);
 	if (error != CL_SUCCESS)
 	{
 		unsigned int	length;
@@ -196,7 +196,7 @@ void		Raytracer::_set_buffer()
 		_nodes_mem_size = aabbtree._size;
 		nodes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _nodes_mem_size * sizeof(Node), 0, &error);
 		check_error(error, "clCreateBuffer()");
-		check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
+		//check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
 	}
 	if (_materials_mem_size < materials_size)
 	{
@@ -214,7 +214,7 @@ void		Raytracer::_set_buffer()
 		lights_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _lights_mem_size * sizeof(Light), 0, &error);
 		check_error(error, "clCreateBuffer()");
 	}
-	//check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
+	check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clEnqueueWriteBuffer(queue, materials_mem, CL_TRUE, 0, materials_count * sizeof(Material), (void *)materials, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clEnqueueWriteBuffer(queue, lights_mem, CL_TRUE, 0, _lights_count * sizeof(Light), (void *)_lights, 0, 0, 0), "clEnqueueWriteBuffer()");
 }

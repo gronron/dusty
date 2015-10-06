@@ -68,6 +68,9 @@ class	World : public Actor
 		void	fill(vec<int, 4> const &start, vec<int, 4> const &end, char const value);
 		bool	create_block(Ray const &ray, char value);
 		bool	destroy_block(Ray const &ray);
+		
+		void	_cull_world();
+		void	_cull_chunk(Chunk &chunk, vec<float, 4> const &position);
 };
 
 #endif

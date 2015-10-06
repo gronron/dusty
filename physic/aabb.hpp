@@ -71,8 +71,8 @@ inline bool	Aabb::is_containing(Aabb const &inner) const
 inline	bool	intersect_rayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
 {
 	vec<float, 3> const	invdir = 1.0f / ray.direction;
-	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
-	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
+	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * invdir;
+	vec<float, 3> const	ttop = (aabb.top - ray.origin) * invdir;
 	vec<float, 3> const	tmin = vmin(tbot, ttop);
 	vec<float, 3> const	tmax = vmax(tbot, ttop);
 
@@ -98,8 +98,8 @@ inline	bool	intersect_invrayaabb(Ray const &ray, Aabb const &aabb, float &tnear,
 inline	bool	intersect_rayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)
 {
 	vec<float, 3> const	invdir = 1.0f / ray.direction;
-	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
-	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
+	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * invdir;
+	vec<float, 3> const	ttop = (aabb.top - ray.origin) * invdir;
 	vec<float, 3> const	tmin = vmin(tbot, ttop);
 	vec<float, 3> const	tmax = vmax(tbot, ttop);
 	

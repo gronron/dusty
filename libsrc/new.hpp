@@ -74,11 +74,11 @@ T		***new_space(unsigned int const x, unsigned int const y, unsigned int const z
 
 	if (!(a = new T**[x]) || !(*a = new T*[x * y]) || !(**a = new T[x * y * z]))
 		exit(EXIT_FAILURE);
-	for (unsigned int j = 1; j < x; ++j)
+	for (unsigned int j = 0; j < x; ++j)
 	{
-		unsigned int const	b = j * x * y;
 		a[j] = *a + j * x;
-		for (unsigned int i = 1; i < y; ++i)
+		unsigned int const	b = j * x * y;
+		for (unsigned int i = 0; i < y; ++i)
 			a[j][i] = **a + b + i * y;
 	}
 	return (a);

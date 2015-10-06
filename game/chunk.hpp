@@ -33,14 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 
-#define CHUNK_SIZE 3
+#define CHUNK_SIZE 32
 
 struct	Chunk
 {
-	vec<unsigned int, 4>	location;
 	unsigned char			blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 };
 
+bool	load_world(char const *filename, vec<unsigned int, 3> &size, Chunk ***chunks);
+bool	save_world(char const *filename, vec<unsigned int, 3> const &size, Chunk const ***chunks);
 void	generate_chunk(Chunk *);
 
 #endif
