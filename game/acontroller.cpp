@@ -199,7 +199,7 @@ void	AController::fire(int size, float *data)
 		aim[0] = data[1];
 		aim[1] = data[2];
 		//aim = unit<float>(aim - vec<float, 4>::cast(engine->graphic->screensize) / 2.0f);*/
-		if (controlled)
+		if (*data && controlled)
 		{
 			Ray	ray;
 			
@@ -218,9 +218,22 @@ void	AController::strongfire(int size, float *data)
 {
 	if (size == 1)
 	{
-		if (rp)
+		/*if (rp)
 			rp->needupdate = true;
-		loadingfire = *data;
+		loadingfire = *data;*/
+		
+		if (*data && controlled)
+		{
+			Ray	ray;
+			
+			ray.origin = controlled->body->position;
+			ray.direction[0] = cos(engine->graphic->camera.spherical_coord[1]) * cos(engine->graphic->camera.spherical_coord[0]);
+			ray.direction[1] = cos(engine->graphic->camera.spherical_coord[1]) * sin(engine->graphic->camera.spherical_coord[0]);
+			ray.direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
+			ray.direction[3] = 0.0f;
+		
+			((World*)engine->find_actor(0))->destroy_block(ray);
+		}
 	}
 }
 

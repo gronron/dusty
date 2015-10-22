@@ -67,7 +67,7 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _act
 	console = new Console(this);
 	if (opt.graphic)
 	{
-		graphic = new Raytracer(1024, 768);
+		graphic = new Raytracer(1440, 900);
 		event = new Eventmanager(this);
 	}
 

@@ -87,11 +87,16 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		
 		engine->graphic->materials_count = 3;
 		engine->graphic->materials[0].color = { 1.0f, 1.0f, 1.0f };
-		engine->graphic->materials[0].transparency = 1.0f;
+		engine->graphic->materials[0].transparency = 0.0f;
+		engine->graphic->materials[0].reflection = 0.0f;
 		engine->graphic->materials[1].color = { 1.0f, 1.0f, 1.0f };
-		engine->graphic->materials[1].transparency = 1.0f;
-		engine->graphic->materials[2].color = { 0.6f, 1.0f, 1.0f };
-		engine->graphic->materials[2].transparency = 1.0f;
+		engine->graphic->materials[1].transparency = 0.0f;
+		engine->graphic->materials[1].reflection = 0.0f;
+		engine->graphic->materials[1].refraction = 0.0f;
+		engine->graphic->materials[2].color = { 0.6f, 0.5f, 0.5f };
+		engine->graphic->materials[2].transparency = 0.8f;
+		engine->graphic->materials[2].reflection = 0.5f;
+		engine->graphic->materials[2].refraction = 1.5f;
 		
 		_cull_world();
 	}
@@ -107,8 +112,8 @@ void	World::tick(float const delta)
 	time += delta;
 	
 	time = 1.0f;
-	light->position[1] = sin(time) * delta * 40000.0f;
-	light->position[2] = cos(time) * delta * 40000.0f;
+	light->position[1] = sin(time) * 4000.0f;
+	light->position[2] = cos(time) * 4000.0f;
 }
 
 bool				World::load(char const *filename)
@@ -180,10 +185,10 @@ bool	World::create_block(Ray const &ray, char const value)
 		vec<float, 4> const	position = engine->graphic->aabbtree._nodes[result.aabbindex].aabb.bottom + normal;
 		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
 		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
-		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = value;
-		
-		Aabb	aabb;
 
+		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = value;
+
+		Aabb	aabb;
 		aabb.bottom = position;
 		aabb.top = aabb.bottom + 1.0f;
 		engine->graphic->aabbtree.add_saabb(aabb, value);
@@ -195,7 +200,20 @@ bool	World::create_block(Ray const &ray, char const value)
 
 bool	World::destroy_block(Ray const &ray)
 {
-	return (true);
+	Result	result = { id, -1, INFINITY, INFINITY };
+	
+	engine->graphic->aabbtree.raycast(ray, &result, &Result::callback);
+	if (result.aabbindex != -1)
+	{
+		vec<float, 4> const	position = engine->graphic->aabbtree._nodes[result.aabbindex].aabb.bottom;
+		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
+		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
+		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = 0;
+		engine->graphic->aabbtree.remove_aabb(result.aabbindex);
+		return (true);
+	}
+	else
+		return (false);
 }
 
 void	World::_cull_world()

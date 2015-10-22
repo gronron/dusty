@@ -60,7 +60,7 @@ inline Aabb	&Aabb::merge(Aabb const &x, Aabb const &y)
 
 inline bool	Aabb::is_overlapping(Aabb const &x) const
 {
-	return ((vec<float, 3>)bottom <= x.top && (vec<float, 3>)top >= x.bottom);
+	return ((vec<float, 3>)bottom < x.top && (vec<float, 3>)top > x.bottom);
 }
 
 inline bool	Aabb::is_containing(Aabb const &inner) const

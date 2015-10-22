@@ -28,41 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef RAYTRACER_H_
-#define RAYTRACER_H_
+#ifndef GRAPHICENGINE_H_
+#define GRAPHICENGINE_H_
 
-#include <CL/cl.h>
-//#include <CL/cl_gl.h>
-#include <SDL.h>
-#include "aabbtree.hpp"
-
-struct						Camera
-{
-	vec<float, 4>			position;
-	vec<float, 2>			spherical_coord;
-	vec<unsigned int, 2>	resolution;
-	float					fov;
-};
-
-struct				Computedcamera
-{
-	vec<float, 4>	position;
-	vec<float, 4>	forward;
-	vec<float, 4>	right;
-	vec<float, 4>	up;
-	vec<float, 2>	half_resolution;
-	float			padding[2];
-};
-
-struct				Material
-{
-	vec<float, 3>	color;
-	float			transparency;
-	float			reflection;
-	float			refraction;
-	float			shining;
-	float			padding;
-};
+#include "math/vec.hpp"
+#include "animation.hpp"
 
 struct				Light
 {
@@ -71,63 +41,51 @@ struct				Light
 	float			power;
 };
 
-class	Raytracer
+struct				Material
+{
+	vec<float, 3>	color;
+	float			transparency;
+	float			refraction;
+	float			reflection;
+	float			shining;
+	float			padding;
+};
+
+class	Graphicengine
 {
 	public:
-	
-		Camera			camera;
 
-		unsigned int	materials_size;
-		unsigned int	materials_count;
-		Material		*materials;
+		unsigned int	_animations_size;
+		unsigned int	_animations_count;
+		Animation		**_animations;
 
 		unsigned int	_lights_size;
 		unsigned int	_lights_count;
 		Light			*_lights;
 		Light			***_lights_links;
 
+		unsigned int	_materials_size;
+		unsigned int	_materials_count;
+		Material		*_materials;
+
 		Aabbtree		aabbtree;
-		
-		//sdl
-		
-		SDL_Window		*window;
-		//SDL_GLContext	glcontext = SDL_GL_CreateContext(window);
-		SDL_Renderer	*renderer;
-		SDL_Surface		*image;
-		
-		//opencl
 
-		cl_context			context;
-		cl_command_queue	queue;
-		cl_program			program;
-		cl_kernel			kernel;
-		
-		unsigned int		_nodes_mem_size;
-		unsigned int		_materials_mem_size;
-		unsigned int		_lights_mem_size;
-		
-		cl_mem		nodes_mem;
-		cl_mem		materials_mem;
-		cl_mem		lights_mem;
-		cl_mem		image_mem;
+		Renderer		_renderer;
 
+		Graphicengine();
+		~Graphicengine();
 
-		Raytracer(unsigned int const, unsigned int const);
-		~Raytracer();
-
-		
 		void	set_resolution(unsigned int const, unsigned int const);
-		
-		void	tick(float const);
 
-		void	_render();
-		void	_set_buffer();
-		void	_compute_camera(Computedcamera &);
-		
+		void	tick(float const delta);
+
+		void	add_animation(Animation *);
+		void	remove_animation(Animation *);
+
 		void	new_light(Light **);
 		void	delete_light(Light *);
-		
-		bool	load_materials();
+
+		bool	load_materials(char const *filename);
 };
 
 #endif

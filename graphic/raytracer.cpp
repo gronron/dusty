@@ -196,7 +196,6 @@ void		Raytracer::_set_buffer()
 		_nodes_mem_size = aabbtree._size;
 		nodes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _nodes_mem_size * sizeof(Node), 0, &error);
 		check_error(error, "clCreateBuffer()");
-		//check_error(clEnqueueWriteBuffer(queue, nodes_mem, CL_TRUE, 0, aabbtree._size * sizeof(Node), (void *)aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
 	}
 	if (_materials_mem_size < materials_size)
 	{
