@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "gameengine.hpp"
 #include "console.hpp"
-//#include "graphicengine.hpp"
-#include "raytracer.hpp"
+#include "graphicengine.hpp"
+//#include "raytracer.hpp"
 #include "eventmanager.hpp"
 
 Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(false)
@@ -99,6 +99,14 @@ void			Eventmanager::event()
 				_mousebutton(event, 0.0f);
 				break;
 			case SDL_MOUSEWHEEL:
+				if (_mousewheel.ctrl)
+				{
+					float	a;
+
+					a = (float)event.wheel.y;
+					(_mousewheel.ctrl->*_mousewheel.fx)(1, &a);
+				}
+				break;
 			case SDL_JOYAXISMOTION:
 			case SDL_JOYBALLMOTION:
 			case SDL_JOYHATMOTION:

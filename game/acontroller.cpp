@@ -14,6 +14,7 @@ AController::AController(Gameengine *g, Replication *r, int i, short int t, Acto
 	loadingfire = false;
 	aim = 0.0f;
 	move = 0.0f;
+	material = 1;
 }
 
 AController::~AController()
@@ -122,6 +123,9 @@ void	AController::bind()
 
 	engine->event->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = this;
 	engine->event->_mousebuttons[SDL_BUTTON_RIGHT].fx = (BINDTYPE)&AController::strongfire;
+	
+	engine->event->_mousewheel.ctrl = this;
+	engine->event->_mousewheel.fx = (BINDTYPE)&AController::change_material;
 }
 
 void	AController::forward(int size, float *data)
@@ -208,8 +212,8 @@ void	AController::fire(int size, float *data)
 			ray.direction[1] = cos(engine->graphic->camera.spherical_coord[1]) * sin(engine->graphic->camera.spherical_coord[0]);
 			ray.direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
 			ray.direction[3] = 0.0f;
-		
-			((World*)engine->find_actor(0))->create_block(ray, 2);
+
+			((World*)engine->find_actor(0))->create_block(ray, material);
 		}
 	}
 }
@@ -267,5 +271,16 @@ void	AController::aimdiry(int size, float *data)
 		if (rp)
 			rp->needupdate = true;
 		aim[1] = *data;
+	}
+}
+
+void	AController::change_material(int size, float *data)
+{
+	if (size == 1)
+	{
+		std::cout << *data << std::endl;
+		material = (material + (int)*data) % engine->graphic->_materials_count;
+		if (!material)
+			material = 1;
 	}
 }

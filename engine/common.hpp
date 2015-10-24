@@ -39,8 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gameengine.hpp"
 #include "callbackmanager.hpp"
 #include "physicengine.hpp"
-
-//#include "graphicengine.hpp"
-#include "raytracer.hpp"
+#include "graphicengine.hpp"
 
 #endif

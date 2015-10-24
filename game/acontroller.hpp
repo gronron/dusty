@@ -14,6 +14,7 @@ class	AController : public Controller
 		bool			loadingfire;
 		vec<float, 4>	aim;
 		vec<float, 4>	move;
+		int				material;
 
 
 		AController(Gameengine *, Replication *, int const, short int const, Actor const *);
@@ -43,6 +44,7 @@ class	AController : public Controller
 		void	aimloc(int size, float *data);
 		void	aimdirx(int size, float *data);
 		void	aimdiry(int size, float *data);
+		void	change_material(int size, float *data);
 };
 
 #endif

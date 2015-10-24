@@ -50,7 +50,6 @@ struct		Result
 	
 	bool	callback(int const aabbidx, int const bdidx, float const nr, float const fr)
 	{
-		std::cout << aabbidx << std::endl;
 		if (/*bdidx == bodyindex && */nr > 0.0f && nr < near)
 		{
 			aabbindex = aabbidx;
@@ -82,22 +81,9 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 	{
 		engine->graphic->new_light(&light);
 		light->position = 0.0f;
-		light->color = { 0.6f, 1.0f, 1.0f };
+		light->color = { 1.0f, 1.0f, 0.6f };
 		light->power = 1000000.0f;
-		
-		engine->graphic->materials_count = 3;
-		engine->graphic->materials[0].color = { 1.0f, 1.0f, 1.0f };
-		engine->graphic->materials[0].transparency = 0.0f;
-		engine->graphic->materials[0].reflection = 0.0f;
-		engine->graphic->materials[1].color = { 1.0f, 1.0f, 1.0f };
-		engine->graphic->materials[1].transparency = 0.0f;
-		engine->graphic->materials[1].reflection = 0.0f;
-		engine->graphic->materials[1].refraction = 0.0f;
-		engine->graphic->materials[2].color = { 0.6f, 0.5f, 0.5f };
-		engine->graphic->materials[2].transparency = 0.8f;
-		engine->graphic->materials[2].reflection = 0.5f;
-		engine->graphic->materials[2].refraction = 1.5f;
-		
+
 		_cull_world();
 	}
 }

@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "console.hpp"
 #include "physicengine.hpp"
 #include "networkengine.hpp"
-#include "raytracer.hpp"
+#include "graphicengine.hpp"
 #include "eventmanager.hpp"
 #include "callbackmanager.hpp"
 #include "gameengine.hpp"
@@ -67,7 +67,7 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _act
 	console = new Console(this);
 	if (opt.graphic)
 	{
-		graphic = new Raytracer(1440, 900);
+		graphic = new Graphicengine();
 		event = new Eventmanager(this);
 	}
 

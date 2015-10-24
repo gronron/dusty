@@ -59,9 +59,12 @@ class	Eventmanager
 
 		bool	running;
 		bool	typing;
-		Bind	_mousemove;
 		Bind	_keys[SDL_NUM_SCANCODES];
+		Bind	_mousemove;
 		Bind	_mousebuttons[8];
+		Bind	_mousewheel;
+		
+		
 		Bind	_gamepadbuttons[32];
 		Bind	_gamepadmoves[8];
 

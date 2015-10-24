@@ -28,32 +28,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include "new.hpp"
+#include "configmanager.hpp"
 #include "graphicengine.hpp"
 
-Graphicengine::Graphicengine()
+Graphicengine::Graphicengine() :	_animations_size(4096), _animations_count(0), _animations(0),
+									_lights_size(4096), _lights_count(0), _lights(0), _lights_links(0),
+									_materials_size(0), _materials_count(0), _materials(0),
+									_renderer(1440, 900)
 {
-	_animation = new *Animation[_animations_size];
+	camera.resolution[0] = 1440;
+	camera.resolution[1] = 900;
+	camera.spherical_coord[0] = -2.2f;
+	camera.spherical_coord[1] = -0.7f;
+	camera.fov = 1.5f;
+	
+	_animations = new Animation*[_animations_size];
 
 	_lights = new Light[_lights_size];
 	_lights_links = new Light**[_lights_size];
+
+	_load_materials("materials.df");
 }
 
 Graphicengine::~Graphicengine()
 {
-	delete [] _animation;
+	delete [] _animations;
 	
 	delete [] _lights;
 	delete [] _lights_links;
-}
-
-Graphicengine::set_resolution()
-{
 	
+	delete [] _materials;
 }
 
-void	Graphicengine::set_resolution(unsigned int const, unsigned int const)
+void	Graphicengine::set_resolution(unsigned int const width, unsigned int const height)
 {
-
+	camera.resolution[0] = width;
+	camera.resolution[1] = height;
+	_renderer.set_resolution(width, height);
 }
 
 void	Graphicengine::tick(float const delta)
@@ -61,7 +73,13 @@ void	Graphicengine::tick(float const delta)
 	for (unsigned int i = 0; i < _animations_count; ++i)
 		_animations[i]->tick(delta);
 
-	_renderer.render();
+		
+	int	x;
+	int	y;
+	SDL_GetRelativeMouseState(&x, &y);
+	camera.spherical_coord[0] -= x / 200.0f;
+	camera.spherical_coord[1] -= y / 200.0f;
+	_renderer.render(this);
 }
 
 void	Graphicengine::add_animation(Animation *animation)
@@ -77,7 +95,7 @@ void	Graphicengine::add_animation(Animation *animation)
 void	Graphicengine::remove_animation(Animation *animation)
 {
 	int	index;
-	for (index = _animations_count - 1; index >= && _animations[index] != animation; --index)
+	for (index = _animations_count - 1; index >= 0 && _animations[index] != animation; --index)
 		;
 	if (index >= 0)
 		_animations[index] = _animations[--_animations_count];
@@ -108,7 +126,12 @@ void	Graphicengine::delete_light(Light *light)
 	_lights_links[index] = _lights_links[_lights_count];
 }
 
-bool	Graphicengine::load_materials(char const *filename)
+void				Graphicengine::_load_materials(char const *filename)
 {
+	Df_node const	*nd = Configmanager::get_instance().get(filename);
 	
+	_materials_count = nd->data_size;
+	_materials_size = nd->data_size;
+	_materials = new Material[_materials_size];
+	memcpy(_materials, nd->data_storage, nd->data_size);
 }

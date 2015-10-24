@@ -147,9 +147,6 @@
     <ClCompile Include="..\..\..\engine\gameengine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\graphic\raytracer.cpp">
-      <Filter>Source Files\graphic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\chunk.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
@@ -161,6 +158,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\game\player.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\animation.cpp">
+      <Filter>Source Files\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\graphicengine.cpp">
+      <Filter>Source Files\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\renderer.cpp">
+      <Filter>Source Files\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -284,9 +290,6 @@
     <ClInclude Include="..\..\..\graphic\opencl_error.hpp">
       <Filter>Header Files\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\graphic\raytracer.hpp">
-      <Filter>Header Files\graphic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\game\chunk.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
@@ -301,6 +304,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\game\player.hpp">
       <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\animation.hpp">
+      <Filter>Header Files\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\graphicengine.hpp">
+      <Filter>Header Files\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\renderer.hpp">
+      <Filter>Header Files\graphic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

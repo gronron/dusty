@@ -32,7 +32,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GRAPHICENGINE_H_
 
 #include "math/vec.hpp"
+#include "aabbtree.hpp"
+#include "renderer.hpp"
 #include "animation.hpp"
+
+struct						Camera
+{
+	vec<float, 4>			position;
+	vec<float, 2>			spherical_coord;
+	vec<unsigned int, 2>	resolution;
+	float					fov;
+};
 
 struct				Light
 {
@@ -54,6 +64,8 @@ struct				Material
 class	Graphicengine
 {
 	public:
+	
+		Camera			camera;
 
 		unsigned int	_animations_size;
 		unsigned int	_animations_count;
@@ -85,7 +97,7 @@ class	Graphicengine
 		void	new_light(Light **);
 		void	delete_light(Light *);
 
-		bool	load_materials(char const *filename);
+		void	_load_materials(char const *filename);
 };
 
 #endif
