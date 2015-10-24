@@ -42,7 +42,7 @@ class	Renderer
 
 		SDL_Window			*window;
 		SDL_Renderer		*renderer;
-		SDL_Surface			*image;
+		SDL_Texture			*texture;
 
 		cl_context			_context;
 		cl_command_queue	_queue;

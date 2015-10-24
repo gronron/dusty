@@ -31,8 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gameengine.hpp"
 #include "eventmanager.hpp"
 #include "networkengine.hpp"
-//#include "graphicengine.hpp"
-#include "raytracer.hpp"
+#include "graphicengine.hpp"
 #include "console.hpp"
 
 Console::Console(Gameengine *g) : engine(g), _blink(false), _blinktime(0.0f), _cursor(0), _text("")

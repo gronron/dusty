@@ -101,7 +101,7 @@ void				_compute_camera(Camera const &camera, Computedcamera &cm)
 Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes_mem_size(0),
 																			_materials_mem_size(0),
 																			_lights_mem_size(0),
-																			image(0)
+																			texture(0)
 {
 	cl_int			error;
 	cl_uint			platforms_count;
@@ -185,7 +185,7 @@ Renderer::~Renderer()
 	clReleaseCommandQueue(_queue);
 	clReleaseContext(_context);
 
-	SDL_FreeSurface(image);
+	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -193,13 +193,13 @@ Renderer::~Renderer()
 
 void	Renderer::set_resolution(unsigned int const width, unsigned int const height)
 {
-	if (image)
+	if (texture)
 	{
-		SDL_FreeSurface(image);
+		SDL_DestroyTexture(texture);
 		clReleaseMemObject(_image_mem);
 	}
-	
-	image = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+
+	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 	cl_int					error;
 	cl_image_format const	format = { CL_RGBA, CL_UNSIGNED_INT8 };
@@ -264,10 +264,12 @@ void	Renderer::render(Graphicengine const *ge)
 
 	size_t const	origin[3] = { 0, 0, 0 };
 	size_t const	region[3] = { ge->camera.resolution[0], ge->camera.resolution[1], 1 };
-	check_error(clEnqueueReadImage(_queue, _image_mem, CL_TRUE, origin, region, 0, 0, image->pixels, 0, 0, 0), "clEnqueueReadImage()");
+	void			*data;
+	int				pitch;
 
-	SDL_Texture	*texture = SDL_CreateTextureFromSurface(renderer, image);
+	SDL_LockTexture(texture, 0, &data, &pitch);
+	check_error(clEnqueueReadImage(_queue, _image_mem, CL_TRUE, origin, region, pitch, 0, data, 0, 0, 0), "clEnqueueReadImage()");
+	SDL_UnlockTexture(texture);
 	SDL_RenderCopy(renderer, texture, 0, 0);
-	SDL_DestroyTexture(texture);
 	SDL_RenderPresent(renderer);
 }
