@@ -40,16 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 inline float	perimeter(Aabb const &x)
 {
-	return (vsum(x.top - x.bottom) * 2.0f);
+	return (vsum(x.top - x.bottom));
 }
 
 inline float	merged_perimeter(Aabb const &x, Aabb const &y)
 {
-	Aabb		a;
-	
-	a.bottom = min(x.bottom, y.bottom);
-	a.top = max(x.top, y.top);
-	return (vsum(a.top - a.bottom) * 2.0f);
+	return (vsum(max(x.top, y.top) - min(x.bottom, y.bottom)));
 }
 
 Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)

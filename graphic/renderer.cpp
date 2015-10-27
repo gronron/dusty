@@ -167,8 +167,6 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes
 	check_error(error, "clCreateKernel()");
 
 	set_resolution(width, height);
-
-	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 Renderer::~Renderer()
@@ -228,6 +226,7 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		_materials_mem_size = ge->_materials_size;
 		_materials_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _materials_mem_size * sizeof(Material), 0, &error);
 		check_error(error, "clCreateBuffer()");
+		check_error(clEnqueueWriteBuffer(_queue, _materials_mem, CL_TRUE, 0, ge->_materials_count * sizeof(Material), (void *)ge->_materials, 0, 0, 0), "clEnqueueWriteBuffer()");
 	}
 	if (_lights_mem_size < ge->_lights_size)
 	{
@@ -238,7 +237,6 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		check_error(error, "clCreateBuffer()");
 	}
 	check_error(clEnqueueWriteBuffer(_queue, _nodes_mem, CL_TRUE, 0, ge->aabbtree._size * sizeof(Node), (void *)ge->aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
-	check_error(clEnqueueWriteBuffer(_queue, _materials_mem, CL_TRUE, 0, ge->_materials_count * sizeof(Material), (void *)ge->_materials, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clEnqueueWriteBuffer(_queue, _lights_mem, CL_TRUE, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights, 0, 0, 0), "clEnqueueWriteBuffer()");
 }
 

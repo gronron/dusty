@@ -278,7 +278,6 @@ void	AController::change_material(int size, float *data)
 {
 	if (size == 1)
 	{
-		std::cout << *data << std::endl;
 		material = (material + (int)*data) % engine->graphic->_materials_count;
 		if (!material)
 			material = 1;

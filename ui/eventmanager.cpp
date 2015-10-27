@@ -71,6 +71,10 @@ void			Eventmanager::event()
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
 					engine->graphic->set_resolution(event.window.data1, event.window.data2);
+				else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+					SDL_SetRelativeMouseMode(SDL_TRUE);
+				else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+					SDL_SetRelativeMouseMode(SDL_FALSE);
 				break;
 			case SDL_SYSWMEVENT:
 				break;
