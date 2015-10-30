@@ -181,16 +181,18 @@ bool	World::create_block(Ray const &ray, char const value)
 		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
 		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
 
-		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = value;
+		if (!chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]])
+		{
+			chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = value;
 
-		Aabb	aabb;
-		aabb.bottom = position;
-		aabb.top = aabb.bottom + 1.0f;
-		engine->graphic->aabbtree.add_saabb(aabb, value);
-		return (true);
+			Aabb	aabb;
+			aabb.bottom = position;
+			aabb.top = aabb.bottom + 1.0f;
+			engine->graphic->aabbtree.add_saabb(aabb, value);
+			return (true);
+		}
 	}
-	else
-		return (false);
+	return (false);
 }
 
 bool	World::destroy_block(Ray const &ray)
@@ -201,17 +203,17 @@ bool	World::destroy_block(Ray const &ray)
 	if (result.aabbindex != -1)
 	{
 		vec<float, 4> const	position = engine->graphic->aabbtree._nodes[result.aabbindex].aabb.bottom;
-		std::cout <<  position[0] << " " << position[1]	<< " " << position[2] << std::endl;
 		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
 		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
 		
-		std::cout <<  wp[0] << " " << wp[1]	<< " " << wp[2] << " - " << cp[0] << " " << cp[1] << " " << cp[2] << std::endl;
-		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = 0;
-		engine->graphic->aabbtree.remove_aabb(result.aabbindex);
-		return (true);
+		if (chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]])
+		{
+			chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = 0;
+			engine->graphic->aabbtree.remove_aabb(result.aabbindex);
+			return (true);
+		}
 	}
-	else
-		return (false);
+	return (false);
 }
 
 void	World::_cull_world()
