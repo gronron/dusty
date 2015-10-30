@@ -45,6 +45,9 @@ class	AController : public Controller
 		void	aimdirx(int size, float *data);
 		void	aimdiry(int size, float *data);
 		void	change_material(int size, float *data);
+		
+		void	load(int size, float *data);
+		void	save(int size, float *data);
 };
 
 #endif

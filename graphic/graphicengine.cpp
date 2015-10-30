@@ -41,7 +41,7 @@ Graphicengine::Graphicengine() :	_animations_size(4096), _animations_count(0), _
 	camera.resolution[1] = 900;
 	camera.spherical_coord[0] = -2.2f;
 	camera.spherical_coord[1] = -0.7f;
-	camera.fov = 1.5f;
+	camera.fov = 1.9198621771f;
 	
 	_animations = new Animation*[_animations_size];
 

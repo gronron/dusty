@@ -43,7 +43,7 @@ inline vec<T, U>	vcall(T (*f)(T), vec<T, U> const &x)
 	vec<T, U>		a;
 
 	for (unsigned int i = 0; i < U; ++i)
-		a = f(x.ar[i]);
+		a.ar[i] = f(x.ar[i]);
 	return (a);
 }
 

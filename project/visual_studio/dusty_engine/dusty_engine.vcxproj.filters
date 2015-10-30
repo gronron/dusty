@@ -147,9 +147,6 @@
     <ClCompile Include="..\..\..\engine\gameengine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\chunk.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\world.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
@@ -289,9 +286,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\graphic\opencl_error.hpp">
       <Filter>Header Files\graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\game\chunk.hpp">
-      <Filter>Header Files\game</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\game\world.hpp">
       <Filter>Header Files\game</Filter>

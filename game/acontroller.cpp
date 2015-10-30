@@ -114,6 +114,11 @@ void	AController::bind()
 
 	engine->event->_keys[SDL_SCANCODE_F].ctrl = this;
 	engine->event->_keys[SDL_SCANCODE_F].fx = (BINDTYPE)&AController::right;
+	
+	engine->event->_keys[SDL_SCANCODE_L].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_L].fx = (BINDTYPE)&AController::load;
+	engine->event->_keys[SDL_SCANCODE_M].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_M].fx = (BINDTYPE)&AController::save;
 
 	engine->event->_mousemove.ctrl = this;
 	engine->event->_mousemove.fx = (BINDTYPE)&AController::aimloc;
@@ -281,5 +286,21 @@ void	AController::change_material(int size, float *data)
 		material = (material + (int)*data) % engine->graphic->_materials_count;
 		if (!material)
 			material = 1;
+	}
+}
+
+void	AController::load(int size, float *data)
+{
+	if (size == 1 && *data > 0.0f)
+	{
+		((World*)engine->find_actor(0))->load("dusty_world.dstw");
+	}
+}
+
+void	AController::save(int size, float *data)
+{
+	if (size == 1 && *data > 0.0f)
+	{
+		((World*)engine->find_actor(0))->save("dusty_world.dstw");
 	}
 }

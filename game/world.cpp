@@ -109,14 +109,20 @@ bool				World::load(char const *filename)
 	if (is.good())
 	{
 		is.read((char *)&size, sizeof(vec<unsigned int, 4>));
+		if (chunks)
+			delete_space(chunks);
 		chunks = new_space<Chunk>(size[0], size[1], size[2]);
-		
+
 		unsigned int const	buffer_size = size[0] * size[1] * size[2] * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 		is.read((char *)chunks[0][0], buffer_size);
+		_cull_world();
 		return (true);
 	}
 	else
+	{
+		std::cerr << "fail to load world" << std::endl;
 		return (false);
+	}
 }
 
 bool				World::save(char const *filename)
@@ -132,7 +138,10 @@ bool				World::save(char const *filename)
 		return (true);
 	}
 	else
+	{
+		std::cerr << "fail to save world" << std::endl;
 		return (false);
+	}
 }
 
 void					World::fill(vec<int, 4> const &start, vec<int, 4> const &end, char const value)
@@ -192,8 +201,11 @@ bool	World::destroy_block(Ray const &ray)
 	if (result.aabbindex != -1)
 	{
 		vec<float, 4> const	position = engine->graphic->aabbtree._nodes[result.aabbindex].aabb.bottom;
+		std::cout <<  position[0] << " " << position[1]	<< " " << position[2] << std::endl;
 		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
 		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
+		
+		std::cout <<  wp[0] << " " << wp[1]	<< " " << wp[2] << " - " << cp[0] << " " << cp[1] << " " << cp[2] << std::endl;
 		chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = 0;
 		engine->graphic->aabbtree.remove_aabb(result.aabbindex);
 		return (true);
@@ -204,9 +216,10 @@ bool	World::destroy_block(Ray const &ray)
 
 void	World::_cull_world()
 {
-	for (unsigned int x = 0; x < size; ++x)
-		for (unsigned int y = 0; y < size; ++y)
-			for (unsigned int z = 0; z < size; ++z)
+	engine->graphic->aabbtree.reset();
+	for (unsigned int x = 0; x < size[0]; ++x)
+		for (unsigned int y = 0; y < size[1]; ++y)
+			for (unsigned int z = 0; z < size[2]; ++z)
 				_cull_chunk(chunks[x][y][z], { (float)x * CHUNK_SIZE, (float)y * CHUNK_SIZE, (float)z * CHUNK_SIZE, 0.0f });
 }
 

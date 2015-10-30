@@ -52,7 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;Opengl32.lib;glew32.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -69,7 +69,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;Opengl32.lib;glew32.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -81,7 +81,6 @@
     <ClCompile Include="..\..\..\engine\factory.cpp" />
     <ClCompile Include="..\..\..\engine\gameengine.cpp" />
     <ClCompile Include="..\..\..\game\acontroller.cpp" />
-    <ClCompile Include="..\..\..\game\chunk.cpp" />
     <ClCompile Include="..\..\..\game\player.cpp" />
     <ClCompile Include="..\..\..\game\world.cpp" />
     <ClCompile Include="..\..\..\graphic\animation.cpp" />
@@ -125,7 +124,6 @@
     <ClInclude Include="..\..\..\engine\factory.hpp" />
     <ClInclude Include="..\..\..\engine\gameengine.hpp" />
     <ClInclude Include="..\..\..\game\acontroller.hpp" />
-    <ClInclude Include="..\..\..\game\chunk.hpp" />
     <ClInclude Include="..\..\..\game\player.hpp" />
     <ClInclude Include="..\..\..\game\world.hpp" />
     <ClInclude Include="..\..\..\graphic\animation.hpp" />

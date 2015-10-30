@@ -1,3 +1,2 @@
 -specialise vec<4, float> for SSEx
--improve BVH (aabbtree) quality
 -create contrainte solving algo for the physic engine
