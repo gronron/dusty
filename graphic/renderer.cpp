@@ -114,7 +114,7 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes
 		std::cerr << "Error: SDL_Init()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN_DESKTOP);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	check_error(clGetPlatformIDs(0, 0, &platforms_count), "clGetPlatformIDs()");
@@ -247,17 +247,14 @@ void	Renderer::render(Graphicengine const *ge)
 	_compute_camera(ge->camera, cm);
 	_set_buffer(ge);
 
-	unsigned int	argc = 0;
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(Computedcamera), &cm), "clSetKernelArg()0");
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(int), &ge->aabbtree._root), "clSetKernelArg()1");
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &_nodes_mem), "clSetKernelArg()2");
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(unsigned int), &ge->_materials_count), "clSetKernelArg()3");
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &_materials_mem), "clSetKernelArg()4");
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(unsigned int), &ge->_lights_count), "clSetKernelArg()5");
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &_lights_mem), "clSetKernelArg()6");
-	check_error(clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &_image_mem), "clSetKernelArg()7");
+	check_error(clSetKernelArg(_kernel, 0, sizeof(Computedcamera), &cm), "clSetKernelArg(camera)");
+	check_error(clSetKernelArg(_kernel, 1, sizeof(int), &ge->aabbtree._root), "clSetKernelArg(root)");
+	check_error(clSetKernelArg(_kernel, 2, sizeof(cl_mem), &_nodes_mem), "clSetKernelArg(nodes)");
+	check_error(clSetKernelArg(_kernel, 3, sizeof(cl_mem), &_materials_mem), "clSetKernelArg(materials)");
+	check_error(clSetKernelArg(_kernel, 4, sizeof(unsigned int), &ge->_lights_count), "clSetKernelArg(lights_count)");
+	check_error(clSetKernelArg(_kernel, 5, sizeof(cl_mem), &_lights_mem), "clSetKernelArg(lights)");
+	check_error(clSetKernelArg(_kernel, 6, sizeof(cl_mem), &_image_mem), "clSetKernelArg(image)");
 
-	unsigned int	local_work_size = 64;
 	check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, (size_t *)&ge->camera.resolution, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
 
 	size_t const	origin[3] = { 0, 0, 0 };

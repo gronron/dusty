@@ -82,7 +82,7 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		engine->graphic->new_light(&light);
 		light->position = 0.0f;
 		light->color = { 1.0f, 1.0f, 0.6f };
-		light->power = 1000000.0f;
+		light->power = 4000.0f;
 
 		_cull_world();
 	}

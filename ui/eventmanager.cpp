@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gameengine.hpp"
 #include "console.hpp"
 #include "graphicengine.hpp"
-//#include "raytracer.hpp"
 #include "eventmanager.hpp"
 
 Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(false)
@@ -137,6 +136,9 @@ void			Eventmanager::event()
 			case SDL_MULTIGESTURE:
 			case SDL_CLIPBOARDUPDATE:
 			case SDL_DROPFILE:
+//				((World*)engine->find_actor(0))->load(event.drop.file);
+				SDL_free(event.drop.file);
+				break;
 			case SDL_RENDER_TARGETS_RESET:
 			default:
 				break;
