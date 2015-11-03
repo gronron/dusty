@@ -120,7 +120,7 @@ void	Graphicengine::delete_light(Light *light)
 {
 	int	index;
 
-	index = light - _lights;
+	index = (int)(light - _lights);
 	_lights[index] = _lights[--_lights_count];
 	_lights_links[index] = _lights_links[_lights_count];
 }
