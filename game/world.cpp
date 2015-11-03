@@ -98,8 +98,8 @@ void	World::tick(float const delta)
 	time += delta;
 	
 	time = 1.0f;
-	light->position[1] = sin(time) * 4000.0f;
-	light->position[2] = cos(time) * 4000.0f;
+	light->position[1] = (float)sin(time) * 4000.0f;
+	light->position[2] = (float)cos(time) * 4000.0f;
 }
 
 bool				World::load(char const *filename)

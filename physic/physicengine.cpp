@@ -116,7 +116,7 @@ void		Physicengine::delete_body(Body *body)
 		body->index = -1;
 	}
 	body->next = _bdfree;
-	_bdfree = body - _bodies;
+	_bdfree = (int)(body - _bodies);
 }
 /*
 thread_local int	_currentquery;

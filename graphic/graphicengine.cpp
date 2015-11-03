@@ -73,7 +73,6 @@ void	Graphicengine::tick(float const delta)
 	for (unsigned int i = 0; i < _animations_count; ++i)
 		_animations[i]->tick(delta);
 
-		
 	int	x;
 	int	y;
 	SDL_GetRelativeMouseState(&x, &y);

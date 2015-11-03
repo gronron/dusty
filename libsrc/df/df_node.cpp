@@ -54,11 +54,11 @@ Df_node::~Df_node()
 		free(data_storage);
 }
 
-Df_node const			*Df_node::get(std::string const &researched_nane) const
+Df_node const	*Df_node::get(std::string const &researched_nane) const
 {
-	unsigned long int	a;
-	std::string			prefix;
-	std::string			suffix;
+	size_t		a;
+	std::string	prefix;
+	std::string	suffix;
 
 	if (!researched_nane.size() || researched_nane == ".")
 		return (this);

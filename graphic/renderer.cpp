@@ -106,7 +106,7 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes
 	cl_int			error;
 	cl_uint			platforms_count;
 	cl_platform_id	*platforms;
-	cl_uint 		devices_count;
+	size_t			devices_count;
 	cl_device_id	*devices;
 
 	if (SDL_Init(SDL_INIT_VIDEO))
@@ -147,7 +147,7 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes
 	error = clBuildProgram(_program, 1, &devices[0], "-w", 0, 0);
 	if (error != CL_SUCCESS)
 	{
-		unsigned int	length;
+		size_t			length;
 		char			*build_log;
 
 		std::cerr << "clBuildProgram(): " << error_to_string(error) << std::endl;
@@ -255,15 +255,17 @@ void	Renderer::render(Graphicengine const *ge)
 	check_error(clSetKernelArg(_kernel, 5, sizeof(cl_mem), &_lights_mem), "clSetKernelArg(lights)");
 	check_error(clSetKernelArg(_kernel, 6, sizeof(cl_mem), &_image_mem), "clSetKernelArg(image)");
 
-	check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, (size_t *)&ge->camera.resolution, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
-
 	size_t const	origin[3] = { 0, 0, 0 };
-	size_t const	region[3] = { ge->camera.resolution[0], ge->camera.resolution[1], 1 };
+	size_t const	image_size[3] = { ge->camera.resolution[0], ge->camera.resolution[1], 1 };
+
+	check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, image_size, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
+	clFinish(_queue);
+
 	void			*data;
 	int				pitch;
 
 	SDL_LockTexture(texture, 0, &data, &pitch);
-	check_error(clEnqueueReadImage(_queue, _image_mem, CL_TRUE, origin, region, pitch, 0, data, 0, 0, 0), "clEnqueueReadImage()");
+	check_error(clEnqueueReadImage(_queue, _image_mem, CL_TRUE, origin, image_size, pitch, 0, data, 0, 0, 0), "clEnqueueReadImage()");
 	SDL_UnlockTexture(texture);
 	SDL_RenderCopy(renderer, texture, 0, 0);
 	SDL_RenderPresent(renderer);

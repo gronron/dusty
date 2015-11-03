@@ -177,9 +177,9 @@ void				Gameengine::tick(float const delta)
 		network->tick(delta);
 	//std::cout << "pe" << std::endl;
 	physic->tick(delta);
-	//std::cout << "ac" << std::endl;
+	//std::cout << "cb" << std::endl;
 	callback->tick(delta);
-	
+	//std::cout << "ac" << std::endl;
 	for (unsigned int i = 0; i < _actsize; ++i)
 	{
 		if (_actors[i])
@@ -198,7 +198,7 @@ void				Gameengine::tick(float const delta)
 			};
 		}
 	}
-
+	//std::cout << "ge" << std::endl;
 	if (graphic)
 		graphic->tick(delta);
 	//std::cout << "end" << std::endl;
