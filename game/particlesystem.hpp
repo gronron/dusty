@@ -28,22 +28,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef ANIMATION_H_
-#define ANIMATION_H_
+#ifndef PARTICLESYSTEM_H_
+#define PARTICLESYSTEM_H_
 
-class	Graphicengine;
+#include <string>
+#include "body.hpp"
+#include "animation.hpp"
+#include "graphicengine.hpp"
 
-class	Animation
+class	Particlesystem : public Animation
 {
 	public:
 
-		Graphicengine	*graphic;
+		struct	Particle
+		{
+			vec<float, 4>	position;
+			vec<float, 4>	velocity;
 
+			float			size;
+			float			fade_rate;
+			int				index;
+		};
 
-		Animation(Graphicengine *);
-		virtual ~Animation();
+		Body					**body;
+		
+		unsigned int		_size;
+		Particle			*_particles;
 
-		virtual bool	tick(float) = 0;
+		bool				attractor;
+		float				spawnrate;
+		float				spawntime;
+		float				time;
+
+		vec<float, 2>	fade_rate;
+		vec<float, 2>	velocity;
+
+		Particlesystem(Graphicengine *, std::string const &, Body **);
+		Particlesystem(Graphicengine *, std::string const &, vec<float, 3> const &);
+		virtual ~Particlesystem();
+
+		bool	tick(float);
+
+		void	stop();
+		void	reverse();
 };
 
 #endif

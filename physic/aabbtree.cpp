@@ -191,23 +191,15 @@ void	Aabbtree::_insert_leaf(int const index)
 	{
 		int const	left = _nodes[i].left;
 		int const	right = _nodes[i].right;
-				
-		//float const	cost = merged_perimeter(_nodes[i].aabb, leafaabb) * 2.0f;
-		//float const	inheritance_cost = cost - perimeter(_nodes[i].aabb) * 2.0f;
 
-		float left_cost = merged_perimeter(_nodes[left].aabb, leafaabb);// + inheritance_cost;
-		float right_cost = merged_perimeter(_nodes[right].aabb, leafaabb);// + inheritance_cost;
+		float left_cost = merged_perimeter(_nodes[left].aabb, leafaabb);
+		float right_cost = merged_perimeter(_nodes[right].aabb, leafaabb);
 		
 		if (_nodes[left].right != -1)
 			left_cost -= perimeter(_nodes[left].aabb);
 		if (_nodes[right].right != -1)
 			right_cost -= perimeter(_nodes[right].aabb);
 
-		/*if (_nodes[i].height > 1 && cost < left_cost && cost < right_cost)
-		{
-			std::cout << "pa: " << merged_perimeter(_nodes[i].aabb, leafaabb) << std::endl;
-			break;
-		}*/
 		i = left_cost < right_cost ? left : right;
 	}
 	
@@ -312,8 +304,6 @@ void			Aabbtree::_rotate(int const up, int const down, int const sibling)
 	else
 		_root = down;
 
-	if (_nodes[left].height == _nodes[right].height)
-		std::cout << "Aabbtree::_rotate eq" << std::endl;
 	if (_nodes[left].height > _nodes[right].height)
 	{
 		_nodes[down].right = left;

@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "animation.hpp"
 
-Animation::Animation(Graphicengine *g, float d) : _ge(g), depth(d)
+Animation::Animation(Graphicengine *g) : graphic(g)
 {
 
 }

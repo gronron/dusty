@@ -114,7 +114,7 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes
 		std::cerr << "Error: SDL_Init()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN_DESKTOP);
+	window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE/* | SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	check_error(clGetPlatformIDs(0, 0, &platforms_count), "clGetPlatformIDs()");
