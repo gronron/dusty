@@ -28,24 +28,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CONTROLLER_H_
-#define CONTROLLER_H_
+#include "common.hpp"
+#include "structure.hpp"
 
-#include "actor.hpp"
-
-class	Controller : public Actor
+Structure::Structure(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), body(0), team(0), ready(false), hp(0), maxhp(0)
 {
-	public:
 
-		typedef	void (Controller::*BINDTYPE)(int const, float const *);
+}
 
+Structure::~Structure()
+{
 
-		Controller(Gameengine *, Replication *, int, short int, Actor const *);
-		virtual ~Controller();
+}
 
-		virtual void	postinstanciation();
+Structure::post_instanciation()
+{
+	Actor::postinstanciation();
+	
+	Team	*team;
+	if ((team = dynamic_cast<Team *>find_actor(ownerid)))
+		teamid = team->teamid;
+	
+	//launch building
+}
 
-		virtual void	bind();
-};
+Structure::destroy()
+{
+	
+}
 
-#endif

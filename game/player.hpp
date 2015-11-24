@@ -45,7 +45,7 @@ class	Player : public Actor
 		Body			*body;
 		Sphereshape		shape;
 
-		float			dmg;
+		float			damage;
 		float			firerate;
 		float			score;
 		float			loadingtime;

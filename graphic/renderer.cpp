@@ -165,6 +165,8 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes
 
 	_kernel = clCreateKernel(_program, "raytrace", &error);
 	check_error(error, "clCreateKernel()");
+	
+	//_camera_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, sizeof(Computedcamera), 0, &error);
 
 	set_resolution(width, height);
 }
@@ -173,6 +175,7 @@ Renderer::~Renderer()
 {
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 	
+	//clReleaseMemObject(_camera_mem);
 	clReleaseMemObject(_nodes_mem);
 	clReleaseMemObject(_materials_mem);
 	clReleaseMemObject(_lights_mem);
@@ -247,6 +250,9 @@ void	Renderer::render(Graphicengine const *ge)
 	_compute_camera(ge->camera, cm);
 	_set_buffer(ge);
 
+	//check_error(clEnqueueWriteBuffer(_queue, _camera_mem, CL_TRUE, 0, sizeof(Computedcamera), (void *)&cm, 0, 0, 0), "clEnqueueWriteBuffer()");
+
+	//check_error(clSetKernelArg(_kernel, 0, sizeof(cl_mem), &_camera_mem), "clSetKernelArg(camera)");
 	check_error(clSetKernelArg(_kernel, 0, sizeof(Computedcamera), &cm), "clSetKernelArg(camera)");
 	check_error(clSetKernelArg(_kernel, 1, sizeof(int), &ge->aabbtree._root), "clSetKernelArg(root)");
 	check_error(clSetKernelArg(_kernel, 2, sizeof(cl_mem), &_nodes_mem), "clSetKernelArg(nodes)");

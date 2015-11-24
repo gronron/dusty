@@ -28,24 +28,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CONTROLLER_H_
-#define CONTROLLER_H_
+#ifndef STRUCTURE_H_
+#define STRUCTURE_H_
 
 #include "actor.hpp"
+#include "shape.hpp"
 
-class	Controller : public Actor
+class	Structure : public Actor
 {
 	public:
+	
+		Body		*body;
 
-		typedef	void (Controller::*BINDTYPE)(int const, float const *);
-
-
-		Controller(Gameengine *, Replication *, int, short int, Actor const *);
-		virtual ~Controller();
-
+		char		teamid;
+		bool		ready;
+		short int	hp;
+		short int	maxhp;
+		
+		Structure(Gameengine *, Replication *, int const, short int const, Actor const *);
+		virtual ~Structure();
+		
 		virtual void	postinstanciation();
+		virtual void	destroy();
 
-		virtual void	bind();
+		virtual void	get_replication(Packet &) const;
+		virtual void	replicate(Packet &, float const);
+
+		virtual bool	collide(Collider *);
+		
+		virtual bool	take_damage(short int, );
+		virtual void	finished();
 };
 
 #endif

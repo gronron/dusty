@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "thread/lightthreadpool_util.hpp"
 #include "shape.hpp"
 #include "collider.hpp"
+#include "narrowphase.hpp"
 #include "physicengine.hpp"
 #include <iostream>
 #include <cstdlib>
@@ -96,7 +97,7 @@ void		Physicengine::init_body(Body *body)
 	if (body->dynamic)
 		body->index = _dynamictree.add_aabb(aabb, (unsigned int)(body - _bodies));
 	else
-		body->index = _statictree.add_aabb(aabb, (unsigned int)(body - _bodies));
+		body->index = _statictree.add_saabb(aabb, (unsigned int)(body - _bodies));
 }
 /*
 void	Physicengine::move(Body *body, vec<float, 4> const &position)
@@ -115,9 +116,20 @@ void		Physicengine::delete_body(Body *body)
 			_statictree.remove_aabb(body->index);
 		body->index = -1;
 	}
+	else if (!body->dynamic)
+		_statictree.remove_aabbs((unsigned int)(body - _bodies));
 	body->next = _bdfree;
 	_bdfree = (int)(body - _bodies);
 }
+
+void	Physicengine::add_aabb(Body *body, Aabb const &aabb)
+{
+	if (!body->dynamic)
+		_statictree.add_saabb(aabb, (unsigned int)(body - _bodies));
+	else
+		;
+}
+
 /*
 thread_local int	_currentquery;
 
@@ -160,8 +172,13 @@ void		Physicengine::tick(float delta)
 	}
 	for (unsigned int i = 0; i < _prcount; ++i)
 	{
-		_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
-		_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
+		float const time = aabox_aabox(_bodies + _pairs[i].b, _bodies + _pairs[i].b);
+		
+		if (time >= 0.0f && time <= delta)
+		{
+			_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
+			_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
+		}
 	}
 }
 
@@ -181,83 +198,3 @@ void	Physicengine::_add_pair(int const index)
 		//spinlock.unlock();
 	}
 }
-/*
-void				Physicengine::_collide2(float delta, Boundingbox *x, Boundingbox *y)
-{
-	vec<float, 3>	u;
-	vec<float, 3>	v;
-	
-	vec<float, 3>	d;
-	vec<float, 3>	e;
-	
-	d = 2.0f * (x->acc - y->acc) * (x->loc - (y->loc + y->size));
-	if (d >= 0.0f)
-	{
-	
-	}
-	else
-	{
-		d = 2.0f * (y->acc - x->acc) * (y->loc - (x->loc + x->size));
-	}
-	
-	u = (-x->spd + sqrt(d)) / (2.0f * x->acc);
-	v = (-x->spd - sqrt(d)) / (2.0f * x->acc);
-
-	for (unsigned int i = 0; i < 3; ++i)
-	{
-		float	t = -1.0f;
-
-		if (d[i] > 0.0f)
-		{
-		
-		}
-		if (u[i] >= 0.0f && u[i] <= delta)
-			t = v[i] >= 0.0f && v[i] < u[i] ? v[i] : u[i];
-		else if (v[i] >= 0.0f && v[i] <= delta)
-			t = v[i];
-		if (t >= 0.0f && _reaction(x, y, t, i))
-			break;
-	}
-}
-
-void				Physicengine::_collide(float delta, Boundingbox *x, Boundingbox *y)
-{
-	vec<float, 2>	u;
-	vec<float, 2>	v;
-
-	//std::cout << "collide begin" << std::endl;
-	u = (y->loc - (x->loc + x->size)) / (x->spd - y->spd);
-	v = (x->loc - (y->loc + y->size)) / (y->spd - x->spd);
-	for (unsigned int i = 0; i < 2; ++i)
-	{
-		float t = -1.0f;
-		if (u[i] >= 0.0f && u[i] <= delta)
-			t = v[i] >= 0.0f && v[i] < u[i] ? v[i] : u[i];
-		else if (v[i] >= 0.0f && v[i] <= delta)
-			t = v[i];
-		if (t >= 0.0f && _reaction(x, y, t, i))
-			break;
-	}
-}
-
-bool				Physicengine::_reaction(Boundingbox *x, Boundingbox *y, float t, unsigned int axis)
-{
-	vec<float, 2>	xloc;
-	vec<float, 2>	yloc;
-
-	//std::cout << "reaction begin" << std::endl;
-	xloc = x->loc + x->spd * t;
-	yloc = y->loc + y->spd * t;
-	for (unsigned int i = 0; i < 2; ++i)
-	{
-		if (i != axis && (xloc[i] > yloc[i] + y->size[i] || yloc[i] > xloc[i] + x->size[i]))
-			return (false);
-	}
-	//std::cout << "reaction" << std::endl;
-	if (x->actor && x->actor->collide(*y->actor))
-		x->nextloc[axis] = xloc[axis];
-	if (y->actor && y->actor->collide(*x->actor))
-		y->nextloc[axis] = yloc[axis];
-	//std::cout << "reaction ended" << std::endl;
-	return (true);
-}*/

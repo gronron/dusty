@@ -47,7 +47,15 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, Body *
 	_size = spawnrate * ((fade_rate[0] + fade_rate[1]) / 2.0f);
 	_particles = new Particle[_size];
 	for (unsigned int i = 0; i < _size; ++i)
-		_particles[i].fade_rate = 0.0f;
+	{
+		_particles[i].size = 0.0f;
+	
+		Aabb	aabb;
+		
+		aabb.bottom = 0.0f;
+		aabb.top = 0.0f;
+		_particles[i].index = graphic->aabbtree.add_saabb(aabb, 4);
+	}
 }
 
 Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<float, 3> const &v) : Animation(g), body(0), _size(0), _particles(0), attractor(false), spawnrate(0.0f), spawntime(0.0f), time(0.0f)
@@ -75,20 +83,25 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<fl
 
 		if (attractor)
 		{
+			_particles[i].size = 0.0f;
 			_particles[i].position += _particles[i].velocity * _particles[i].fade_rate;
 			_particles[i].velocity = -_particles[i].velocity;
 		}
 		Aabb	aabb;
 		aabb.bottom = _particles[i].position;
 		aabb.top = aabb.bottom + _particles[i].size * 0.2f;
-		_particles[i].index = graphic->aabbtree.add_saabb(aabb, 1);
+		_particles[i].index = graphic->aabbtree.add_saabb(aabb, 3);
 	}
 }
 
 Particlesystem::~Particlesystem()
 {
 	if (_particles)
+	{
+		for (unsigned int i = 0; i < _size; ++i)
+			graphic->aabbtree.remove_aabb(_particles[i].index);
 		delete [] _particles;
+	}
 }
 
 bool	Particlesystem::tick(float delta)
@@ -102,11 +115,14 @@ bool	Particlesystem::tick(float delta)
 			_particles[i].size += delta / _particles[i].fade_rate;
 		else
 			_particles[i].size -= delta / _particles[i].fade_rate;
-		if (_particles[i].size <= 0.0f && spawnrate != 0.0f)
+		if ((_particles[i].size <= 0.0f || _particles[i].size >= 1.0f) && spawnrate != 0.0f)
 		{
 			_particles[i].size = 1.0f;
 			_particles[i].fade_rate =  (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
-			_particles[i].position = 4.0f;//(*body)->position;
+			if (body)
+				_particles[i].position = (*body)->position;
+			else
+				_particles[i].position = 4.0f;
 			_particles[i].velocity[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			_particles[i].velocity[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			_particles[i].velocity[2] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
@@ -114,6 +130,7 @@ bool	Particlesystem::tick(float delta)
 
 			if (attractor)
 			{
+				_particles[i].size = 0.0f;
 				_particles[i].position += _particles[i].velocity * _particles[i].fade_rate;
 				_particles[i].velocity = -_particles[i].velocity;
 			}

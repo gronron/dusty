@@ -146,6 +146,7 @@
     <ClCompile Include="..\..\..\game\acontroller.cpp" />
     <ClCompile Include="..\..\..\game\particlesystem.cpp" />
     <ClCompile Include="..\..\..\game\player.cpp" />
+    <ClCompile Include="..\..\..\game\projectile.cpp" />
     <ClCompile Include="..\..\..\game\world.cpp" />
     <ClCompile Include="..\..\..\graphic\animation.cpp" />
     <ClCompile Include="..\..\..\graphic\graphicengine.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="..\..\..\game\acontroller.hpp" />
     <ClInclude Include="..\..\..\game\particlesystem.hpp" />
     <ClInclude Include="..\..\..\game\player.hpp" />
+    <ClInclude Include="..\..\..\game\projectile.hpp" />
     <ClInclude Include="..\..\..\game\world.hpp" />
     <ClInclude Include="..\..\..\graphic\animation.hpp" />
     <ClInclude Include="..\..\..\graphic\graphicengine.hpp" />

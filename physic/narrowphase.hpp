@@ -28,24 +28,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CONTROLLER_H_
-#define CONTROLLER_H_
+#ifndef NARROWPHASE_H_
+#define NARROWPHASE_H_
 
-#include "actor.hpp"
+#include "body.hpp"
 
-class	Controller : public Actor
-{
-	public:
-
-		typedef	void (Controller::*BINDTYPE)(int const, float const *);
-
-
-		Controller(Gameengine *, Replication *, int, short int, Actor const *);
-		virtual ~Controller();
-
-		virtual void	postinstanciation();
-
-		virtual void	bind();
-};
+float	sphere_sphere(Body const *, Body const *);
+float	sphere_aabox(Body const *, Body const *);
+float	aabox_aabox(Body const *, Body const *);
 
 #endif

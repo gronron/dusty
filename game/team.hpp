@@ -28,24 +28,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CONTROLLER_H_
-#define CONTROLLER_H_
+#ifndef TEAM_H_
+#define TEAM_H_
 
 #include "actor.hpp"
 
-class	Controller : public Actor
+class	Team : public Actor
 {
 	public:
+	
+		int	structureid[64];
+		int	playerid[64];
 
-		typedef	void (Controller::*BINDTYPE)(int const, float const *);
-
-
-		Controller(Gameengine *, Replication *, int, short int, Actor const *);
-		virtual ~Controller();
-
-		virtual void	postinstanciation();
-
-		virtual void	bind();
 };
 
 #endif

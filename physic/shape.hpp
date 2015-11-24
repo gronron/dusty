@@ -38,7 +38,7 @@ class	Shape
 {
 	public:
 
-		enum Type	{ SPHERE, AXIS_CYLINDER, AXIS_BOX, BOX, MESH };
+		enum Type	{ SPHERE, AXIS_CYLINDER, AXIS_ALIGNED_BOX, BOX, MESH };
 
 
 		char	type;
@@ -78,15 +78,15 @@ class	Axiscylindershape : public Shape
 		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
 };
 
-class	Axisboxshape : public Shape
+class	Axisalignedboxshape : public Shape
 {
 	public:
 	
 		vec<float, 3>	size;
 
 
-		Axisboxshape();
-		virtual ~Axisboxshape();
+		Axisalignedboxshape();
+		virtual ~Axisalignedboxshape();
 		
 		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
 };
@@ -119,36 +119,5 @@ class	Meshshape : public Shape
 		
 		virtual Aabb	&compute_aabb(Aabb &aabb, vec<float, 4> const &position) const;
 };
-/*
-float	collide_sphere_sphere(Sphereshape *a, Sphereshape *b, Body x, Body y)
-{
-	vec<float, 4>	s = x->position - y->position; // vector between the centers of each sphere
-    vec<float, 4>	v = x->velocity - y->velocity; // relative velocity between spheres
-    float			r = a->radius + b->radius;
- 
-    float			c = s.dot(s) - r * r; // if negative, they overlap
 
-    if (c < 0.0) // if true, they already overlap
-    {
-        t = 0.0;
-        return true;
-    }
- 
-    float	a = v.dot(v);
-    //if (a &lt; EPSILON)
-    //  return false; // does not move towards each other
- 
-    float	b = v.dot(s);
-    if (b >= 0.0f)
-        return false; // does not move towards each other
- 
-    float d = b * b - a * c;
-    if (d &lt; 0.0)
-        return false; // no real roots ... no collision
- 
-    t = (-b - sqrt(d)) / a;
- 
-    return true;
-}
-*/
 #endif

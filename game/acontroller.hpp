@@ -7,8 +7,12 @@
 class	AController : public Controller
 {
 	public:
+	
+		enum	Type { SPECTATOR, WORLDCREATOR, FIGHTER, BUILDER };
 
 		Player			*controlled;
+
+		char			controllertype;
 
 		bool			firing;
 		bool			loadingfire;
@@ -28,26 +32,29 @@ class	AController : public Controller
         void	replicate(Packet &, float const);
 
 		void	tick(float const delta);
-
+		
 		void	bind();
 
+		void	change_type(char const);
 
-		void	forward(int size, float *data);
-		void	backward(int size, float *data);
-		void	left(int size, float *data);
-		void	right(int size, float *data);
-
-		void	movex(int size, float *data);
-		void	movey(int size, float *data);
-		void	fire(int size, float *data);
-		void	strongfire(int size, float *data);
-		void	aimloc(int size, float *data);
-		void	aimdirx(int size, float *data);
-		void	aimdiry(int size, float *data);
-		void	change_material(int size, float *data);
+		void	switch_to_spectator(int const, float const *);
+		void	switch_to_worldcreator(int const, float const *);
+		void	switch_to_fighter(int const, float const *);
 		
-		void	load(int size, float *data);
-		void	save(int size, float *data);
+		void	forward(int const, float const *);
+		void	backward(int const, float const *);
+		void	left(int const, float const *);
+		void	right(int const, float const *);
+		void	aimloc(int const, float const *);
+		
+		void	load(int const, float const *);
+		void	save(int const, float const *);
+		void	create_block(int const, float const *);
+		void	destroy_block(int const, float const *);
+		void	change_material(int const, float const *);
+
+		void	fire(int const, float const *);
+		void	strongfire(int const, float const *);
 };
 
 #endif

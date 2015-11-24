@@ -19,3 +19,11 @@ Actors can configure their replication by changing the frequency of the update, 
 The get_replication methode of the actor is called by the replication, the actor must write his own needed data in a packet.
 The replicate methode of the actor is called by the replication, the actor must read the data from the packet and fills his own data with it.
 
+Network:
+if (engine.network != 0) : online
+engine.network.master == true : server (dedicated or not)
+
+replication.authority :
+	none : object on client
+	local : controller on client
+	global : object on server

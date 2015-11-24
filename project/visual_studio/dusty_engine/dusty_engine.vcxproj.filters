@@ -168,6 +168,9 @@
     <ClCompile Include="..\..\..\game\particlesystem.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\game\projectile.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\actor.hpp">
@@ -312,6 +315,9 @@
       <Filter>Header Files\graphic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\game\particlesystem.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\projectile.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,0 +1,19 @@
+Gameplay from Tremulous 1.1
+
+2 team : alien vs human
+
+-each team start with a base constitued with structure
+-the goal is to elinate all ennemys and ennemys respawn possibility.
+-each ennemy killed grand points to the team and too oneself
+-team points are used to unlock structure for the base and evolution for aliens and stuff for humans the team
+-self points are used to buy unlocked stuff
+
+For alien unlocked stuff are evolution, you spend self points to evolve to a more powerfull alien with more and better abilitys
+For human unlocked stuff are weapons, armors and devices.
+
+---------------------------------------
+
+base entity:
+
+structure
+projectile

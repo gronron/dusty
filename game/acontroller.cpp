@@ -9,6 +9,7 @@ FACTORYREG(AController);
 
 AController::AController(Gameengine *g, Replication *r, int i, short int t, Actor const *o) : Controller(g, r, i, t, o)
 {
+	controllertype = SPECTATOR;
 	controlled = 0;
 	firing = false;
 	loadingfire = false;
@@ -72,10 +73,6 @@ void	AController::tick(float delta)
 	Controller::tick(delta);
 	if (controlled)
 	{
-		//controlled->body->velocity = move * 256.0f;
-		controlled->firing = firing;
-		controlled->loadingfire = loadingfire;
-		controlled->dir = aim;
 		//beware
 		
 		vec<float, 4>	direction;
@@ -93,7 +90,20 @@ void	AController::tick(float delta)
 	
 		controlled->body->velocity = (direction * -move[1] + right * move[0]) * delta * 1000.0f;
 		engine->graphic->camera.position = controlled->body->position;
+		
+		controlled->firing = firing;
+		controlled->loadingfire = loadingfire;
+		controlled->dir = direction;
 	}
+}
+
+void	AController::change_type(char const tp)
+{
+	controllertype = tp;
+	if (rp)
+		rp->needupdate = true;
+	if (!rp || rp->authority & Replication::LOCAL)
+		bind();
 }
 
 void	AController::bind()
@@ -103,6 +113,16 @@ void	AController::bind()
 	{
 		//am->ge->add(controlled->hud);
 	}
+
+	engine->event->_keys[SDL_SCANCODE_F1].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_F1].fx = (BINDTYPE)&AController::switch_to_spectator;
+	
+	engine->event->_keys[SDL_SCANCODE_F2].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_F2].fx = (BINDTYPE)&AController::switch_to_worldcreator;
+	
+	engine->event->_keys[SDL_SCANCODE_F3].ctrl = this;
+	engine->event->_keys[SDL_SCANCODE_F3].fx = (BINDTYPE)&AController::switch_to_fighter;
+	
 	engine->event->_keys[SDL_SCANCODE_E].ctrl = this;
 	engine->event->_keys[SDL_SCANCODE_E].fx = (BINDTYPE)&AController::forward;
 
@@ -114,26 +134,70 @@ void	AController::bind()
 
 	engine->event->_keys[SDL_SCANCODE_F].ctrl = this;
 	engine->event->_keys[SDL_SCANCODE_F].fx = (BINDTYPE)&AController::right;
-	
-	engine->event->_keys[SDL_SCANCODE_L].ctrl = this;
-	engine->event->_keys[SDL_SCANCODE_L].fx = (BINDTYPE)&AController::load;
-	engine->event->_keys[SDL_SCANCODE_M].ctrl = this;
-	engine->event->_keys[SDL_SCANCODE_M].fx = (BINDTYPE)&AController::save;
 
 	engine->event->_mousemove.ctrl = this;
 	engine->event->_mousemove.fx = (BINDTYPE)&AController::aimloc;
 
-	engine->event->_mousebuttons[SDL_BUTTON_LEFT].ctrl = this;
-	engine->event->_mousebuttons[SDL_BUTTON_LEFT].fx = (BINDTYPE)&AController::fire;
+	if (controllertype == SPECTATOR)
+	{
+		engine->event->_mousebuttons[SDL_BUTTON_LEFT].ctrl = 0;
+		engine->event->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = 0;
+		engine->event->_mousewheel.ctrl = 0;
+		engine->event->_keys[SDL_SCANCODE_L].ctrl = 0;
+		engine->event->_keys[SDL_SCANCODE_M].ctrl = 0;
+	}
+	else if (controllertype == WORLDCREATOR)
+	{
+		engine->event->_mousebuttons[SDL_BUTTON_LEFT].ctrl = this;
+		engine->event->_mousebuttons[SDL_BUTTON_LEFT].fx = (BINDTYPE)&AController::create_block;
 
-	engine->event->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = this;
-	engine->event->_mousebuttons[SDL_BUTTON_RIGHT].fx = (BINDTYPE)&AController::strongfire;
+		engine->event->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = this;
+		engine->event->_mousebuttons[SDL_BUTTON_RIGHT].fx = (BINDTYPE)&AController::destroy_block;
+
+		engine->event->_mousewheel.ctrl = this;
+		engine->event->_mousewheel.fx = (BINDTYPE)&AController::change_material;
+
+		engine->event->_keys[SDL_SCANCODE_L].ctrl = this;
+		engine->event->_keys[SDL_SCANCODE_L].fx = (BINDTYPE)&AController::load;
 	
-	engine->event->_mousewheel.ctrl = this;
-	engine->event->_mousewheel.fx = (BINDTYPE)&AController::change_material;
+		engine->event->_keys[SDL_SCANCODE_M].ctrl = this;
+		engine->event->_keys[SDL_SCANCODE_M].fx = (BINDTYPE)&AController::save;
+	}
+	else if (controllertype == FIGHTER)
+	{
+		engine->event->_mousebuttons[SDL_BUTTON_LEFT].ctrl = this;
+		engine->event->_mousebuttons[SDL_BUTTON_LEFT].fx = (BINDTYPE)&AController::fire;
+
+		engine->event->_mousebuttons[SDL_BUTTON_RIGHT].ctrl = this;
+		engine->event->_mousebuttons[SDL_BUTTON_RIGHT].fx = (BINDTYPE)&AController::strongfire;
+		
+		engine->event->_mousewheel.ctrl = 0;
+		engine->event->_keys[SDL_SCANCODE_L].ctrl = 0;
+		engine->event->_keys[SDL_SCANCODE_M].ctrl = 0;
+	}
 }
 
-void	AController::forward(int size, float *data)
+//// SPECTATOR ////////////////////////
+
+void	AController::switch_to_spectator(int const size, float const *data)
+{
+	if (size == 1 && !*data)
+		change_type(SPECTATOR);
+}
+
+void	AController::switch_to_worldcreator(int const size, float const *data)
+{
+	if (size == 1 && !*data)
+		change_type(WORLDCREATOR);
+}
+
+void	AController::switch_to_fighter(int const size, float const *data)
+{
+	if (size == 1 && !*data)
+		change_type(FIGHTER);
+}
+
+void	AController::forward(int const size, float const *data)
 {
 	if (size == 1)
 	{
@@ -141,11 +205,10 @@ void	AController::forward(int size, float *data)
 			rp->needupdate = true;
 		if (*data > 0.0f || (*data == 0.0f && move[1] < 0.0f))
 			move[1] = -*data;
-		
 	}
 }
 
-void	AController::backward(int size, float *data)
+void	AController::backward(int const size, float const *data)
 {
 	if (size == 1)
 	{
@@ -156,7 +219,7 @@ void	AController::backward(int size, float *data)
 	}
 }
 
-void	AController::left(int size, float *data)
+void	AController::left(int const size, float const *data)
 {
 	if (size == 1)
 	{
@@ -167,7 +230,7 @@ void	AController::left(int size, float *data)
 	}
 }
 
-void	AController::right(int size, float *data)
+void	AController::right(int const size, float const *data)
 {
 	if (size == 1)
 	{
@@ -178,36 +241,41 @@ void	AController::right(int size, float *data)
 	}
 }
 
-void	AController::movex(int size, float *data)
+void	AController::aimloc(int const size, float const *data)
 {
-	if (size == 1)
+	if (size == 2)
 	{
 		if (rp)
 			rp->needupdate = true;
-		move[0] = *data;
+		aim[0] += data[0] / 1000.0f;
+		aim[1] += data[1] / 1000.0f;
+		
+		//aim = unit<float>(aim - vec<float, 4>::cast(engine->graphic->screensize) / 2.0f);
 	}
 }
 
-void	AController::movey(int size, float *data)
+//// MAPCREATOR ///////////////////////
+
+void	AController::load(int const size, float const *data)
 {
-	if (size == 1)
+	if (size == 1 && *data > 0.0f)
 	{
-		if (rp)
-			rp->needupdate = true;
-		move[1] = *data;
+		((World*)engine->find_actor(0))->load("dusty_world.dstw");
 	}
 }
 
-void	AController::fire(int size, float *data)
+void	AController::save(int const size, float const *data)
+{
+	if (size == 1 && *data > 0.0f)
+	{
+		((World*)engine->find_actor(0))->save("dusty_world.dstw");
+	}
+}
+
+void	AController::create_block(int const size, float const *data)
 {
 	if (size == 1)
 	{
-		/*if (rp)
-			rp->needupdate = true;
-		firing = *data;
-		aim[0] = data[1];
-		aim[1] = data[2];
-		//aim = unit<float>(aim - vec<float, 4>::cast(engine->graphic->screensize) / 2.0f);*/
 		if (*data && controlled)
 		{
 			Ray	ray;
@@ -223,14 +291,10 @@ void	AController::fire(int size, float *data)
 	}
 }
 
-void	AController::strongfire(int size, float *data)
+void	AController::destroy_block(int const size, float const *data)
 {
 	if (size == 1)
 	{
-		/*if (rp)
-			rp->needupdate = true;
-		loadingfire = *data;*/
-		
 		if (*data && controlled)
 		{
 			Ray	ray;
@@ -246,40 +310,7 @@ void	AController::strongfire(int size, float *data)
 	}
 }
 
-void	AController::aimloc(int size, float *data)
-{
-	if (size == 2)
-	{
-		if (rp)
-			rp->needupdate = true;
-		aim[0] += data[0] / 1000.0f;
-		aim[1] += data[1] / 1000.0f;
-		
-		//aim = unit<float>(aim - vec<float, 4>::cast(engine->graphic->screensize) / 2.0f);
-	}
-}
-
-void	AController::aimdirx(int size, float *data)
-{
-	if (size == 1)
-	{
-		if (rp)
-			rp->needupdate = true;
-		aim[0] = *data;
-	}
-}
-
-void	AController::aimdiry(int size, float *data)
-{
-	if (size == 1)
-	{
-		if (rp)
-			rp->needupdate = true;
-		aim[1] = *data;
-	}
-}
-
-void	AController::change_material(int size, float *data)
+void	AController::change_material(int const size, float const *data)
 {
 	if (size == 1)
 	{
@@ -289,18 +320,24 @@ void	AController::change_material(int size, float *data)
 	}
 }
 
-void	AController::load(int size, float *data)
+//// FIGHTER //////////////////////////
+
+void	AController::fire(int const size, float const *data)
 {
-	if (size == 1 && *data > 0.0f)
+	if (size == 1)
 	{
-		((World*)engine->find_actor(0))->load("dusty_world.dstw");
+		if (rp)
+			rp->needupdate = true;
+		firing = *data;
 	}
 }
 
-void	AController::save(int size, float *data)
+void	AController::strongfire(int const size, float const *data)
 {
-	if (size == 1 && *data > 0.0f)
+	if (size == 1)
 	{
-		((World*)engine->find_actor(0))->save("dusty_world.dstw");
+		if (rp)
+			rp->needupdate = true;
+		loadingfire = *data;
 	}
 }

@@ -49,6 +49,9 @@ class	World : public Actor
 		Chunk					***chunks;
 		Light	*light;
 		double	time;
+
+		//int		teamids[2];
+		//Team	*teams;
 	
 		World(Gameengine *, Replication *, int const, short int const, Actor const *);
 		virtual ~World();

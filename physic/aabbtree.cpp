@@ -113,6 +113,18 @@ void			Aabbtree::remove_aabb(int const index)
 	_free_node(index);
 }
 
+void			Aabbtree::remove_aabbs(unsigned int const data)
+{
+	for (unsigned int i = 0; i < _size; ++i)
+	{
+		if (_nodes[i].data == data)
+		{
+			_remove_leaf(i);
+			_free_node(i);
+		}
+	}
+}
+
 bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity)
 {
 	if (_nodes[index].aabb.is_containing(aabb))

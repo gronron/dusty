@@ -76,6 +76,7 @@ class	Aabbtree
 		int		add_aabb(Aabb const &, int const data);
 		int		add_saabb(Aabb const &, int const data);
 		void	remove_aabb(int const);
+		void	remove_aabbs(unsigned int const);
 		bool	move_aabb(int const, Aabb const &, vec<float, 4> const &);
 		bool	move_saabb(int const, Aabb const &);
 

@@ -1,18 +1,14 @@
 #include "common.hpp"
 #include "player.hpp"
-//#include "projectile.hpp"
-//#include "bonus.hpp"
-//#include "feeder.hpp"
-//#include "level.hpp"
+#include "projectile.hpp"
 #include "acontroller.hpp"
 
 #include <iostream>
-#include <cmath>
 #define M_E 2.718281828459045
 
 FACTORYREG(Player);
 
-Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), dmg(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
+Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), damage(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
 {
 	engine->physic->new_body(&body, &shape, this);
 	shape.radius = 32.0f;
@@ -82,7 +78,7 @@ void	Player::replicate(Packet &pckt, float const p)
 void	Player::tick(float const delta)
 {
 	Actor::tick(delta);
-	/*if (engine->master)
+	if (engine->master)
 	{
 		if (loadingfire)
 		{
@@ -98,11 +94,11 @@ void	Player::tick(float const delta)
 				Projectile		*p = (Projectile *)engine->create("Projectile", this, true);
 
 				p->ownerid = id;
-				p->dmg = dmg;
+				//p->damage = dmg;
 				p->body->position = body->position;
 				a[0] = (float)MT().genrand_real1(-1.0, 1.0);
 				a[1] = (float)MT().genrand_real1(-1.0, 1.0);
-				p->body->velocity = unit<float>(a) * 512.0f;
+				p->body->velocity = vunit<float>(a) * 2.0f;
 			}
 			loadingtime = 0.0f;
 		}
@@ -111,7 +107,7 @@ void	Player::tick(float const delta)
 			fire();
 			engine->callback->start_callback(1, this, (bool (Actor::*)())&Player::fire, 1.0f / firerate, true);
 		}
-	}*/
+	}
 }
 
 bool			Player::collide(Collider *x)
@@ -143,19 +139,19 @@ bool			Player::collide(Collider *x)
 
 bool	Player::fire()
 {
-	/*if (firing)
+	if (firing)
 	{
 		if (engine->master)
 		{
 			Projectile *p = (Projectile *)engine->create("Projectile", this, true);
 			p->ownerid = id;
-			p->dmg = dmg;
+			p->damage = damage;
 			p->body->position = body->position;
-			p->body->velocity = dir * 512.0f;
+			p->body->velocity = dir * 4.0f;
 		}
 		return (true);
 	}
 	else
-		return (false);*/
+		return (false);
 	return (false);
 }

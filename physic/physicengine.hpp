@@ -69,6 +69,8 @@ class	Physicengine
 		void	new_body(Body **, Shape *, Collider *);
 		void	init_body(Body *);
 		void	delete_body(Body *);
+		
+		void	add_aabb(Body *, Aabb const &);
 
 		void	tick(float const);
 		

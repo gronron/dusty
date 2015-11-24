@@ -28,117 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "shape.hpp"
+#include "vec_util.hpp"
+#include "narrowphase.hpp"
 
-Shape::Shape(char const t) : type(t)
-{
+//sphere-sphere
 
-}
-
-Shape::~Shape()
-{
-
-}
-
-///////////////////////////////////////
-
-Sphereshape::Sphereshape() : Shape(SPHERE)
-{
-
-}
-
-Sphereshape::~Sphereshape()
-{
-
-}
-
-Aabb	&Sphereshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position - radius;
-	aabb.top = position + radius;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Axiscylindershape::Axiscylindershape() : Shape(AXIS_CYLINDER)
-{
-
-}
-
-Axiscylindershape::~Axiscylindershape()
-{
-
-}
-
-Aabb	&Axiscylindershape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position - radius;
-	aabb.top = position + radius;
-	aabb.bottom[axis] = position[axis] - lenght;
-	aabb.top[axis] = position[axis] + lenght;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Axisalignedboxshape::Axisalignedboxshape() : Shape(AXIS_ALIGNED_BOX)
-{
-
-}
-
-Axisalignedboxshape::~Axisalignedboxshape()
-{
-
-}
-
-Aabb	&Axisalignedboxshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position - size;
-	aabb.top = position + size;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Boxshape::Boxshape() : Shape(BOX)
-{
-
-}
-
-Boxshape::~Boxshape()
-{
-
-}
-
-Aabb	&Boxshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position;
-	aabb.top = position;
-	return (aabb);
-}
-
-///////////////////////////////////////
-
-Meshshape::Meshshape() : Shape(MESH)
-{
-
-}
-
-Meshshape::~Meshshape()
-{
-
-}
-
-Aabb	&Meshshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
-{
-	aabb.bottom = position;
-	aabb.top = position;
-	return (aabb);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-/*
 float					sphere_sphere(Body const *x, Body const *y)
 {
 	vec<float, 4> const	p = x->position - y->posistion;
@@ -162,10 +56,14 @@ float					sphere_sphere(Body const *x, Body const *y)
 	return (pp + -pv * (pv / vv));
 }
 
+//sphere-abox
+
 float					sphere_aabox(Body const *x, Body const *y)
 {
 	return (-1.0f);
 }
+
+//abox-abox
 
 float					aabox_aabox(Body const *x, Body const *y)
 {
@@ -177,4 +75,14 @@ float					aabox_aabox(Body const *x, Body const *y)
 
 	return (min(tu, tv));
 }
-*/
+
+//cylinder-cylinder
+
+//box-box
+
+//sphere-cylinder
+
+//sphere-box
+//cylinder-abox
+//cylinder-box
+//abox-box

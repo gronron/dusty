@@ -28,24 +28,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CONTROLLER_H_
-#define CONTROLLER_H_
+#ifndef PROJECTILE_H_
+#define PROJECTILE_H_
 
 #include "actor.hpp"
+#include "shape.hpp"
+#include "particlesystem.hpp"
 
-class	Controller : public Actor
+class	Projectile : public Actor
 {
 	public:
 
-		typedef	void (Controller::*BINDTYPE)(int const, float const *);
+		Body		*body;
+		Sphereshape	shape;
+
+		float	damage;
+
+		Particlesystem	*ps;
 
 
-		Controller(Gameengine *, Replication *, int, short int, Actor const *);
-		virtual ~Controller();
+		Projectile(Gameengine *, Replication *, int const, short int const, Actor const *);
+		virtual ~Projectile();
 
-		virtual void	postinstanciation();
+		void	postinstanciation();
+		void	destroy();
 
-		virtual void	bind();
+		//void	notified_by_owner(Actor *, bool const);
+
+		void	get_replication(Packet &) const;
+		void	replicate(Packet &, float const);
+
+		//void	tick(float const);
+
+		bool	collide(Collider *);
+
+		bool	selfdestroy();
 };
 
 #endif

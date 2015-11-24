@@ -53,6 +53,7 @@ class	Renderer
 		unsigned int		_materials_mem_size;
 		unsigned int		_lights_mem_size;
 		
+		cl_mem				_camera_mem;
 		cl_mem				_nodes_mem;
 		cl_mem				_materials_mem;
 		cl_mem				_lights_mem;
