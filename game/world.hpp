@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "actor.hpp"
 #include "math/vec.hpp"
+#include "shape.hpp"
 
 #define CHUNK_SIZE 32
 
@@ -49,6 +50,9 @@ class	World : public Actor
 		Chunk					***chunks;
 		Light	*light;
 		double	time;
+		
+		Axisalignedboxshape	shape;
+		Body				*body;
 
 		//int		teamids[2];
 		//Team	*teams;

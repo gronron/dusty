@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "aabbtree.hpp"
 
-#include <iostream>
-
 #define GAP 0.2f
 #define	MUL 2.0f
 
@@ -107,17 +105,17 @@ int				Aabbtree::add_saabb(Aabb const &aabb, int const data)
 	return (index);
 }
 
-void			Aabbtree::remove_aabb(int const index)
+void	Aabbtree::remove_aabb(int const index)
 {
 	_remove_leaf(index);
 	_free_node(index);
 }
 
-void			Aabbtree::remove_aabbs(unsigned int const data)
+void	Aabbtree::remove_aabbs(unsigned int const data)
 {
 	for (unsigned int i = 0; i < _size; ++i)
 	{
-		if (_nodes[i].data == data)
+		if (_nodes[i].height == 0 && _nodes[i].data == data)
 		{
 			_remove_leaf(i);
 			_free_node(i);
@@ -172,8 +170,12 @@ int		Aabbtree::_allocate_node()
 		_nodes = resize(_nodes, _size, _size << 1);
 		_size <<= 1;
 		for (unsigned int i = _size >> 1; i < _size - 1; ++i)
+		{
 			_nodes[i].next = i + 1;
+			_nodes[i].height = -1;
+		}
 		_nodes[_size - 1].next = -1;
+		_nodes[_size - 1].height = -1;
 	}
 
 	index = _free;

@@ -82,7 +82,7 @@ class	Axisalignedboxshape : public Shape
 {
 	public:
 	
-		vec<float, 3>	size;
+		vec<float, 4>	size;
 
 
 		Axisalignedboxshape();
@@ -95,7 +95,7 @@ class	Boxshape : public Shape
 {
 	public:
 	
-		vec<float, 3>	size;
+		vec<float, 4>	size;
 
 
 		Boxshape();

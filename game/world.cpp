@@ -66,7 +66,10 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 {
 	size = 2;
 	chunks = new_space<Chunk>(2, 2, 2);
-	
+
+	shape.size = 1.0f;
+	engine->physic->new_body(&body, &shape, this);
+
 	vec<int, 4>	start;
 	vec<int, 4>	end;
 	start = 0;
@@ -96,6 +99,7 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 
 World::~World()
 {
+	engine->physic->delete_body(body);
 	delete_space(chunks);
 }
 
@@ -195,6 +199,7 @@ bool	World::create_block(Ray const &ray, char const value)
 			aabb.bottom = position;
 			aabb.top = aabb.bottom + 1.0f;
 			engine->graphic->aabbtree.add_saabb(aabb, value);
+			engine->physic->add_aabb(body, aabb);
 			return (true);
 		}
 	}
@@ -216,6 +221,11 @@ bool	World::destroy_block(Ray const &ray)
 		{
 			chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = 0;
 			engine->graphic->aabbtree.remove_aabb(result.aabbindex);
+			
+			Aabb	aabb;
+			aabb.bottom = position + 0.25f;
+			aabb.top = position + 0.75f;
+			engine->physic->remove_aabb(body, aabb);
 			return (true);
 		}
 	}
@@ -250,6 +260,7 @@ void	World::_cull_chunk(Chunk &chunk, vec<float, 4> const &position)
 					aabb.bottom += position;
 					aabb.top = aabb.bottom + 1.0f;
 					engine->graphic->aabbtree.add_saabb(aabb, chunk.blocks[x][y][z]);
+					engine->physic->add_aabb(body, aabb);
 				}
 			}
 		}

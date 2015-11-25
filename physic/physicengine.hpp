@@ -71,6 +71,7 @@ class	Physicengine
 		void	delete_body(Body *);
 		
 		void	add_aabb(Body *, Aabb const &);
+		void	remove_aabb(Body *, Aabb const &);
 
 		void	tick(float const);
 		

@@ -124,10 +124,17 @@ void		Physicengine::delete_body(Body *body)
 
 void	Physicengine::add_aabb(Body *body, Aabb const &aabb)
 {
-	if (!body->dynamic)
+	if (body->index == -1 && !body->dynamic)
 		_statictree.add_saabb(aabb, (unsigned int)(body - _bodies));
-	else
-		;
+}
+
+void	Physicengine::remove_aabb(Body *body, Aabb const &aabb)
+{
+	if (body->index == -1 && !body->dynamic)
+	{
+		//_statictree.add_saabb(aabb, (unsigned int)(body - _bodies));
+		//query aabb and select aabb.data == index of body
+	}
 }
 
 /*
@@ -172,9 +179,9 @@ void		Physicengine::tick(float delta)
 	}
 	for (unsigned int i = 0; i < _prcount; ++i)
 	{
-		float const time = aabox_aabox(_bodies + _pairs[i].b, _bodies + _pairs[i].b);
+		//float const time = aabox_aabox(_bodies + _pairs[i].b, _bodies + _pairs[i].b);
 		
-		if (time >= 0.0f && time <= delta)
+		//if (time >= 0.0f && time <= delta)
 		{
 			_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
 			_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);
