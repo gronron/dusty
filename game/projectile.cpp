@@ -1,12 +1,14 @@
 #include "common.hpp"
+#include "world.hpp"
 #include "projectile.hpp"
 
 FACTORYREG(Projectile);
 
 Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), body(0)
 {
+	shape.size = 0.1f;
 	engine->physic->new_body(&body, &shape, this);
-	shape.radius = 0.1f;
+	
 	body->dynamic = true;
 	damage = 1.0f;
 }
@@ -53,11 +55,12 @@ void	Projectile::replicate(Packet &pckt, float const p)
 
 bool	Projectile::collide(Collider *x)
 {
-	/*if (dynamic_cast<Feeder const *>(&x) || dynamic_cast<Level const *>(&x))
+	if (dynamic_cast<World const *>(x))
 	{
+		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", body->prevposition));
 		destroy();
 		return (true);
-	}*/
+	}
 	return (false);
 }
 

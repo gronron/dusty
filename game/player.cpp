@@ -8,10 +8,10 @@
 
 FACTORYREG(Player);
 
-Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), damage(1.0f), firerate(200.0f), score(0.0f), loadingtime(0.0f)
+Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), damage(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)
 {
+	shape.size = 1.0f;
 	engine->physic->new_body(&body, &shape, this);
-	shape.radius = 32.0f;
 	body->dynamic = true;
 	body->position = 5.0f;
 	
@@ -147,7 +147,7 @@ bool	Player::fire()
 			p->ownerid = id;
 			p->damage = damage;
 			p->body->position = body->position;
-			p->body->velocity = dir * 4.0f;
+			p->body->velocity = dir * 32.0f;
 		}
 		return (true);
 	}

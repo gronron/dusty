@@ -28,20 +28,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "vec_util.hpp"
+#include "math/vec_util.hpp"
+#include "shape.hpp"
 #include "narrowphase.hpp"
 
 //sphere-sphere
 
 float					sphere_sphere(Body const *x, Body const *y)
 {
-	vec<float, 4> const	p = x->position - y->posistion;
+	vec<float, 4> const	p = x->position - y->position;
 	vec<float, 4> const	v = x->velocity - y->velocity;
 
-	float const	r = x->shape->radius + y->shape->radius;
+	float const	r = ((Sphereshape const *)x->shape)->radius + ((Sphereshape const *)x->shape)->radius;
     float const pp = vsqrnorm(p) - r * r;
 
-	if (p <= 0.0)
+	if (pp <= 0.0)
 		return (0.0f);
 
     float const	pv = vdot(p, v);
@@ -67,8 +68,8 @@ float					sphere_aabox(Body const *x, Body const *y)
 
 float					aabox_aabox(Body const *x, Body const *y)
 {
-	vec<float, 4> const	u = (y->position - (x->position + x->shape->size)) / (x->velocity - y->velocity);
-	vec<float, 4> const	v = (x->position - (y->position + y->shape->size)) / (y->velocity - x->velocity);
+	vec<float, 4> const	u = (y->position - (x->position + ((Axisalignedboxshape const *)x->shape)->size)) / (x->velocity - y->velocity);
+	vec<float, 4> const	v = (x->position - (y->position + ((Axisalignedboxshape const *)y->shape)->size)) / (y->velocity - x->velocity);
 	
 	float const	tu = max(max(u[0], u[1]), u[2]);
 	float const	tv = max(max(v[0], v[1]), v[2]);

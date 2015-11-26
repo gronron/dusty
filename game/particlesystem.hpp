@@ -51,6 +51,7 @@ class	Particlesystem : public Animation
 		};
 
 		Body					**body;
+		vec<float, 4>			position;
 		
 		unsigned int		_size;
 		Particle			*_particles;
@@ -64,7 +65,7 @@ class	Particlesystem : public Animation
 		vec<float, 2>	velocity;
 
 		Particlesystem(Graphicengine *, std::string const &, Body **);
-		Particlesystem(Graphicengine *, std::string const &, vec<float, 3> const &);
+		Particlesystem(Graphicengine *, std::string const &, vec<float, 4> const &);
 		virtual ~Particlesystem();
 
 		bool	tick(float);

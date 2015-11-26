@@ -42,8 +42,8 @@ class	Player : public Actor
 {
 	public:
 
-		Body			*body;
-		Sphereshape		shape;
+		Body				*body;
+		Axisalignedboxshape	shape;
 
 		float			damage;
 		float			firerate;
@@ -52,7 +52,7 @@ class	Player : public Actor
 
 		bool			firing;
 		bool			loadingfire;
-		vec<float, 2>	dir;
+		vec<float, 4>	dir;
 
 		//Particlesystem	*ps;
 		//Hud				*hud;

@@ -39,8 +39,8 @@ class	Projectile : public Actor
 {
 	public:
 
-		Body		*body;
-		Sphereshape	shape;
+		Body				*body;
+		Axisalignedboxshape	shape;
 
 		float	damage;
 

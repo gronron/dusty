@@ -175,6 +175,7 @@
     <ClCompile Include="..\..\..\network\server.cpp" />
     <ClCompile Include="..\..\..\physic\aabbtree.cpp" />
     <ClCompile Include="..\..\..\physic\body.cpp" />
+    <ClCompile Include="..\..\..\physic\narrowphase.cpp" />
     <ClCompile Include="..\..\..\physic\physicengine.cpp" />
     <ClCompile Include="..\..\..\physic\shape.cpp" />
     <ClCompile Include="..\..\..\ui\console.cpp" />

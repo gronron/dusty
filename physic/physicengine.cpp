@@ -161,8 +161,8 @@ void		Physicengine::tick(float delta)
 			_bodies[i].position = _bodies[i].position + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
 			_bodies[i].velocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
 
-			_bodies[i].shape->compute_aabb(_bodies[i].aabb, _bodies[i].position);
-			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb, _bodies[i].velocity);
+			_bodies[i].shape->compute_aabb(_bodies[i].aabb, _bodies[i].prevposition);
+			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb, _bodies[i].velocity * delta);
 		}
 	}
 
@@ -179,9 +179,10 @@ void		Physicengine::tick(float delta)
 	}
 	for (unsigned int i = 0; i < _prcount; ++i)
 	{
-		//float const time = aabox_aabox(_bodies + _pairs[i].b, _bodies + _pairs[i].b);
+		float const time = aabox_aabox(_bodies + _pairs[i].a, _bodies + _pairs[i].b);
+		std::cout << "::" << time << std::endl;
 		
-		//if (time >= 0.0f && time <= delta)
+		if (time >= 0.0f && time <= delta)
 		{
 			_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
 			_bodies[_pairs[i].b].collider->collide(_bodies[_pairs[i].a].collider);

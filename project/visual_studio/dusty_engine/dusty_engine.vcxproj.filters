@@ -171,6 +171,9 @@
     <ClCompile Include="..\..\..\game\projectile.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\physic\narrowphase.cpp">
+      <Filter>Source Files\physic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\actor.hpp">
