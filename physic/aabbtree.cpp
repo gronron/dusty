@@ -123,17 +123,11 @@ void	Aabbtree::remove_aabbs(unsigned int const data)
 	}
 }
 
-bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity)
+bool					Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity)
 {
-	if (_nodes[index].aabb.is_containing(aabb))
-		return (false);
-
-	Aabb	a = aabb;
-	a.bottom -= GAP;
-	a.top += GAP;
-
+	Aabb				a = aabb;
 	vec<float, 4> const	b = velocity * MUL;
-	
+
 	for (unsigned int i = 0; i < 3; ++i)
 	{
 		if (b[i] < 0.0f)
@@ -141,6 +135,12 @@ bool	Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const 
 		else
 			a.top[i] += b[i];
 	}
+	
+	if (_nodes[index].aabb.is_containing(aabb))
+		return (false);
+
+	a.bottom -= GAP;
+	a.top += GAP;
 	_nodes[index].aabb = a;
 
 	_remove_leaf(index);

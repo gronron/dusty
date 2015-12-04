@@ -34,16 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<class T, unsigned int U>
 struct	vec
 {
-	template<class V, unsigned int W>
-	static vec	cast(vec<V, W> const &);
-
-
 	T	ar[U];
 
 
 	template<class V, unsigned int W>
 	operator vec<V, W>();
-	
 	template<class V, unsigned int W>
 	operator vec<V, W>() const;
 
@@ -108,16 +103,6 @@ vec<T, U>::operator vec<V, W>() const
 
 	for (unsigned int i = 0; i < W; ++i)
 		a.ar[i] = (V)(i < U ? ar[i] : 0);
-	return (a);
-}
-
-template<class T, unsigned int U> template<class V, unsigned int W>
-vec<T, U>		vec<T, U>::cast(vec<V, W> const &x)
-{
-	vec<T, U>	a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = i < W ? (T)x.ar[i] : 0;
 	return (a);
 }
 
@@ -797,6 +782,6 @@ inline bool	operator>=(T const &x, vec<T, U> const &y)
 	return (true);
 }
 
-//#include "vec_sse.hpp"
+#include "vec_sse.hpp"
 
 #endif

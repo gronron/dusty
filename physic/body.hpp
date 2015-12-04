@@ -61,7 +61,6 @@ struct	Body
 
 	float			mass;
 
-	Aabb			aabb;
 
 	void	get_replication(Packet &) const;
 	void	replicate(Packet &, float);

@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float					sphere_sphere(Body const *x, Body const *y)
 {
-	vec<float, 4> const	p = x->position - y->position;
-	vec<float, 4> const	v = x->velocity - y->velocity;
+	vec<float, 4> const	p = x->prevposition - y->prevposition;
+	vec<float, 4> const	v = x->prevvelocity - y->prevvelocity;
 
 	float const	r = ((Sphereshape const *)x->shape)->radius + ((Sphereshape const *)x->shape)->radius;
     float const pp = vsqrnorm(p) - r * r;
@@ -68,8 +68,8 @@ float					sphere_aabox(Body const *x, Body const *y)
 
 float					aabox_aabox(Body const *x, Body const *y)
 {
-	vec<float, 4> const	u = (y->position - (x->position + ((Axisalignedboxshape const *)x->shape)->size)) / (x->velocity - y->velocity);
-	vec<float, 4> const	v = (x->position - (y->position + ((Axisalignedboxshape const *)y->shape)->size)) / (y->velocity - x->velocity);
+	vec<float, 4> const	u = (y->prevposition - (x->prevposition + ((Axisalignedboxshape const *)x->shape)->size)) / (x->velocity - y->velocity);
+	vec<float, 4> const	v = (x->prevposition - (y->prevposition + ((Axisalignedboxshape const *)y->shape)->size)) / (y->velocity - x->velocity);
 	
 	float const	tu = max(max(u[0], u[1]), u[2]);
 	float const	tv = max(max(v[0], v[1]), v[2]);

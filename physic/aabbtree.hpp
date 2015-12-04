@@ -81,7 +81,7 @@ class	Aabbtree
 		bool	move_saabb(int const, Aabb const &);
 
 		template<class T>
-		void	query(Aabb const &, T *, void (T::*)(int const)) const;
+		void	query(Aabb const &, T *, void (T::*)(int const, int const)) const;
 		template <class T>
 		void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
 		template <class T>
@@ -100,7 +100,7 @@ class	Aabbtree
 ///////////////////////////////////////
 
 template<class T>
-void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)) const
+void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const, int const)) const
 {
 	if (_root != -1)
 	{
@@ -115,7 +115,7 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const)
 			if (aabb.is_overlapping(_nodes[index].aabb))
 			{
 				if (_nodes[index].right == -1)
-					(object->*callback)(_nodes[index].data);
+					(object->*callback)(index, _nodes[index].data);
 				else
 				{
 					stack[top++] = _nodes[index].left;

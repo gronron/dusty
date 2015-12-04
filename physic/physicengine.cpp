@@ -87,6 +87,9 @@ void		Physicengine::new_body(Body **link, Shape *shape, Collider *collider)
 	*body->link = body;
 	body->shape = shape;
 	body->collider = collider;
+	
+	body->velocity = 0.0f;
+	body->acceleration = 0.0f;
 }
 
 void		Physicengine::init_body(Body *body)
@@ -161,8 +164,10 @@ void		Physicengine::tick(float delta)
 			_bodies[i].position = _bodies[i].position + _bodies[i].velocity * delta + _bodies[i].acceleration * delta * delta * 0.5f; // + bd->ping
 			_bodies[i].velocity = _bodies[i].velocity + _bodies[i].acceleration * delta;
 
-			_bodies[i].shape->compute_aabb(_bodies[i].aabb, _bodies[i].prevposition);
-			_dynamictree.move_aabb(_bodies[i].index, _bodies[i].aabb, _bodies[i].velocity * delta);
+			Aabb	aabb;
+
+			_bodies[i].shape->compute_aabb(aabb, _bodies[i].prevposition);
+			_dynamictree.move_aabb(_bodies[i].index, aabb, _bodies[i].velocity * delta);
 		}
 	}
 
@@ -173,15 +178,18 @@ void		Physicengine::tick(float delta)
 		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 		{
 			_currentquery = i;
-			_dynamictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
-			_statictree.query(_bodies[i].aabb, this, &Physicengine::_add_pair);
+			_dynamictree.query(_dynamictree._nodes[_bodies[i].index].aabb, this, &Physicengine::_add_pair);
+			_statictree.query(_dynamictree._nodes[_bodies[i].index].aabb, this, &Physicengine::_add_pair);
 		}
 	}
 	for (unsigned int i = 0; i < _prcount; ++i)
 	{
+		if (_bodies[_pairs[i].b].index == -1)
+			_bodies[_pairs[i].b].prevposition = _statictree._nodes[_pairs[i].aabb].aabb.bottom;
+	
 		float const time = aabox_aabox(_bodies + _pairs[i].a, _bodies + _pairs[i].b);
 		std::cout << "::" << time << std::endl;
-		
+
 		if (time >= 0.0f && time <= delta)
 		{
 			_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);
@@ -190,9 +198,9 @@ void		Physicengine::tick(float delta)
 	}
 }
 
-void	Physicengine::_add_pair(int const index)
+void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 {
-	if (index > _currentquery || !_bodies[index].dynamic)
+	if (bodyindex > _currentquery || !_bodies[bodyindex].dynamic)
 	{
 		//spinlock.lock();
 		if (_prcount >= _prsize)
@@ -201,7 +209,8 @@ void	Physicengine::_add_pair(int const index)
 			_pairs = resize(_pairs, _prcount, _prsize);
 		}
 		_pairs[_prcount].a = _currentquery;
-		_pairs[_prcount].b = index;
+		_pairs[_prcount].b = bodyindex;
+		_pairs[_prcount].aabb = aabbindex;
 		++_prcount;
 		//spinlock.unlock();
 	}

@@ -36,15 +36,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<>
 struct	vec<float, 4>
 {
-	template<class T, unsigned int U>
-	static vec	cast(vec<T, U> const &);
-
 	union
 	{
 		float	ar[4];
 		__m128	v;
 	};
-	
+
+
+	template<class V, unsigned int W>
+	operator vec<V, W>();
+	template<class V, unsigned int W>
+	operator vec<V, W>() const;
+
 	float		&operator[](unsigned int const x);
 	float const	&operator[](unsigned int const x) const;
 
@@ -61,13 +64,24 @@ struct	vec<float, 4>
 	vec	&operator/=(float const &x);
 };
 
-template<class T, unsigned int U>
-vec<float, 4>		vec<float, 4>::cast(vec<T, U> const &x)
-{
-	vec<float, 4>	a;
 
-	for (unsigned int i = 0; i < 4; ++i)
-		a.ar[i] = i < U ? (float)x.ar[i] : 0.0f;
+template<class V, unsigned int W>
+vec<float, 4>::operator vec<V, W>()
+{
+	vec<V, W>	a;
+
+	for (unsigned int i = 0; i < W; ++i)
+		a.ar[i] = (V)(i < 4 ? ar[i] : 0);
+	return (a);
+}
+
+template<class V, unsigned int W>
+vec<float, 4>::operator vec<V, W>() const
+{
+	vec<V, W>	a;
+
+	for (unsigned int i = 0; i < W; ++i)
+		a.ar[i] = (V)(i < 4 ? ar[i] : 0);
 	return (a);
 }
 
@@ -248,7 +262,10 @@ inline vec<float, 4>	operator/(float const &x, vec<float, 4> const &y)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/*
+
+#undef min
+#undef max
+
 inline vec<float, 4>	min(vec<float, 4> const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>	a;
@@ -272,5 +289,5 @@ inline vec<float, 4>	sqrt(vec<float, 4> const &x)
 	a.v = _mm_sqrt_ps(x.v);
 	return (a);
 }
-*/
+
 #endif

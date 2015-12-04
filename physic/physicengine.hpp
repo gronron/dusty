@@ -46,6 +46,7 @@ class	Physicengine
 		{
 			int	a;
 			int	b;
+			int aabb;
 		};
 
 
@@ -75,7 +76,7 @@ class	Physicengine
 
 		void	tick(float const);
 		
-		void	_add_pair(int const);
+		void	_add_pair(int const, int const);
 };
 
 #endif
