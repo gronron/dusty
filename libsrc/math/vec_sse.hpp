@@ -263,10 +263,7 @@ inline vec<float, 4>	operator/(float const &x, vec<float, 4> const &y)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#undef min
-#undef max
-
-inline vec<float, 4>	min(vec<float, 4> const &x, vec<float, 4> const &y)
+inline vec<float, 4>	vmin(vec<float, 4> const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>	a;
 	
@@ -274,7 +271,7 @@ inline vec<float, 4>	min(vec<float, 4> const &x, vec<float, 4> const &y)
 	return (a);
 }
 
-inline vec<float, 4>	max(vec<float, 4> const &x, vec<float, 4> const &y)
+inline vec<float, 4>	vmax(vec<float, 4> const &x, vec<float, 4> const &y)
 {
 	vec<float, 4>	a;
 	
@@ -282,7 +279,7 @@ inline vec<float, 4>	max(vec<float, 4> const &x, vec<float, 4> const &y)
 	return (a);
 }
 
-inline vec<float, 4>	sqrt(vec<float, 4> const &x)
+inline vec<float, 4>	vsqrt(vec<float, 4> const &x)
 {
 	vec<float, 4>	a;
 	

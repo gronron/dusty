@@ -37,16 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef min
 #undef max
 
-template<class T, unsigned int U>
-inline vec<T, U>	vcall(T (*f)(T), vec<T, U> const &x)
-{
-	vec<T, U>		a;
-
-	for (unsigned int i = 0; i < U; ++i)
-		a.ar[i] = f(x.ar[i]);
-	return (a);
-}
-
 template<class T>
 inline T const	&min(T const &x, T const &y)
 {
@@ -57,6 +47,16 @@ template<class T>
 inline T const	&max(T const &x, T const &y)
 {
 	return ((x < y) ? y : x);
+}
+
+template<class T, unsigned int U>
+inline vec<T, U>	vcall(T (*f)(T), vec<T, U> const &x)
+{
+	vec<T, U>		a;
+
+	for (unsigned int i = 0; i < U; ++i)
+		a.ar[i] = f(x.ar[i]);
+	return (a);
 }
 
 template<class T, unsigned int U, unsigned int V>
