@@ -71,9 +71,9 @@ void	Packet::operator()(unsigned int const size, char const *d)
 	memcpy(&_data[0], d, size);
 }
 
-unsigned int			Packet::get_size() const
+unsigned int	Packet::get_size() const
 {
-	return (_data.size());
+	return ((unsigned int)_data.size());
 }
 
 char const	*Packet::get_data() const
@@ -90,9 +90,9 @@ bool	Packet::read(unsigned int const size, char *d)
 	return (true);
 }
 
-bool	Packet::write(unsigned int const size, char const *d)
+bool				Packet::write(unsigned int const size, char const *d)
 {
-	int	a = _data.size();
+	size_t const	a = _data.size();
 	_data.resize(a + size);
 	memcpy(&_data[a], d, size);
 	return (true);

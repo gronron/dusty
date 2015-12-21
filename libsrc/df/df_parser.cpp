@@ -416,7 +416,7 @@ Df_node				*df_parse(std::istream &is)
 	else
 	{
 		node = new Df_node;
-		node->size = ps.ndlist->size();
+		node->size = (unsigned int)ps.ndlist->size();
 		node->type = Df_node::BLOCK;
 		node->name = "";
 		node->node = new Df_node*[node->size];

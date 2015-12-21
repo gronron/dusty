@@ -1,2 +1,2 @@
--specialise vec<4, float> for SSEx
+-remove stl from network and libsrc/stream
 -create contrainte solving algo for the physic engine

@@ -94,7 +94,7 @@ void		Server::_addclient()
 		delete clt.tcp;
 		return;
 	}
-	clt.udpid = INVALID_SOCKET;
+	clt.udpid = -1;
 	clt.ping = new Ping(8);
 	_slctr.add_socket(*clt.tcp);
 	mq->push_in_cnt(clt.id);

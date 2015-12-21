@@ -56,7 +56,7 @@ bool				Selector::check(float timeout)
 			max = *it;
 		FD_SET(*it, &_rfds);
 	}
-	if ((ret = select(max + 1, &_rfds, 0, 0, timeout < 0.0f ? 0 : &tv)) < 0)
+	if ((ret = select((int)max + 1, &_rfds, 0, 0, timeout < 0.0f ? 0 : &tv)) < 0)
 	{
 		perror("Error: select()");
 		return (false);
