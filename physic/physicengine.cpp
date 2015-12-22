@@ -186,10 +186,14 @@ void		Physicengine::tick(float delta)
 	{
 		if (_bodies[_pairs[i].b].index == -1)
 			_bodies[_pairs[i].b].prevposition = _statictree._nodes[_pairs[i].aabb].aabb.bottom;
-	
-		float const time = aabox_aabox(_bodies + _pairs[i].a, _bodies + _pairs[i].b);
-		std::cout << "::" << time << std::endl;
+		
+		float	time;
 
+		if (_bodies[_pairs[i].a].shape->type < _bodies[_pairs[i].b].shape->type)
+			time = COLLISION_DISPATCHER[_bodies[_pairs[i].a].shape->type][_bodies[_pairs[i].b].shape->type](_bodies + _pairs[i].a, _bodies + _pairs[i].b);
+		else
+			time = COLLISION_DISPATCHER[_bodies[_pairs[i].b].shape->type][_bodies[_pairs[i].a].shape->type](_bodies + _pairs[i].b, _bodies + _pairs[i].a);
+		
 		if (time >= 0.0f && time <= delta)
 		{
 			_bodies[_pairs[i].a].collider->collide(_bodies[_pairs[i].b].collider);

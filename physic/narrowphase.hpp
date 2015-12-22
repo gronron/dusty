@@ -37,4 +37,13 @@ float	sphere_sphere(Body const *, Body const *);
 float	sphere_aabox(Body const *, Body const *);
 float	aabox_aabox(Body const *, Body const *);
 
+
+float	(* const COLLISION_DISPATCHER[4][4])(Body const *, Body const *) =
+{
+	{ &sphere_sphere, 0, 0, 0 },
+	{ 0, 0, 0, 0 },
+	{ 0, 0, &aabox_aabox, 0 },
+	{ 0, 0, 0, 0 }
+};
+
 #endif
