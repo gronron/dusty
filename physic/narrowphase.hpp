@@ -33,12 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "body.hpp"
 
-float	sphere_sphere(Body const *, Body const *);
-float	sphere_aabox(Body const *, Body const *);
-float	aabox_aabox(Body const *, Body const *);
+float	sphere_sphere(Body const *, Body const *, float const, vec<float, 4> *);
+float	sphere_aabox(Body const *, Body const *, float const, vec<float, 4> *);
+float	aabox_aabox(Body const *, Body const *, float const, vec<float, 4> *);
 
 
-float	(* const COLLISION_DISPATCHER[4][4])(Body const *, Body const *) =
+float	(* const COLLISION_DISPATCHER[4][4])(Body const *, Body const *, float const, vec<float, 4> *) =
 {
 	{ &sphere_sphere, 0, 0, 0 },
 	{ 0, 0, 0, 0 },

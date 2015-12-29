@@ -34,10 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //sphere-sphere
 
-float					sphere_sphere(Body const *x, Body const *y)
+float					sphere_sphere(Body const *x, Body const *y, float const time, vec<float, 4> *normal)
 {
-	vec<float, 4> const	p = x->prevposition - y->prevposition;
-	vec<float, 4> const	v = x->prevvelocity - y->prevvelocity;
+	vec<float, 4> const	xp = x->position + x->volocity * (time - x->time);
+	vec<float, 4> const	yp = y->position + y->volocity * (time - y->time);
+	vec<float, 4> const	p = xp - yp;
+	vec<float, 4> const	v = x->velocity - y->velocity;
 
 	float const	r = ((Sphereshape const *)x->shape)->radius + ((Sphereshape const *)x->shape)->radius;
     float const pp = vsqrnorm(p) - r * r;
@@ -59,17 +61,19 @@ float					sphere_sphere(Body const *x, Body const *y)
 
 //sphere-abox
 
-float					sphere_aabox(Body const *x, Body const *y)
+float					sphere_aabox(Body const *x, Body const *y, float const time, vec<float, 4> *normal)
 {
 	return (-1.0f);
 }
 
 //abox-abox
 
-float					aabox_aabox(Body const *x, Body const *y)
+float					aabox_aabox(Body const *x, Body const *y, vec<float, 4> *normal)
 {
-	vec<float, 4> const	u = (y->prevposition - (x->prevposition + ((Axisalignedboxshape const *)x->shape)->size)) / (x->velocity - y->velocity);
-	vec<float, 4> const	v = (x->prevposition - (y->prevposition + ((Axisalignedboxshape const *)y->shape)->size)) / (y->velocity - x->velocity);
+	vec<float, 4> const	xp = x->position + x->volocity * (time - x->time);
+	vec<float, 4> const	yp = y->position + y->volocity * (time - y->time);
+	vec<float, 4> const	u = (yp - (xp + ((Axisalignedboxshape const *)x->shape)->size)) / (x->velocity - y->velocity);
+	vec<float, 4> const	v = (xp - (yp + ((Axisalignedboxshape const *)y->shape)->size)) / (y->velocity - x->velocity);
 	
 	float const	tu = max(max(u[0], u[1]), u[2]);
 	float const	tv = max(max(v[0], v[1]), v[2]);

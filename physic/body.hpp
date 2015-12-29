@@ -56,10 +56,10 @@ struct	Body
 	vec<float, 4>	velocity;
 	vec<float, 4>	acceleration;
 
-	vec<float, 4>	prevposition;
-	vec<float, 4>	prevvelocity;
-
 	float			mass;
+	float			elasticity;
+
+	float			time;
 
 
 	void	get_replication(Packet &) const;

@@ -42,11 +42,13 @@ class	Physicengine
 {
 	public:
 	
-		struct	Pair
+		struct				Pair
 		{
-			int	a;
-			int	b;
-			int aabb;
+			int				a;
+			int				b;
+			int				aabb;
+			float			time;
+			vec<float, 4>	normal;
 		};
 
 
@@ -61,7 +63,10 @@ class	Physicengine
 		unsigned int	_prsize;
 		Pair			*_pairs;
 		int				_currentquery;
-		Mutex			spinlock;
+		Mutex			_spinlock;
+		
+		float			_currenttime;
+		float			_delta;
 
 
 		Physicengine();
@@ -77,6 +82,8 @@ class	Physicengine
 		void	tick(float const);
 		
 		void	_add_pair(int const, int const);
+		void	_update_body(int const, int const);
+		void	_sort_pairs();
 };
 
 #endif
