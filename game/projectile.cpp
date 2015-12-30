@@ -57,7 +57,7 @@ bool	Projectile::collide(Collider *x)
 {
 	if (dynamic_cast<World const *>(x))
 	{
-		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", body->prevposition));
+		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", body->position));
 		destroy();
 		return (true);
 	}

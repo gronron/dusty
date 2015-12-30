@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float					sphere_sphere(Body const *x, Body const *y, float const time, vec<float, 4> *normal)
 {
-	vec<float, 4> const	xp = x->position + x->volocity * (time - x->time);
-	vec<float, 4> const	yp = y->position + y->volocity * (time - y->time);
+	vec<float, 4> const	xp = x->position + x->velocity * (time - x->time);
+	vec<float, 4> const	yp = y->position + y->velocity * (time - y->time);
 	vec<float, 4> const	p = xp - yp;
 	vec<float, 4> const	v = x->velocity - y->velocity;
 
@@ -68,10 +68,10 @@ float					sphere_aabox(Body const *x, Body const *y, float const time, vec<float
 
 //abox-abox
 
-float					aabox_aabox(Body const *x, Body const *y, vec<float, 4> *normal)
+float					aabox_aabox(Body const *x, Body const *y, float const time, vec<float, 4> *normal)
 {
-	vec<float, 4> const	xp = x->position + x->volocity * (time - x->time);
-	vec<float, 4> const	yp = y->position + y->volocity * (time - y->time);
+	vec<float, 4> const	xp = x->position + x->velocity * (time - x->time);
+	vec<float, 4> const	yp = y->position + y->velocity * (time - y->time);
 	vec<float, 4> const	u = (yp - (xp + ((Axisalignedboxshape const *)x->shape)->size)) / (x->velocity - y->velocity);
 	vec<float, 4> const	v = (xp - (yp + ((Axisalignedboxshape const *)y->shape)->size)) / (y->velocity - x->velocity);
 	
