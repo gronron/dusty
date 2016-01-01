@@ -91,6 +91,8 @@ void		Physicengine::new_body(Body **link, Shape *shape, Collider *collider)
 	
 	body->velocity = 0.0f;
 	body->acceleration = 0.0f;
+	body->mass = 0.0f;
+	body->elasticity = 0.0f;
 }
 
 void		Physicengine::init_body(Body *body)
@@ -101,7 +103,10 @@ void		Physicengine::init_body(Body *body)
 	if (body->dynamic)
 		body->index = _dynamictree.add_aabb(aabb, (unsigned int)(body - _bodies));
 	else
+	{
+		body->mass = INFINITY;
 		body->index = _statictree.add_saabb(aabb, (unsigned int)(body - _bodies));
+	}
 }
 /*
 void	Physicengine::move(Body *body, vec<float, 4> const &position)
@@ -182,18 +187,20 @@ void		Physicengine::tick(float const delta)
 			_statictree.query(_dynamictree._nodes[_bodies[i].index].aabb, this, &Physicengine::_add_pair);
 		}
 	}
-	_sort_pairs();
+	_sort_pairs(0);
 	
-	for (unsigned int i = 0; i < _prcount; ++i)
+	for (unsigned int i = 0; i < _prcount; ++i) // fix time
 	{
 		int const	a = _pairs[i].a;
 		int const	b = _pairs[i].b;
+
+		if (a == -1 || b == -1 && _bodies[a].mass == INFINITY && _bodies[b].mass == INFINITY)
+			continue;
+
+		unsigned int const	currentcount = _prcount;
 		_currenttime = _pairs[i].time;
 
-		if (a == -1 || b == -1)
-			continue;
-		
-		_bodies[a].position += _bodies[a].velocity * (_currenttime - _bodies[a].time);
+		_bodies[a].position += _bodies[a].velocity * (_currenttime - _bodies[a].time - FLT_EPSILON);
 		_bodies[a].time = _currenttime;
 		if (_bodies[b].dynamic)
 		{
@@ -206,7 +213,7 @@ void		Physicengine::tick(float const delta)
 			_update_body(a, i);
 		if (_bodies[a].mass != INFINITY)
 			_update_body(b, i);
-		_sort_pairs();
+		_sort_pairs(currentcount);
 
 		_bodies[a].collider->collide(_bodies[b].collider);
 		_bodies[b].collider->collide(_bodies[a].collider);
@@ -274,41 +281,42 @@ void	Physicengine::_update_body(int const index, int const start)
 	_statictree.query(_dynamictree._nodes[_bodies[index].index].aabb, this, &Physicengine::_add_pair);
 }
 
-void	Physicengine::_sort_pairs()
+void	Physicengine::_sort_pairs(unsigned int const start)
 {
-	for (unsigned int i = 0; i < _prcount; ++i)
+	for (unsigned int i = start; i < _prcount; ++i)
 	{
-	
+		Pair	a = _pairs[i];
+		unsigned int j;
+		for (j = i; i && _pairs[j - 1].time > a.time; --j)
+			_pairs[j] = _pairs[j - 1];
+		_pairs[j] = a;
 	}
 }
 
-void	Physicengine::_solve(Body *x, Body *y, vec<float, 4> const &normal)
+void		Physicengine::_solve(Body *x, Body *y, vec<float, 4> const &normal)
 {
-	if (x->mass != INFINITY || y->mass != INFINITY)
+	float	mx = x->mass;
+	float	my = y->mass;
+
+	if (mx == INFINITY)
 	{
-		float	mx = x->mass;
-		float	my = y->mass;
-	
-		if (mx == INFINITY)
-		{
-			mx = 1.0;
-			my = 0.0f;
-		}
-		else if (my == INFINITY)
-		{
-			mx = 1.0;
-			my = 0.0f;
-		}
-
-		vec<float, 4> const	vx = x->velocity * normal;
-		vec<float, 4> const	vy = y->velocity * -normal;
-		vec<float, 4> const	mv = mx * vx + my * vy;
-		float const	mm = mx + my;
-		float const ee = x->elasticity * y->elasticity;
-
-		if (x->mass != INFINITY)
-			x->velocity = (ee * my * (vy - vx) + mv) / mm;
-		if (y->mass != INFINITY)
-			y->velocity = (ee * mx * (vx - vy) + mv) / mm;
+		mx = 1.0;
+		my = 0.0f;
 	}
+	else if (my == INFINITY)
+	{
+		mx = 1.0;
+		my = 0.0f;
+	}
+
+	vec<float, 4> const	vx = x->velocity * normal;
+	vec<float, 4> const	vy = y->velocity * -normal;
+	vec<float, 4> const	mv = mx * vx + my * vy;
+	float const	mm = mx + my;
+	float const ee = x->elasticity * y->elasticity;
+
+	if (x->mass != INFINITY)
+		x->velocity += (ee * my * (vy - vx) + mv) / mm - vx;
+	if (y->mass != INFINITY)
+		y->velocity += (ee * mx * (vx - vy) + mv) / mm - vy;
 }
