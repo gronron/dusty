@@ -56,15 +56,17 @@ class	Physicengine
 		int				_bdfree;
 		Body			*_bodies;
 
-		Aabbtree		_dynamictree;
-		Aabbtree		_statictree;
-
 		unsigned int	_prcount;
 		unsigned int	_prsize;
 		Pair			*_pairs;
-		int				_currentquery;
+
+		Aabbtree		_dynamictree;
+		Aabbtree		_statictree;
+
 		Mutex			_spinlock;
-		
+
+		int				_currentquery;
+		int				_avoidquery;
 		float			_currenttime;
 		float			_delta;
 

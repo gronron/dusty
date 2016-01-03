@@ -93,6 +93,7 @@ void		Physicengine::new_body(Body **link, Shape *shape, Collider *collider)
 	body->acceleration = 0.0f;
 	body->mass = 0.0f;
 	body->elasticity = 0.0f;
+	body->time = 0.0f;
 }
 
 void		Physicengine::init_body(Body *body)
@@ -119,6 +120,9 @@ void		Physicengine::delete_body(Body *body)
 {
 	if (body->index != -1)
 	{
+		for (unsigned int i = 0; i < _prcount; ++i)
+			if (_pairs[i].a == body->index || _pairs[i].b == body->index)
+				_pairs[i].a = -1;
 		if (body->dynamic)
 			_dynamictree.remove_aabb(body->index);
 		else
@@ -177,6 +181,8 @@ void		Physicengine::tick(float const delta)
 	}
 
 	_prcount = 0;
+	_avoidquery = -1;
+	_currenttime = 0.0f;
 	//Lightthreadpool::get_instance().run_tasks<Caller_fa>(_bsize, _bodies, _query, this);
 	for (unsigned int i = 0; i < _bdsize; ++i)
 	{
@@ -187,36 +193,43 @@ void		Physicengine::tick(float const delta)
 			_statictree.query(_dynamictree._nodes[_bodies[i].index].aabb, this, &Physicengine::_add_pair);
 		}
 	}
-	_sort_pairs(0);
+	//_sort_pairs(0);
 	
-	for (unsigned int i = 0; i < _prcount; ++i) // fix time
+	for (unsigned int i = 0; i < _prcount; ++i) // fix _currenttime
 	{
 		int const	a = _pairs[i].a;
 		int const	b = _pairs[i].b;
 
-		if (a == -1 || b == -1 && _bodies[a].mass == INFINITY && _bodies[b].mass == INFINITY)
+		if (a == -1 || (_bodies[a].mass == INFINITY && _bodies[b].mass == INFINITY))
 			continue;
 
 		unsigned int const	currentcount = _prcount;
-		_currenttime = _pairs[i].time;
+		_currenttime = _pairs[i].time - FLT_EPSILON;
 
-		_bodies[a].position += _bodies[a].velocity * (_currenttime - _bodies[a].time - FLT_EPSILON);
-		_bodies[a].time = _currenttime;
-		if (_bodies[b].dynamic)
-		{
-			_bodies[b].position += _bodies[b].velocity * (_currenttime - _bodies[b].time - FLT_EPSILON);
-			_bodies[b].time = _currenttime;
-		}
+		if (_bodies[a].mass != INFINITY)
+			_bodies[a].position += _bodies[a].velocity * (_currenttime - _bodies[a].time);
+		if (_bodies[b].mass != INFINITY)
+			_bodies[b].position += _bodies[b].velocity * (_currenttime - _bodies[b].time);
+
+		bool const	areaction = _bodies[a].collider->collide(_bodies[b].collider);
+		bool const	breaction = _bodies[b].collider->collide(_bodies[a].collider);
+		
 		_solve(_bodies + a, _bodies + b, _pairs[i].normal);
 
-		if (_bodies[a].mass != INFINITY)
+		if (areaction && _bodies[a].mass != INFINITY)
+		{
+			_bodies[a].time = _currenttime;
+			_avoidquery = b;
 			_update_body(a, i);
-		if (_bodies[a].mass != INFINITY)
+		}
+		if (breaction && _bodies[b].mass != INFINITY)
+		{
+			_bodies[b].time = _currenttime;
+			_avoidquery = a;
 			_update_body(b, i);
-		_sort_pairs(currentcount);
+		}
 
-		_bodies[a].collider->collide(_bodies[b].collider);
-		_bodies[b].collider->collide(_bodies[a].collider);
+		//_sort_pairs(currentcount);
 	}
 	
 	for (unsigned int i = 0; i < _bdsize; ++i)
@@ -224,12 +237,13 @@ void		Physicengine::tick(float const delta)
 			_bodies[i].position += _bodies[i].velocity * (delta - _bodies[i].time);
 }
 
+#define OUT_VEC(x) x[0] << x[1] << x[2]
+
 void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 {
-	if (bodyindex > _currentquery || !_bodies[bodyindex].dynamic)
+	if ((bodyindex > _currentquery || !_bodies[bodyindex].dynamic) && bodyindex != _avoidquery
+		&& (_bodies[_currentquery].collider->should_collide(_bodies[bodyindex].collider) || _bodies[bodyindex].collider->should_collide(_bodies[_currentquery].collider)))
 	{
-		//check shloud_collide
-	
 		if (_bodies[bodyindex].index == -1)
 			_bodies[bodyindex].position = _statictree._nodes[aabbindex].aabb.bottom;
 
@@ -241,6 +255,11 @@ void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 		else
 			time = COLLISION_DISPATCHER[_bodies[bodyindex].shape->type][_bodies[_currentquery].shape->type](_bodies + bodyindex, _bodies + _currentquery, _currenttime, &normal) + _currenttime;
 		
+		if (time == NAN)
+		{
+			std::cout << OUT_VEC(_bodies[_currentquery].velocity) << std::endl;
+			std::cout << _currenttime << "  " << time << std::endl;
+		}
 		if (time >= _currenttime && time <= _delta)
 		{
 			//spinlock.lock();
@@ -265,10 +284,7 @@ void	Physicengine::_update_body(int const index, int const start)
 	for (unsigned int i = start; i < _prcount; ++i)
 	{
 		if (_pairs[i].a == index || _pairs[i].b == index)
-		{
 			_pairs[i].a = -1;
-			_pairs[i].b = -1;
-		}
 	}
 
 	Aabb	aabb;
@@ -287,7 +303,7 @@ void	Physicengine::_sort_pairs(unsigned int const start)
 	{
 		Pair	a = _pairs[i];
 		unsigned int j;
-		for (j = i; i && _pairs[j - 1].time > a.time; --j)
+		for (j = i; j && _pairs[j - 1].time > a.time; --j)
 			_pairs[j] = _pairs[j - 1];
 		_pairs[j] = a;
 	}

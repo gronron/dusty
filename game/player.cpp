@@ -147,7 +147,7 @@ bool	Player::fire()
 			p->ownerid = id;
 			p->damage = damage;
 			p->body->position = body->position;
-			p->body->velocity = dir * 32.0f;
+			p->body->velocity = dir * 320.0f;
 		}
 		return (true);
 	}

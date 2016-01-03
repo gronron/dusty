@@ -59,7 +59,7 @@ class	Projectile : public Actor
 		void	replicate(Packet &, float const);
 
 		//void	tick(float const);
-
+		bool	should_collide(Collider const *) const;
 		bool	collide(Collider *);
 
 		bool	selfdestroy();

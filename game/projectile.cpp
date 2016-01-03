@@ -6,7 +6,7 @@ FACTORYREG(Projectile);
 
 Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), body(0)
 {
-	shape.size = 0.1f;
+	shape.size = 0.01f;
 	engine->physic->new_body(&body, &shape, this);
 	
 	body->dynamic = true;
@@ -51,6 +51,15 @@ void	Projectile::replicate(Packet &pckt, float const p)
 	Actor::replicate(pckt, p);
 	pckt.read(damage);
 	body->replicate(pckt, p);
+}
+
+bool	Projectile::should_collide(Collider const *x) const
+{
+	if (dynamic_cast<World const *>(x))
+	{
+		return (true);
+	}
+	return (false);
 }
 
 bool	Projectile::collide(Collider *x)

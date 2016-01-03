@@ -68,6 +68,8 @@ class	Actor : public Collider
         virtual void	replicate(Packet &, float const);
 
 		virtual void	tick(float const);
+		
+		virtual bool	should_collide(Collider const *) const;
 		virtual bool	collide(Collider *);
 };
 

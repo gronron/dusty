@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class	Collider
 {
 	public:
-	
+
+		virtual bool	should_collide(Collider const *) const = 0;
 		virtual bool	collide(Collider *) = 0;
 		/*virtual bool	touch() = 0;
 		virtual bool	untouch() = 0;*/

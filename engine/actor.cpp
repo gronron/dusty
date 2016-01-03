@@ -78,9 +78,14 @@ void	Actor::replicate(Packet &pckt, float const p)
 	pckt.read(ownerid);
 }
 
-void	Actor::tick(float const delta)
+void	Actor::tick(float const)
 {
 	ping = 0.0f;
+}
+
+bool	Actor::should_collide(Collider const *) const
+{
+	return (false);
 }
 
 bool	Actor::collide(Collider *)

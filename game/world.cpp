@@ -69,6 +69,9 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 
 	shape.size = 1.0f;
 	engine->physic->new_body(&body, &shape, this);
+	body->dynamic = false;
+	body->mass = INFINITY;
+	
 
 	vec<int, 4>	start;
 	vec<int, 4>	end;
@@ -93,7 +96,7 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Acto
 		
 		vec<float, 3> v;
 		v = 16.0f;
-		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", v));
+		//engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", v));
 	}
 }
 
