@@ -136,7 +136,7 @@ bool					Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> co
 			a.top[i] += b[i];
 	}
 	
-	if (_nodes[index].aabb.is_containing(aabb))
+	if (_nodes[index].aabb.is_containing(a))
 		return (false);
 
 	a.bottom -= GAP;

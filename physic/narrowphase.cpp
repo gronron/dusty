@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //sphere-sphere
 
-float					sphere_sphere(Body const *x, Body const *y, float const time, vec<float, 4> *normal)
+float					sphere_sphere(Body const *x, Body const *y, float const time, vec<float, 4> &normal)
 {
 	vec<float, 4> const	xp = x->position + x->velocity * (time - x->time);
 	vec<float, 4> const	yp = y->position + y->velocity * (time - y->time);
@@ -56,20 +56,20 @@ float					sphere_sphere(Body const *x, Body const *y, float const time, vec<floa
 	if ((pv + vv) <= 0.0f && (vv + 2.0f * pv + pp) >= 0.0f) //beware
 		return (-1.0f);
 
-	*normal = 1.0f;
+	normal = 1.0f;
 	return (pp + -pv * (pv / vv));
 }
 
 //sphere-abox
 
-float					sphere_aabox(Body const *x, Body const *y, float const time, vec<float, 4> *normal)
+float					sphere_aabox(Body const *x, Body const *y, float const time, vec<float, 4> &normal)
 {
 	return (-1.0f);
 }
 
 //abox-abox
 
-float					aabox_aabox(Body const *x, Body const *y, float const time, vec<float, 4> *normal)
+float					aabox_aabox(Body const *x, Body const *y, float const time, vec<float, 4> &normal)
 {
 	vec<float, 4> const	xp = x->position + x->velocity * (time - x->time);
 	vec<float, 4> const	yp = y->position + y->velocity * (time - y->time);
@@ -79,7 +79,7 @@ float					aabox_aabox(Body const *x, Body const *y, float const time, vec<float,
 	float const	tu = max(max(u[0], u[1]), u[2]);
 	float const	tv = max(max(v[0], v[1]), v[2]);
 
-	*normal = 1.0f;
+	normal = 1.0f;
 	return (min(tu, tv));
 }
 

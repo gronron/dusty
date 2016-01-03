@@ -163,6 +163,8 @@ void	_query(Body const *body, Physicengine *pe)
 	}
 }
 */
+#define OUT_VEC(x) x[0] << " " << x[1] << " " << x[2]
+
 void		Physicengine::tick(float const delta)
 {
 	_delta = delta;
@@ -193,7 +195,7 @@ void		Physicengine::tick(float const delta)
 			_statictree.query(_dynamictree._nodes[_bodies[i].index].aabb, this, &Physicengine::_add_pair);
 		}
 	}
-	//_sort_pairs(0);
+	_sort_pairs(0);
 	
 	for (unsigned int i = 0; i < _prcount; ++i) // fix _currenttime
 	{
@@ -229,15 +231,13 @@ void		Physicengine::tick(float const delta)
 			_update_body(b, i);
 		}
 
-		//_sort_pairs(currentcount);
+		_sort_pairs(currentcount);
 	}
 	
 	for (unsigned int i = 0; i < _bdsize; ++i)
 		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 			_bodies[i].position += _bodies[i].velocity * (delta - _bodies[i].time);
 }
-
-#define OUT_VEC(x) x[0] << x[1] << x[2]
 
 void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 {
@@ -251,15 +251,10 @@ void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 		vec<float, 4>	normal;
 
 		if (_bodies[_currentquery].shape->type < _bodies[bodyindex].shape->type)
-			time = COLLISION_DISPATCHER[_bodies[_currentquery].shape->type][_bodies[bodyindex].shape->type](_bodies + _currentquery, _bodies + bodyindex, _currenttime, &normal) + _currenttime;
+			time = COLLISION_DISPATCHER[_bodies[_currentquery].shape->type][_bodies[bodyindex].shape->type](_bodies + _currentquery, _bodies + bodyindex, _currenttime, normal) + _currenttime;
 		else
-			time = COLLISION_DISPATCHER[_bodies[bodyindex].shape->type][_bodies[_currentquery].shape->type](_bodies + bodyindex, _bodies + _currentquery, _currenttime, &normal) + _currenttime;
-		
-		if (time == NAN)
-		{
-			std::cout << OUT_VEC(_bodies[_currentquery].velocity) << std::endl;
-			std::cout << _currenttime << "  " << time << std::endl;
-		}
+			time = COLLISION_DISPATCHER[_bodies[bodyindex].shape->type][_bodies[_currentquery].shape->type](_bodies + bodyindex, _bodies + _currentquery, _currenttime, normal) + _currenttime;
+
 		if (time >= _currenttime && time <= _delta)
 		{
 			//spinlock.lock();
