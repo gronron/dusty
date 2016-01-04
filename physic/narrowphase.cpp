@@ -73,13 +73,49 @@ float					aabox_aabox(Body const *x, Body const *y, float const time, vec<float,
 {
 	vec<float, 4> const	xp = x->position + x->velocity * (time - x->time);
 	vec<float, 4> const	yp = y->position + y->velocity * (time - y->time);
-	vec<float, 4> const	ivv = 1.0f / (x->velocity - y->velocity);
-	vec<float, 4> const	u = (yp - (xp + ((Axisalignedboxshape const *)x->shape)->size)) * ivv;
-	vec<float, 4> const	v = (xp - (yp + ((Axisalignedboxshape const *)y->shape)->size)) * -ivv;
-	vec<float, 4> const	t = vmin(u, v);
 
-	normal = 1.0f;
-	return (max(max(t[0], t[1]), t[2]));
+	vec<float, 4> const	speed = 1.0f / (y->velocity - x->velocity);
+	vec<float, 4> const	center = (xp - yp);
+	vec<float, 4> const	left_u = (center - ((Axisalignedboxshape const *)y->shape)->size);
+	vec<float, 4> const	left_v = (center + ((Axisalignedboxshape const *)x->shape)->size);
+	vec<float, 4> const	u = left_u * speed;
+	vec<float, 4> const	v = left_v * speed;
+
+	float t_min = -INFINITY;
+	float t_max = +INFINITY;
+	
+	int	n = 0;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (speed[i] > 0.0f)
+		{
+			if (t_min < u[i])
+				n = i;
+			t_min = max(t_min, u[i]);
+			t_max = min(t_max, v[i]);
+		}
+		else if (speed[i] < 0.0f)
+		{
+			if (t_min < v[i])
+				n = i;
+			t_min = max(t_min, v[i]);
+			t_max = min(t_max, u[i]);
+		}
+		else
+		{
+			if (left_u[i] > 0.0f || left_v[i] < 0.0f)
+			{
+				t_min = +INFINITY;
+				t_max = -INFINITY;
+				break;
+			}
+		}
+	}
+	
+	normal = 0.0f;
+	normal[n] = 1.0f;
+	return (t_min <= t_max ? t_min : -1.0f);
 }
 
 //cylinder-cylinder

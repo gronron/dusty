@@ -92,7 +92,7 @@ void		Physicengine::new_body(Body **link, Shape *shape, Collider *collider)
 	body->velocity = 0.0f;
 	body->acceleration = 0.0f;
 	body->mass = 0.0f;
-	body->elasticity = 0.0f;
+	body->elasticity = 1.0f;
 	body->time = 0.0f;
 }
 
@@ -200,8 +200,6 @@ void		Physicengine::tick(float const delta)
 	{
 		int const	a = _pairs[i].a;
 		int const	b = _pairs[i].b;
-		
-		std::cout << _pairs[i].time << std::endl;
 
 		if (a == -1 || (_bodies[a].mass == INFINITY && _bodies[b].mass == INFINITY))
 			continue;
@@ -222,7 +220,7 @@ void		Physicengine::tick(float const delta)
 		if (areaction && _bodies[a].mass != INFINITY)
 		{
 			_bodies[a].time = _currenttime;
-			_avoidquery = b;
+			_avoidquery = _bodies[b].index != -1 ? b : -1;
 			_update_body(a, i);
 		}
 		if (breaction && _bodies[b].mass != INFINITY)
@@ -251,7 +249,7 @@ void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 		float			time;
 		vec<float, 4>	normal;
 
-		if (_bodies[_currentquery].shape->type < _bodies[bodyindex].shape->type)
+		if (_bodies[_currentquery].shape->type <= _bodies[bodyindex].shape->type)
 			time = COLLISION_DISPATCHER[_bodies[_currentquery].shape->type][_bodies[bodyindex].shape->type](_bodies + _currentquery, _bodies + bodyindex, _currenttime, normal) + _currenttime;
 		else
 			time = COLLISION_DISPATCHER[_bodies[bodyindex].shape->type][_bodies[_currentquery].shape->type](_bodies + bodyindex, _bodies + _currentquery, _currenttime, normal) + _currenttime;
