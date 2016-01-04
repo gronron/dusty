@@ -163,7 +163,6 @@ void	_query(Body const *body, Physicengine *pe)
 	}
 }
 */
-#define OUT_VEC(x) x[0] << " " << x[1] << " " << x[2]
 
 void		Physicengine::tick(float const delta)
 {
@@ -195,12 +194,14 @@ void		Physicengine::tick(float const delta)
 			_statictree.query(_dynamictree._nodes[_bodies[i].index].aabb, this, &Physicengine::_add_pair);
 		}
 	}
-	_sort_pairs(0);
+	_sort_pairs(1);
 	
 	for (unsigned int i = 0; i < _prcount; ++i) // fix _currenttime
 	{
 		int const	a = _pairs[i].a;
 		int const	b = _pairs[i].b;
+		
+		std::cout << _pairs[i].time << std::endl;
 
 		if (a == -1 || (_bodies[a].mass == INFINITY && _bodies[b].mass == INFINITY))
 			continue;
@@ -274,6 +275,18 @@ void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 	}
 }
 
+void	Physicengine::_sort_pairs(unsigned int const start)
+{
+	for (unsigned int i = start; i < _prcount; ++i)
+	{
+		Pair	a = _pairs[i];
+		unsigned int j;
+		for (j = i; j && _pairs[j - 1].time > a.time; --j)
+			_pairs[j] = _pairs[j - 1];
+		_pairs[j] = a;
+	}
+}
+
 void	Physicengine::_update_body(int const index, int const start)
 {
 	for (unsigned int i = start; i < _prcount; ++i)
@@ -292,18 +305,6 @@ void	Physicengine::_update_body(int const index, int const start)
 	_statictree.query(_dynamictree._nodes[_bodies[index].index].aabb, this, &Physicengine::_add_pair);
 }
 
-void	Physicengine::_sort_pairs(unsigned int const start)
-{
-	for (unsigned int i = start; i < _prcount; ++i)
-	{
-		Pair	a = _pairs[i];
-		unsigned int j;
-		for (j = i; j && _pairs[j - 1].time > a.time; --j)
-			_pairs[j] = _pairs[j - 1];
-		_pairs[j] = a;
-	}
-}
-
 void		Physicengine::_solve(Body *x, Body *y, vec<float, 4> const &normal)
 {
 	float	mx = x->mass;
@@ -316,8 +317,8 @@ void		Physicengine::_solve(Body *x, Body *y, vec<float, 4> const &normal)
 	}
 	else if (my == INFINITY)
 	{
-		mx = 1.0;
-		my = 0.0f;
+		mx = 0.0;
+		my = 1.0f;
 	}
 
 	vec<float, 4> const	vx = x->velocity * normal;

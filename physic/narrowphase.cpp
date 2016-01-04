@@ -73,14 +73,13 @@ float					aabox_aabox(Body const *x, Body const *y, float const time, vec<float,
 {
 	vec<float, 4> const	xp = x->position + x->velocity * (time - x->time);
 	vec<float, 4> const	yp = y->position + y->velocity * (time - y->time);
-	vec<float, 4> const	u = (yp - (xp + ((Axisalignedboxshape const *)x->shape)->size)) / (x->velocity - y->velocity);
-	vec<float, 4> const	v = (xp - (yp + ((Axisalignedboxshape const *)y->shape)->size)) / (y->velocity - x->velocity);
-	
-	float const	tu = max(max(u[0], u[1]), u[2]);
-	float const	tv = max(max(v[0], v[1]), v[2]);
+	vec<float, 4> const	ivv = 1.0f / (x->velocity - y->velocity);
+	vec<float, 4> const	u = (yp - (xp + ((Axisalignedboxshape const *)x->shape)->size)) * ivv;
+	vec<float, 4> const	v = (xp - (yp + ((Axisalignedboxshape const *)y->shape)->size)) * -ivv;
+	vec<float, 4> const	t = vmin(u, v);
 
 	normal = 1.0f;
-	return (min(tu, tv));
+	return (max(max(t[0], t[1]), t[2]));
 }
 
 //cylinder-cylinder

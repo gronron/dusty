@@ -84,9 +84,9 @@ class	Physicengine
 		void	tick(float const);
 		
 		void	_add_pair(int const, int const);
-		void	_update_body(int const, int const);
 		void	_sort_pairs();
 		void	_sort_pairs(unsigned int const);
+		void	_update_body(int const, int const);
 		void	_solve(Body *, Body *, vec<float, 4> const &);
 };
 
