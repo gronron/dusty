@@ -320,7 +320,7 @@ void		Physicengine::_solve(Body *x, Body *y, vec<float, 4> const &normal)
 	}
 
 	vec<float, 4> const	vx = x->velocity * normal;
-	vec<float, 4> const	vy = y->velocity * -normal;
+	vec<float, 4> const	vy = y->velocity * normal;
 	vec<float, 4> const	mv = mx * vx + my * vy;
 	float const	mm = mx + my;
 	float const ee = x->elasticity * y->elasticity;

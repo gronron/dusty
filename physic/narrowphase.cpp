@@ -74,48 +74,41 @@ float					aabox_aabox(Body const *x, Body const *y, float const time, vec<float,
 	vec<float, 4> const	xp = x->position + x->velocity * (time - x->time);
 	vec<float, 4> const	yp = y->position + y->velocity * (time - y->time);
 
-	vec<float, 4> const	speed = 1.0f / (y->velocity - x->velocity);
-	vec<float, 4> const	center = (xp - yp);
-	vec<float, 4> const	left_u = (center - ((Axisalignedboxshape const *)y->shape)->size);
-	vec<float, 4> const	left_v = (center + ((Axisalignedboxshape const *)x->shape)->size);
-	vec<float, 4> const	u = left_u * speed;
-	vec<float, 4> const	v = left_v * speed;
+	vec<float, 4> const	ivelocity = 1.0f / (y->velocity - x->velocity);
+	vec<float, 4> const	p = xp - yp;
+	vec<float, 4> const	du = p - ((Axisalignedboxshape const *)y->shape)->size;
+	vec<float, 4> const	dv = p + ((Axisalignedboxshape const *)x->shape)->size;
+	vec<float, 4> const	u = du * ivelocity;
+	vec<float, 4> const	v = dv * ivelocity;
 
-	float t_min = -INFINITY;
-	float t_max = +INFINITY;
-	
+	float tnear = -INFINITY;
+	float tfar = +INFINITY;
+
 	int	n = 0;
 
 	for (int i = 0; i < 3; ++i)
 	{
-		if (speed[i] > 0.0f)
+		if (ivelocity[i] > 0.0f)
 		{
-			if (t_min < u[i])
+			if (tnear < u[i])
 				n = i;
-			t_min = max(t_min, u[i]);
-			t_max = min(t_max, v[i]);
+			tnear = max(tnear, u[i]);
+			tfar = min(tfar, v[i]);
 		}
-		else if (speed[i] < 0.0f)
+		else if (ivelocity[i] < 0.0f)
 		{
-			if (t_min < v[i])
+			if (tnear < v[i])
 				n = i;
-			t_min = max(t_min, v[i]);
-			t_max = min(t_max, u[i]);
+			tnear = max(tnear, v[i]);
+			tfar = min(tfar, u[i]);
 		}
-		else
-		{
-			if (left_u[i] > 0.0f || left_v[i] < 0.0f)
-			{
-				t_min = +INFINITY;
-				t_max = -INFINITY;
-				break;
-			}
-		}
+		else if (du[i] > 0.0f || dv[i] < 0.0f)
+			return (-1.0f);
 	}
-	
+
 	normal = 0.0f;
 	normal[n] = 1.0f;
-	return (t_min <= t_max ? t_min : -1.0f);
+	return (tnear <= tfar ? tnear : -1.0f);
 }
 
 //cylinder-cylinder
