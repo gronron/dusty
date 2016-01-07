@@ -10,6 +10,7 @@ Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int con
 	engine->physic->new_body(&body, &shape, this);
 	
 	body->dynamic = true;
+	body->elasticity = 0.9f;
 	damage = 1.0f;
 }
 
@@ -67,7 +68,7 @@ bool	Projectile::collide(Collider *x)
 	if (dynamic_cast<World const *>(x))
 	{
 		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", body->position));
-		destroy();
+		//destroy();
 		return (true);
 	}
 	return (false);

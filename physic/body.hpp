@@ -46,20 +46,18 @@ struct	Body
 		int			next;
 	};
 
-	int				index;
 	Shape			*shape;
 	Collider		*collider;
-
+	int				index;
 	bool			dynamic;
 
 	vec<float, 4>	position;
 	vec<float, 4>	velocity;
 	vec<float, 4>	acceleration;
 
+	float			time;
 	float			mass;
 	float			elasticity;
-
-	float			time;
 
 
 	void	get_replication(Packet &) const;
