@@ -45,9 +45,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\engine\actor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\engine\configmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -174,11 +171,11 @@
     <ClCompile Include="..\..\..\physic\narrowphase.cpp">
       <Filter>Source Files\physic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\engine\entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\engine\actor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -322,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\game\projectile.hpp">
       <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\entity.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

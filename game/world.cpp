@@ -62,7 +62,7 @@ struct		Result
 	}
 };
 
-World::World(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o)
+World::World(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o)
 {
 	size = 2;
 	chunks = new_space<Chunk>(2, 2, 2);

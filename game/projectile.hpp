@@ -31,11 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PROJECTILE_H_
 #define PROJECTILE_H_
 
-#include "actor.hpp"
+#include "entity.hpp"
 #include "shape.hpp"
 #include "particlesystem.hpp"
 
-class	Projectile : public Actor
+class	Projectile : public Entity
 {
 	public:
 
@@ -47,13 +47,13 @@ class	Projectile : public Actor
 		Particlesystem	*ps;
 
 
-		Projectile(Gameengine *, Replication *, int const, short int const, Actor const *);
+		Projectile(Gameengine *, Replication *, int const, short int const, Entity const *);
 		virtual ~Projectile();
 
 		void	postinstanciation();
 		void	destroy();
 
-		//void	notified_by_owner(Actor *, bool const);
+		//void	notified_by_owner(Entity *, bool const);
 
 		void	get_replication(Packet &) const;
 		void	replicate(Packet &, float const);

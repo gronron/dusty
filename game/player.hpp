@@ -31,14 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
-#include "actor.hpp"
+#include "entity.hpp"
 #include "shape.hpp"
 //#include "particlesystem.hpp"
 //#include "hud.hpp"
 
 struct	Body;
 
-class	Player : public Actor
+class	Player : public Entity
 {
 	public:
 
@@ -58,13 +58,13 @@ class	Player : public Actor
 		//Hud				*hud;
 
 
-		Player(Gameengine *, Replication *, int const, short int const, Actor const *);
+		Player(Gameengine *, Replication *, int const, short int const, Entity const *);
 		virtual ~Player();
 
 		void	postinstanciation();
 		void	destroy();
 
-		void	notified_by_owner(Actor *, bool const);
+		void	notified_by_owner(Entity *, bool const);
 
 		void	get_replication(Packet &) const;
 		void	replicate(Packet &, float const);

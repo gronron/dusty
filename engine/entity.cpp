@@ -28,49 +28,67 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef ACTOR_H_
-#define ACTOR_H_
-
 #include "endian/packet.hpp"
-#include "collider.hpp"
+#include "replication.hpp"
+#include "callbackmanager.hpp"
+#include "gameengine.hpp"
+#include "entity.hpp"
 
-class	Gameengine;
-class	Replication;
-
-class	Actor : public Collider
+Entity::Entity(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : engine(g), rp(r), callbacks(-1), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), state(CREATED), ping(0.0f)
 {
-	public:
-	
-		enum	State { CREATED, OK, DESTROYED };
 
+}
 
-		Gameengine		*engine;
-		Replication		*rp;
-		int				callbacks;
+Entity::~Entity()
+{
 
-		short int	type;
-		int			id;
-		int			ownerid;
-		char		state;
-		float		ping;
+}
 
+void	Entity::postinstanciation()
+{
+	state = OK;
+}
 
-		Actor(Gameengine *, Replication *, int const, short int const, Actor const *);
-		virtual ~Actor();
+void	Entity::destroy()
+{
+    state = DESTROYED;
+	if (rp)
+		rp->destroy();
+	engine->callback->stop_allcallbacks(this);
+}
 
-		virtual void	postinstanciation();
-		virtual void	destroy();
+void	Entity::notified_by_owner(Entity *, bool const)
+{
 
-		virtual void	notified_by_owner(Actor *, bool const);
-		virtual void	notified_by_owned(Actor *, bool const);
+}
 
-		virtual void	get_replication(Packet &) const;
-        virtual void	replicate(Packet &, float const);
+void	Entity::notified_by_owned(Entity *, bool const)
+{
 
-		virtual void	tick(float const);
-		
-		virtual bool	should_collide(Collider const *) const;
-		virtual bool	collide(Collider *);
-};
+}
 
-#endif
+void	Entity::get_replication(Packet &pckt) const
+{
+	pckt.write(ownerid);
+}
+
+void	Entity::replicate(Packet &pckt, float const p)
+{
+	ping = p;
+	pckt.read(ownerid);
+}
+
+void	Entity::tick(float const)
+{
+	ping = 0.0f;
+}
+
+bool	Entity::should_collide(Collider const *) const
+{
+	return (false);
+}
+
+bool	Entity::collide(Collider *)
+{
+	return (false);
+}

@@ -72,7 +72,7 @@ short int									Factory::get_type(std::string const &name) const
 	}
 }
 
-Actor										*Factory::create(Gameengine *g, Replication *r) const
+Entity										*Factory::create(Gameengine *g, Replication *r) const
 {
 	std::map<std::string, Class>::const_iterator	i;
 
@@ -86,7 +86,7 @@ Actor										*Factory::create(Gameengine *g, Replication *r) const
 	return (0);
 }
 
-Actor												*Factory::create(Gameengine *g, Replication *r, int const id, std::string const &name, Actor const *owner) const
+Entity												*Factory::create(Gameengine *g, Replication *r, int const id, std::string const &name, Entity const *owner) const
 {
 	std::map<std::string, Class>::const_iterator	i;
 

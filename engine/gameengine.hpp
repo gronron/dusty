@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 
-class	Actor;
+class	Entity;
 class	Replication;
 class	Controller;
 class	Console;
@@ -63,8 +63,8 @@ class	Gameengine
 
 		bool			master;
 		
-		unsigned int	_actsize;
-		Actor			**_actors;
+		unsigned int	_entsize;
+		Entity			**_entities;
 
 		Callbackmanager	*callback;
 		Physicengine	*physic;
@@ -84,11 +84,11 @@ class	Gameengine
 		Gameengine(Option const &);
 		~Gameengine();
 
-		Actor	*create(std::string const &, Actor const *, bool const need_replication);
-		Actor	*create(Replication *);
-		Actor	*find_actor(int const);
-		void	notify_owner(Actor *, bool const);
-		void	notify_owned(Actor *, bool const);
+		Entity	*create(std::string const &, Entity const *, bool const need_replication);
+		Entity	*create(Replication *);
+		Entity	*find_entity(int const);
+		void	notify_owner(Entity *, bool const);
+		void	notify_owned(Entity *, bool const);
 		void	destroy(int const);
 		void	control(int const);
 

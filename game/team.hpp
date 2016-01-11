@@ -39,7 +39,16 @@ class	Team : public Actor
 	
 		int	structureid[64];
 		int	playerid[64];
+		
+		unsigned short	structcount;
+		unsigned short	playercount;
 
+		unsigned short	maxbuildpoint;
+		unsigned short	buildpoint;
+		unsigned short	score;
+
+		unsigned char	level;
+		unsigned char	teamid;
 };
 
 #endif

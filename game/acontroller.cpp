@@ -7,7 +7,7 @@
 
 FACTORYREG(AController);
 
-AController::AController(Gameengine *g, Replication *r, int i, short int t, Actor const *o) : Controller(g, r, i, t, o)
+AController::AController(Gameengine *g, Replication *r, int i, short int t, Entity const *o) : Controller(g, r, i, t, o)
 {
 	controllertype = SPECTATOR;
 	controlled = 0;
@@ -33,11 +33,11 @@ void	AController::postinstanciation()
 		engine->notify_owned(this, true);
 }
 
-void	AController::notified_by_owned(Actor *a, bool l)
+void	AController::notified_by_owned(Entity *e, bool l)
 {
 	if (l)
 	{
-		controlled = (Player *)a;
+		controlled = (Player *)e;
 		if (engine->graphic && engine->_controllermap.find(id) != engine->_controllermap.end())
 		{
 			//am->ge->add(controlled->hud);
@@ -260,7 +260,7 @@ void	AController::load(int const size, float const *data)
 {
 	if (size == 1 && *data > 0.0f)
 	{
-		((World*)engine->find_actor(0))->load("dusty_world.dstw");
+		((World*)engine->find_entity(0))->load("dusty_world.dstw");
 	}
 }
 
@@ -268,7 +268,7 @@ void	AController::save(int const size, float const *data)
 {
 	if (size == 1 && *data > 0.0f)
 	{
-		((World*)engine->find_actor(0))->save("dusty_world.dstw");
+		((World*)engine->find_entity(0))->save("dusty_world.dstw");
 	}
 }
 
@@ -286,7 +286,7 @@ void	AController::create_block(int const size, float const *data)
 			ray.direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
 			ray.direction[3] = 0.0f;
 
-			((World*)engine->find_actor(0))->create_block(ray, material);
+			((World*)engine->find_entity(0))->create_block(ray, material);
 		}
 	}
 }
@@ -305,7 +305,7 @@ void	AController::destroy_block(int const size, float const *data)
 			ray.direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
 			ray.direction[3] = 0.0f;
 		
-			((World*)engine->find_actor(0))->destroy_block(ray);
+			((World*)engine->find_entity(0))->destroy_block(ray);
 		}
 	}
 }

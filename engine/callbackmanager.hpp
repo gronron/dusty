@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CALLBACKMANAGER_H_
 #define CALLBACKMANAGER_H_
 
-#include "actor.hpp"
+#include "entity.hpp"
 
 class	Callbackmanager
 {
@@ -40,8 +40,8 @@ class	Callbackmanager
 		struct	Callback
 		{
 			int			id;
-			Actor		*actor;
-			bool		(Actor::*function)();
+			Entity		*entity;
+			bool		(Entity::*function)();
 			float		delta;
 			float		timer;
 			bool		loop;
@@ -59,15 +59,15 @@ class	Callbackmanager
 
 		void	tick(float const delta);
 
-		void	start_callback(int const id, Actor *actor, bool (Actor::*)(), float const delta, bool const loop);
-		void	stop_callback(int const id, Actor *actor);
+		void	start_callback(int const id, Entity *entity, bool (Entity::*)(), float const delta, bool const loop);
+		void	stop_callback(int const id, Entity *entity);
 
-		bool	is_callback_started(int const id, Actor const *actor) const;
-		bool	update_callback(int const id, Actor const *actor, float const delta);
-		bool	update_callback(int const id, Actor const *actor, bool const loop);
-		bool	update_callback(int const id, Actor const *actor, float const delta, bool const loop);
+		bool	is_callback_started(int const id, Entity const *entity) const;
+		bool	update_callback(int const id, Entity const *entity, float const delta);
+		bool	update_callback(int const id, Entity const *entity, bool const loop);
+		bool	update_callback(int const id, Entity const *entity, float const delta, bool const loop);
 
-		void	stop_allcallbacks(Actor *actor);
+		void	stop_allcallbacks(Entity *entity);
 
 		void	_stop_callback(int const callback);
 };

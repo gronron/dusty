@@ -8,7 +8,7 @@
 
 FACTORYREG(Player);
 
-Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), damage(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)
+Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o), damage(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)
 {
 	shape.size = 1.0f;
 	engine->physic->new_body(&body, &shape, this);
@@ -26,7 +26,7 @@ Player::~Player()
 
 void	Player::postinstanciation()
 {
-	Actor::postinstanciation();
+	Entity::postinstanciation();
 	engine->physic->init_body(body);
 	if (engine->graphic)
 	{
@@ -41,15 +41,15 @@ void	Player::postinstanciation()
 
 void	Player::destroy()
 {
-	Actor::destroy();
+	Entity::destroy();
 	engine->physic->delete_body(body);
 	if (engine->graphic)
 		;//engine->graphic->remove(ps);
 }
 
-void	Player::notified_by_owner(Actor *a, bool const)
+void	Player::notified_by_owner(Entity *e, bool const)
 {
-	AController	*c = (AController *)a;
+	AController	*c = (AController *)e;
 
 	c->controlled = this;
 	if (engine->graphic && engine->_controllermap.find(c->id) != engine->_controllermap.end())
@@ -61,7 +61,7 @@ void	Player::notified_by_owner(Actor *a, bool const)
 
 void	Player::get_replication(Packet &pckt) const
 {
-	Actor::get_replication(pckt);
+	Entity::get_replication(pckt);
 	pckt.write(dir);
 	pckt.write(firing);
 	body->get_replication(pckt);
@@ -69,7 +69,7 @@ void	Player::get_replication(Packet &pckt) const
 
 void	Player::replicate(Packet &pckt, float const p)
 {
-	Actor::replicate(pckt, p);
+	Entity::replicate(pckt, p);
 	pckt.read(dir);
 	pckt.read(firing);
 	body->replicate(pckt, p);
@@ -77,7 +77,7 @@ void	Player::replicate(Packet &pckt, float const p)
 
 void	Player::tick(float const delta)
 {
-	Actor::tick(delta);
+	Entity::tick(delta);
 	if (engine->master)
 	{
 		if (loadingfire)
@@ -105,7 +105,7 @@ void	Player::tick(float const delta)
 		else if (firing && !engine->callback->is_callback_started(1, this))
 		{
 			fire();
-			engine->callback->start_callback(1, this, (bool (Actor::*)())&Player::fire, 1.0f / firerate, true);
+			engine->callback->start_callback(1, this, (bool (Entity::*)())&Player::fire, 1.0f / firerate, true);
 		}
 	}
 }
@@ -126,7 +126,7 @@ bool			Player::collide(Collider *x)
 		if (engine->graphic)
 			engine->graphic->add(new Particlesystem(0.0f, "damage", bd.loc));
 		dose += 1;
-		start_callback(3.0f, (bool (Actor::*)())&Player::down);
+		start_callback(3.0f, (bool (Entity::*)())&Player::down);
 		if (!high && dose == tolerance)
 			high = true;
 		if (dose > tolerance)
@@ -148,7 +148,7 @@ bool	Player::fire()
 			p->damage = damage;
 			p->body->position = body->position;
 			p->body->velocity = dir * 10.0f;
-			p->body->acceleration = { 0.0f, 0.0f, -50.0f, 0.0f };
+			p->body->acceleration = { 0.0f, 0.0f, -10.0f, 0.0f };
 		}
 		return (true);
 	}

@@ -28,67 +28,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#ifndef ENTITY_H_
+#define ENTITY_H_
+
 #include "endian/packet.hpp"
-#include "replication.hpp"
-#include "callbackmanager.hpp"
-#include "gameengine.hpp"
-#include "actor.hpp"
+#include "collider.hpp"
 
-Actor::Actor(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : engine(g), rp(r), callbacks(-1), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), state(CREATED), ping(0.0f)
+class	Gameengine;
+class	Replication;
+
+class	Entity : public Collider
 {
+	public:
+	
+		enum	State { CREATED, OK, DESTROYED };
 
-}
 
-Actor::~Actor()
-{
+		Gameengine		*engine;
+		Replication		*rp;
+		int				callbacks;
 
-}
+		short int	type;
+		int			id;
+		int			ownerid;
+		char		state;
+		float		ping;
 
-void	Actor::postinstanciation()
-{
-	state = OK;
-}
 
-void	Actor::destroy()
-{
-    state = DESTROYED;
-	if (rp)
-		rp->destroy();
-	engine->callback->stop_allcallbacks(this);
-}
+		Entity(Gameengine *, Replication *, int const, short int const, Entity const *);
+		virtual ~Entity();
 
-void	Actor::notified_by_owner(Actor *, bool const)
-{
+		virtual void	postinstanciation();
+		virtual void	destroy();
 
-}
+		virtual void	notified_by_owner(Entity *, bool const);
+		virtual void	notified_by_owned(Entity *, bool const);
 
-void	Actor::notified_by_owned(Actor *, bool const)
-{
+		virtual void	get_replication(Packet &) const;
+        virtual void	replicate(Packet &, float const);
 
-}
+		virtual void	tick(float const);
+		
+		virtual bool	should_collide(Collider const *) const;
+		virtual bool	collide(Collider *);
+};
 
-void	Actor::get_replication(Packet &pckt) const
-{
-	pckt.write(ownerid);
-}
-
-void	Actor::replicate(Packet &pckt, float const p)
-{
-	ping = p;
-	pckt.read(ownerid);
-}
-
-void	Actor::tick(float const)
-{
-	ping = 0.0f;
-}
-
-bool	Actor::should_collide(Collider const *) const
-{
-	return (false);
-}
-
-bool	Actor::collide(Collider *)
-{
-	return (false);
-}
+#endif

@@ -4,13 +4,13 @@
 
 FACTORYREG(Projectile);
 
-Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), body(0)
+Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o), body(0)
 {
 	shape.size = 0.01f;
 	engine->physic->new_body(&body, &shape, this);
 	
 	body->dynamic = true;
-	body->elasticity = 0.9f;
+	body->elasticity = 0.8f;
 	damage = 1.0f;
 }
 
@@ -23,33 +23,33 @@ Projectile::~Projectile()
 
 void	Projectile::postinstanciation()
 {
-	Actor::postinstanciation();
+	Entity::postinstanciation();
 	engine->physic->init_body(body);
 	if (engine->graphic)
 	{
 		ps = new Particlesystem(engine->graphic, "projectile", &body);
 		engine->graphic->add_animation(ps);
 	}
-	engine->callback->start_callback(1, this, (bool (Actor::*)())&Projectile::selfdestroy, 8.0f, false);
+	engine->callback->start_callback(1, this, (bool (Entity::*)())&Projectile::selfdestroy, 8.0f, false);
 }
 
 void	Projectile::destroy()
 {
-	Actor::destroy();
+	Entity::destroy();
 	if (engine->graphic)
 		ps->stop();
 }
 
 void	Projectile::get_replication(Packet &pckt) const
 {
-	Actor::get_replication(pckt);
+	Entity::get_replication(pckt);
 	pckt.write(damage);
 	body->get_replication(pckt);
 }
 
 void	Projectile::replicate(Packet &pckt, float const p)
 {
-	Actor::replicate(pckt, p);
+	Entity::replicate(pckt, p);
 	pckt.read(damage);
 	body->replicate(pckt, p);
 }

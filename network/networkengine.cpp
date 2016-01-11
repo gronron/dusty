@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "time/time.hpp"
 #include "client.hpp"
 #include "server.hpp"
-#include "actor.hpp"
+#include "entity.hpp"
 #include "gameengine.hpp"
 #include "console.hpp"
 #include "networkengine.hpp"
@@ -85,11 +85,11 @@ Replication		*Networkengine::new_replication(int const id)
 	{
 		_replications = resize(_replications, _rsize, _rsize << 1);
 		for (unsigned int i = 0; i < _rsize; ++i)
-			if (_replications[i].actor)
-				_replications[i].actor->rp = _replications + i;
+			if (_replications[i].entity)
+				_replications[i].entity->rp = _replications + i;
 		_rsize <<= 1;
 	}
-	if (_replications[id].actor)
+	if (_replications[id].entity)
 	{
 		//destroy everything
 	}
@@ -107,20 +107,20 @@ void								Networkengine::tick(float const delta)
 		if (msg->type == Messagequeue::UPDATE)
 		{
 			id = Replication::get_id(msg->pckt);
-			if (id < (int)_rsize && _replications[id].actor) // check type
+			if (id < (int)_rsize && _replications[id].entity) // check type
 				_replications[id].replicate(msg->pckt, msg->ping);
 			else if (!master)
 			{
 				Replication	*r = new_replication(id);
 				r->init(msg->pckt, msg->ping);
-				r->actor = engine->create(r);
-				r->actor->replicate(msg->pckt, msg->ping);
+				r->entity = engine->create(r);
+				r->entity->replicate(msg->pckt, msg->ping);
 			}
 		}
 		else if (msg->type == Messagequeue::DESTROY)
 		{
 			id = Replication::get_id(msg->pckt);
-			if (!master && id < (int)_rsize && _replications[id].actor)
+			if (!master && id < (int)_rsize && _replications[id].entity)
 				_replications[id].destroy();
 		}
 		else if (msg->type == Messagequeue::CONNECTION)
@@ -132,8 +132,8 @@ void								Networkengine::tick(float const delta)
 		else if (msg->type == Messagequeue::DISCONNECTION)
 		{
 			if ((j = _playeridmap.find(msg->cltid)) != _playeridmap.end())
-				if (_replications[j->second].actor)
-					_replications[j->second].actor->destroy();
+				if (_replications[j->second].entity)
+					_replications[j->second].entity->destroy();
 		}
 		else if (msg->type == Messagequeue::CONTROL)
 			engine->control(msg->actid);
@@ -144,7 +144,7 @@ void								Networkengine::tick(float const delta)
 
 	for (unsigned int i = 0; i < _rsize; ++i)
 	{
-		if (_replications[i].actor)
+		if (_replications[i].entity)
 		{
 			if (_replications[i].tick(delta))
 			{

@@ -98,10 +98,12 @@ void				_compute_camera(Camera const &camera, Computedcamera &cm)
 	cm.half_resolution = (vec<float, 2>)camera.resolution / 2.0f;
 }
 
-Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes_mem_size(0),
+Renderer::Renderer(unsigned int const width, unsigned int const height) :	_window(0),
+																			_renderer(0),
+																			_texture(0),
+																			_nodes_mem_size(0),
 																			_materials_mem_size(0),
-																			_lights_mem_size(0),
-																			texture(0)
+																			_lights_mem_size(0)
 {
 	cl_int			error;
 	cl_uint			platforms_count;
@@ -114,8 +116,7 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_nodes
 		std::cerr << "Error: SDL_Init()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE/* | SDL_WINDOW_FULLSCREEN_DESKTOP*/);
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE/* | SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 
 	check_error(clGetPlatformIDs(0, 0, &platforms_count), "clGetPlatformIDs()");
 	platforms = new cl_platform_id[platforms_count];
@@ -186,21 +187,23 @@ Renderer::~Renderer()
 	clReleaseCommandQueue(_queue);
 	clReleaseContext(_context);
 
-	SDL_DestroyTexture(texture);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	SDL_DestroyTexture(_texture);
+	SDL_DestroyRenderer(_renderer);
+	SDL_DestroyWindow(_window);
 	SDL_Quit();
 }
 
 void	Renderer::set_resolution(unsigned int const width, unsigned int const height)
 {
-	if (texture)
+	if (_texture)
 	{
-		SDL_DestroyTexture(texture);
+		SDL_DestroyTexture(_texture);
+		SDL_DestroyRenderer(_renderer);
 		clReleaseMemObject(_image_mem);
 	}
 
-	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
+	_renderer = SDL_CreateRenderer(_window, -1, 0);
+	_texture = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 	cl_int					error;
 	cl_image_format const	format = { CL_RGBA, CL_UNSIGNED_INT8 };
@@ -270,9 +273,9 @@ void	Renderer::render(Graphicengine const *ge)
 	void			*data;
 	int				pitch;
 
-	SDL_LockTexture(texture, 0, &data, &pitch);
+	SDL_LockTexture(_texture, 0, &data, &pitch);
 	check_error(clEnqueueReadImage(_queue, _image_mem, CL_TRUE, origin, image_size, pitch, 0, data, 0, 0, 0), "clEnqueueReadImage()");
-	SDL_UnlockTexture(texture);
-	SDL_RenderCopy(renderer, texture, 0, 0);
-	SDL_RenderPresent(renderer);
+	SDL_UnlockTexture(_texture);
+	SDL_RenderCopy(_renderer, _texture, 0, 0);
+	SDL_RenderPresent(_renderer);
 }

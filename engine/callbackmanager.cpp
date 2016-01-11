@@ -36,10 +36,10 @@ Callbackmanager::Callbackmanager() : _cbsize(1024), _cbfree(0), _callbacks(0)
 	_callbacks = new Callback[_cbsize];
 	for (unsigned int i = 0; i < _cbsize - 1; ++i)
 	{
-		_callbacks[i].actor = 0;
+		_callbacks[i].entity = 0;
 		_callbacks[i].next = i + 1;
 	}
-	_callbacks[_cbsize - 1].actor = 0;
+	_callbacks[_cbsize - 1].entity = 0;
 	_callbacks[_cbsize - 1].next = -1;
 }
 
@@ -52,20 +52,20 @@ void	Callbackmanager::tick(float const delta)
 {
 	for (unsigned int i = 0; i < _cbsize; ++i)
 	{
-		if (_callbacks[i].actor)
+		if (_callbacks[i].entity)
 		{
 			if ((_callbacks[i].timer += delta) >= _callbacks[i].delta)
 			{
-				if ((_callbacks[i].actor->*_callbacks[i].function)() && _callbacks[i].loop)
+				if ((_callbacks[i].entity->*_callbacks[i].function)() && _callbacks[i].loop)
 					_callbacks[i].timer -= _callbacks[i].delta;
-				else if (_callbacks[i].actor)
+				else if (_callbacks[i].entity)
 					_stop_callback(i);
 			}
 		}
 	}
 }
 
-void	Callbackmanager::start_callback(int const id, Actor *actor, bool (Actor::*function)(), float const delta, bool const loop)
+void	Callbackmanager::start_callback(int const id, Entity *entity, bool (Entity::*function)(), float const delta, bool const loop)
 {
 	int	cb;
 
@@ -76,40 +76,40 @@ void	Callbackmanager::start_callback(int const id, Actor *actor, bool (Actor::*f
 		_callbacks = resize(_callbacks, _cbfree, _cbsize);
 		for (unsigned int i = _cbfree; i < _cbsize - 1; ++i)
 		{
-			_callbacks[i].actor = 0;
+			_callbacks[i].entity = 0;
 			_callbacks[i].next = i + 1;
 		}
-		_callbacks[_cbsize - 1].actor = 0;
+		_callbacks[_cbsize - 1].entity = 0;
 		_callbacks[_cbsize - 1].next = -1;
 	}
 	
 	cb = _cbfree;
 	_cbfree = _callbacks[_cbfree].next;
-	_callbacks[cb].next = actor->callbacks;
-	actor->callbacks = cb;
+	_callbacks[cb].next = entity->callbacks;
+	entity->callbacks = cb;
 
 	_callbacks[cb].id = id;
-	_callbacks[cb].actor = actor;
+	_callbacks[cb].entity = entity;
 	_callbacks[cb].function = function;
 	_callbacks[cb].delta = delta;
 	_callbacks[cb].loop = id < 0 ? false : loop;
 	_callbacks[cb].timer = 0.0f;
 }
 
-bool	Callbackmanager::is_callback_started(int const id, Actor const *actor) const
+bool	Callbackmanager::is_callback_started(int const id, Entity const *entity) const
 {
 	if (id >= 0)
-		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		for (unsigned int i = entity->callbacks; i != -1; i = _callbacks[i].next)
 			if (_callbacks[i].id == id)
 				return (true);
 	return (false);
 }
 
-bool	Callbackmanager::update_callback(int const id, Actor const *actor, float const delta)
+bool	Callbackmanager::update_callback(int const id, Entity const *entity, float const delta)
 {
 	if (id >= 0)
 	{
-		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		for (unsigned int i = entity->callbacks; i != -1; i = _callbacks[i].next)
 		{
 			if (_callbacks[i].id == id)
 			{
@@ -121,11 +121,11 @@ bool	Callbackmanager::update_callback(int const id, Actor const *actor, float co
 	return (false);
 }
 
-bool	Callbackmanager::update_callback(int const id, Actor const *actor, bool const loop)
+bool	Callbackmanager::update_callback(int const id, Entity const *entity, bool const loop)
 {
 	if (id >= 0)
 	{
-		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		for (unsigned int i = entity->callbacks; i != -1; i = _callbacks[i].next)
 		{
 			if (_callbacks[i].id == id)
 			{
@@ -137,11 +137,11 @@ bool	Callbackmanager::update_callback(int const id, Actor const *actor, bool con
 	return (false);
 }
 
-bool	Callbackmanager::update_callback(int const id, Actor const *actor, float const delta, bool const loop)
+bool	Callbackmanager::update_callback(int const id, Entity const *entity, float const delta, bool const loop)
 {
 	if (id >= 0)
 	{
-		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		for (unsigned int i = entity->callbacks; i != -1; i = _callbacks[i].next)
 		{
 			if (_callbacks[i].id == id)
 			{
@@ -154,18 +154,18 @@ bool	Callbackmanager::update_callback(int const id, Actor const *actor, float co
 	return (false);
 }
 
-void	Callbackmanager::stop_allcallbacks(Actor *actor)
+void	Callbackmanager::stop_allcallbacks(Entity *entity)
 {
-	int	cbs = actor->callbacks;
+	int	cbs = entity->callbacks;
 
 	if (cbs != -1)
 	{
 		int	cb;
 
-		actor->callbacks = -1;
+		entity->callbacks = -1;
 		for (unsigned int i = cbs; i != -1; i = _callbacks[i].next)
 		{
-			_callbacks[i].actor = 0;
+			_callbacks[i].entity = 0;
 			cb = i;
 		}
 		_callbacks[cb].next = _cbfree;
@@ -175,13 +175,13 @@ void	Callbackmanager::stop_allcallbacks(Actor *actor)
 
 void		Callbackmanager::_stop_callback(int const cb)
 {
-	Actor	*actor = _callbacks[cb].actor;
+	Entity	*entity = _callbacks[cb].entity;
 	
-	if (actor->callbacks == cb)
-		actor->callbacks = _callbacks[cb].next;
+	if (entity->callbacks == cb)
+		entity->callbacks = _callbacks[cb].next;
 	else
 	{
-		for (unsigned int i = actor->callbacks; i != -1; i = _callbacks[i].next)
+		for (unsigned int i = entity->callbacks; i != -1; i = _callbacks[i].next)
 		{
 			if (_callbacks[i].next == cb)
 			{
@@ -190,7 +190,7 @@ void		Callbackmanager::_stop_callback(int const cb)
 			}
 		}
 	}
-	_callbacks[cb].actor = 0;
+	_callbacks[cb].entity = 0;
 	_callbacks[cb].next = _cbfree;
 	_cbfree = cb;
 }

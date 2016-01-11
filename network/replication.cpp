@@ -28,7 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "actor.hpp"
+#include "entity.hpp"
 #include "replication.hpp"
 
 int					Replication::get_id(Packet const &pckt)
@@ -44,7 +44,7 @@ int					Replication::get_id(Packet const &pckt)
 
 void	Replication::init(Packet &pckt, float ping)
 {
-	actor = 0;
+	entity = 0;
 	authority = NONE;
 	id = 0;
 	type = 0;
@@ -64,7 +64,7 @@ void	Replication::init(Packet &pckt, float ping)
 
 void	Replication::init(float const updttm, float const tmt)
 {
-	actor = 0;
+	entity = 0;
 	authority = Replication::GLOBAL;
 	id = 0;
 	type = 0;
@@ -85,7 +85,7 @@ void	Replication::get_replication(Packet &pckt)
 	pckt.write(id);
 	pckt.write(type);
 	pckt.write(++numout);
-	actor->get_replication(pckt);
+	entity->get_replication(pckt);
 }
 
 void			Replication::replicate(Packet &pckt, float p)
@@ -105,7 +105,7 @@ void			Replication::replicate(Packet &pckt, float p)
 			numin = n;
 			if (authority >= GLOBAL)
 				needupdate = true;
-			actor->replicate(pckt, p);
+			entity->replicate(pckt, p);
 		}
 	}
 }
@@ -125,8 +125,8 @@ bool	Replication::tick(float delta)
 		if (lastrecvupd > timeout)
 		{
 			if (!dead)
-				actor->destroy();
-			actor = 0;
+				entity->destroy();
+			entity = 0;
 			return (false);
 		}
 	}
@@ -135,7 +135,7 @@ bool	Replication::tick(float delta)
 
 void	Replication::destroy()
 {
-	actor = 0;
+	entity = 0;
 	updatetime = 0.5f;
 	timeout = 5.0f;
 	lastsendupd = 0.0f;

@@ -40,9 +40,9 @@ class	Renderer
 {
 	public:
 
-		SDL_Window			*window;
-		SDL_Renderer		*renderer;
-		SDL_Texture			*texture;
+		SDL_Window			*_window;
+		SDL_Renderer		*_renderer;
+		SDL_Texture			*_texture;
 
 		cl_context			_context;
 		cl_command_queue	_queue;

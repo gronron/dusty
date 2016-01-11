@@ -31,13 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef WORLD_H_
 #define WORLD_H_
 
-#include "actor.hpp"
+#include "entity.hpp"
 #include "math/vec.hpp"
 #include "shape.hpp"
 
 #define CHUNK_SIZE 32
 
-class	World : public Actor
+class	World : public Entity
 {
 	public:
 
@@ -57,7 +57,7 @@ class	World : public Actor
 		//int		teamids[2];
 		//Team	*teams;
 	
-		World(Gameengine *, Replication *, int const, short int const, Actor const *);
+		World(Gameengine *, Replication *, int const, short int const, Entity const *);
 		virtual ~World();
 
 		//virtual void	postinstanciation();

@@ -21,12 +21,12 @@ class	AController : public Controller
 		int				material;
 
 
-		AController(Gameengine *, Replication *, int const, short int const, Actor const *);
+		AController(Gameengine *, Replication *, int const, short int const, Entity const *);
 		virtual ~AController();
 
 		void	postinstanciation();
 
-		void	notified_by_owned(Actor *, bool const);
+		void	notified_by_owned(Entity *, bool const);
 
 		void	get_replication(Packet &) const;
         void	replicate(Packet &, float const);

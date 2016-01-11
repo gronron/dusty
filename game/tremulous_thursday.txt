@@ -17,3 +17,30 @@ base entity:
 
 structure
 projectile
+
+---------------------------------------
+
+wolrd blocks:
+
+none
+grass
+dirt
+clay
+white sand
+sand
+orange sand
+stone
+dark stone
+iron
+copper
+silver
+gold
+glass
+light blue glass
+light green glass
+light wood
+wood
+dark wood
+light leaves
+leaves
+dark leaves

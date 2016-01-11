@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include "new.hpp"
-#include "actor.hpp"
+#include "entity.hpp"
 #include "replication.hpp"
 #include "controller.hpp"
 #include "factory.hpp"
@@ -44,13 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
-Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _actsize(1024), _actors(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
+Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _entsize(1024), _entities(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
 {
 	Factory::get_instance().generate_type();
 
-	_actors = new Actor*[_actsize];
-	for (unsigned int i = 0; i < _actsize; ++i)
-		_actors[i] = 0;
+	_entities = new Entity*[_entsize];
+	for (unsigned int i = 0; i < _entsize; ++i)
+		_entities[i] = 0;
 	
 	callback = new Callbackmanager();
 	physic = new Physicengine();
@@ -85,10 +85,10 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _act
 
 Gameengine::~Gameengine()
 {
-	for (unsigned int i = 0; i < _actsize; ++i)
-		if (_actors[i])
-			delete _actors[i];
-	delete [] _actors;
+	for (unsigned int i = 0; i < _entsize; ++i)
+		if (_entities[i])
+			delete _entities[i];
+	delete [] _entities;
 
 	delete callback;
 	delete physic;
@@ -105,13 +105,13 @@ Gameengine::~Gameengine()
 	delete console;
 }
 
-Actor		*Gameengine::create(std::string const &name, Actor const *owner, bool const need_replication)
+Entity		*Gameengine::create(std::string const &name, Entity const *owner, bool const need_replication)
 {
 	int		id = -1;
 
-	for (unsigned int i = 0; i < _actsize; ++i)
+	for (unsigned int i = 0; i < _entsize; ++i)
 	{
-		if (!_actors[i])
+		if (!_entities[i])
 		{
 			id = i;
 			break;
@@ -119,39 +119,39 @@ Actor		*Gameengine::create(std::string const &name, Actor const *owner, bool con
 	}
 	if (id < 0)
 	{
-		id = _actsize;
-		_actors = resize(_actors, _actsize, _actsize << 1);
-		_actsize <<= 1;
-		for (unsigned int i = _actsize >> 1; i < _actsize; ++i)
-			_actors[i] = 0;
+		id = _entsize;
+		_entities = resize(_entities, _entsize, _entsize << 1);
+		_entsize <<= 1;
+		for (unsigned int i = _entsize >> 1; i < _entsize; ++i)
+			_entities[i] = 0;
 	}
-	_actors[id] = Factory::get_instance().create(this, (need_replication && network ? network->new_replication(id) : 0), id, name, owner);
-	return (_actors[id]);
+	_entities[id] = Factory::get_instance().create(this, (need_replication && network ? network->new_replication(id) : 0), id, name, owner);
+	return (_entities[id]);
 }
 
-Actor		*Gameengine::create(Replication *r)
+Entity		*Gameengine::create(Replication *r)
 {
-	_actors[r->id] = Factory::get_instance().create(this, r);
-	return (_actors[r->id]);
+	_entities[r->id] = Factory::get_instance().create(this, r);
+	return (_entities[r->id]);
 }
 
-Actor	*Gameengine::find_actor(int const id)
+Entity	*Gameengine::find_entity(int const id)
 {
-	return (id < (int)_actsize ? _actors[id] : 0);
+	return (id < (int)_entsize ? _entities[id] : 0);
 }
 
-void	Gameengine::notify_owner(Actor *a, bool const l)
+void	Gameengine::notify_owner(Entity *a, bool const l)
 {
-	if (a->ownerid < (int)_actsize && _actors[a->ownerid])
-		_actors[a->ownerid]->notified_by_owned(a, l);
+	if (a->ownerid < (int)_entsize && _entities[a->ownerid])
+		_entities[a->ownerid]->notified_by_owned(a, l);
 }
 
-void	Gameengine::notify_owned(Actor *a, bool const l)
+void	Gameengine::notify_owned(Entity *a, bool const l)
 {
-	for	(unsigned int i = 0; i < _actsize; ++i)
+	for	(unsigned int i = 0; i < _entsize; ++i)
 	{
-		if (_actors[i]->ownerid == a->id)
-			_actors[i]->notified_by_owner(a, l);
+		if (_entities[i]->ownerid == a->id)
+			_entities[i]->notified_by_owner(a, l);
 	}
 }
 
@@ -159,7 +159,7 @@ void			Gameengine::control(int const id)
 {
 	Controller	*ctrl;
 
-	if ((ctrl = (Controller *)find_actor(id)))
+	if ((ctrl = (Controller *)find_entity(id)))
 		ctrl->bind();
 	else
 		_controllermap[id] = ctrl;
@@ -180,20 +180,20 @@ void				Gameengine::tick(float const delta)
 	//std::cout << "cb" << std::endl;
 	callback->tick(delta);
 	//std::cout << "ac" << std::endl;
-	for (unsigned int i = 0; i < _actsize; ++i)
+	for (unsigned int i = 0; i < _entsize; ++i)
 	{
-		if (_actors[i])
+		if (_entities[i])
 		{
-			switch (_actors[i]->state)
+			switch (_entities[i]->state)
 			{
-				case Actor::CREATED:
-					_actors[i]->postinstanciation();
-				case Actor::OK:
-					_actors[i]->tick(delta);
+				case Entity::CREATED:
+					_entities[i]->postinstanciation();
+				case Entity::OK:
+					_entities[i]->tick(delta);
 					break;
-				case Actor::DESTROYED:
-					delete _actors[i];
-					_actors[i] = 0;
+				case Entity::DESTROYED:
+					delete _entities[i];
+					_entities[i] = 0;
 					break;
 			};
 		}

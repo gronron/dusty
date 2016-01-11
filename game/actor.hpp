@@ -28,48 +28,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef REPLICATION_H_
-#define REPLICATION_H_
+#ifndef ENTITY_H_
+#define ENTITY_H_
 
-#include "endian/packet.hpp"
+#include "entity.hpp"
 
-class	Entity;
-
-class	Replication
+class	Actor
 {
 	public:
-
-		enum	AUTHORITY { NONE = 0, LOCAL = 1, GLOBAL = 2 };
-
-
-		static int		get_id(Packet const &);
-
-
-		Entity			*entity;
-		unsigned char	authority;
-
-		int 			id;
-		short int		type;
-		int				numin;
-		int				numout;
-
-		float			updatetime;
-		float			timeout;
-		float			lastsendupd;
-		float			lastrecvupd;
-		bool			needupdate;
-		bool			dead;
-
+	
+		unsigned char	teamid;
 		
-		void	init(Packet &pckt, float ping);
-		void	init(float const, float const);
-
-		void	get_replication(Packet &pckt);
-        void	replicate(Packet &pckt, float ping);
-
-        bool	tick(float delta);
-
-        void	destroy();
+		unsigned short	maxlife;
+		unsigned short	life;
+		
+		bool	take_damage();
 };
 
 #endif
