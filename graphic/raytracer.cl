@@ -459,6 +459,5 @@ kernel void	raytrace(	Camera const			*camera,
 	}
 	while (top);
 
-	color *= 255.0f;
-	write_imageui(image, (int2)(x, y), (uint4)(color.z, color.y, color.x, color.w));
+	write_imagef(image, (int2)(x, y), color);
 }
