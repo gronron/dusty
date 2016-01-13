@@ -259,17 +259,13 @@ void	AController::aimloc(int const size, float const *data)
 void	AController::load(int const size, float const *data)
 {
 	if (size == 1 && *data > 0.0f)
-	{
 		((World*)engine->find_entity(0))->load("dusty_world.dstw");
-	}
 }
 
 void	AController::save(int const size, float const *data)
 {
 	if (size == 1 && *data > 0.0f)
-	{
 		((World*)engine->find_entity(0))->save("dusty_world.dstw");
-	}
 }
 
 void	AController::create_block(int const size, float const *data)

@@ -99,9 +99,6 @@
     <ClCompile Include="..\..\..\ui\console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\ui\controller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\ui\eventmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -174,6 +171,9 @@
     <ClCompile Include="..\..\..\engine\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\engine\controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">
@@ -237,9 +237,6 @@
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\ui\console.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\ui\controller.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\ui\eventmanager.hpp">
@@ -321,6 +318,9 @@
       <Filter>Header Files\game</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\engine\entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\engine\controller.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -90,7 +90,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -103,7 +103,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\x64\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -120,7 +120,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
@@ -138,7 +138,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\x64\$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\engine\callbackmanager.cpp" />
     <ClCompile Include="..\..\..\engine\configmanager.cpp" />
+    <ClCompile Include="..\..\..\engine\controller.cpp" />
     <ClCompile Include="..\..\..\engine\entity.cpp" />
     <ClCompile Include="..\..\..\engine\factory.cpp" />
     <ClCompile Include="..\..\..\engine\gameengine.cpp" />
@@ -186,13 +187,13 @@
     <ClCompile Include="..\..\..\physic\physicengine.cpp" />
     <ClCompile Include="..\..\..\physic\shape.cpp" />
     <ClCompile Include="..\..\..\ui\console.cpp" />
-    <ClCompile Include="..\..\..\ui\controller.cpp" />
     <ClCompile Include="..\..\..\ui\eventmanager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\callbackmanager.hpp" />
     <ClInclude Include="..\..\..\engine\common.hpp" />
     <ClInclude Include="..\..\..\engine\configmanager.hpp" />
+    <ClInclude Include="..\..\..\engine\controller.hpp" />
     <ClInclude Include="..\..\..\engine\entity.hpp" />
     <ClInclude Include="..\..\..\engine\factory.hpp" />
     <ClInclude Include="..\..\..\engine\gameengine.hpp" />
@@ -237,7 +238,6 @@
     <ClInclude Include="..\..\..\physic\physicengine.hpp" />
     <ClInclude Include="..\..\..\physic\shape.hpp" />
     <ClInclude Include="..\..\..\ui\console.hpp" />
-    <ClInclude Include="..\..\..\ui\controller.hpp" />
     <ClInclude Include="..\..\..\ui\eventmanager.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -23,6 +23,23 @@ projectile
 wolrd blocks:
 
 none
+white
+grey
+black
+red
+green
+blue
+
+iron
+copper
+silver
+gold
+mirror
+
+glass
+light blue glass
+light green glass
+
 grass
 dirt
 clay
@@ -31,13 +48,7 @@ sand
 orange sand
 stone
 dark stone
-iron
-copper
-silver
-gold
-glass
-light blue glass
-light green glass
+
 light wood
 wood
 dark wood

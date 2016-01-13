@@ -29,7 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include <CL/cl.h>
+#include <CL/cl_gl.h>
 #include <SDL.h>
+#include <SDL_syswm.h>
 #include <iostream>
 #include <cstdlib>
 #include "opencl_error.hpp"
@@ -99,7 +101,7 @@ void				_compute_camera(Camera const &camera, Computedcamera &cm)
 }
 
 Renderer::Renderer(unsigned int const width, unsigned int const height) :	_window(0),
-																			_renderer(0),
+																			_glcontext(0),
 																			_texture(0),
 																			_nodes_mem_size(0),
 																			_materials_mem_size(0),
@@ -110,22 +112,45 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_windo
 	cl_platform_id	*platforms;
 	size_t			devices_count;
 	cl_device_id	*devices;
+	SDL_SysWMinfo info;
 
 	if (SDL_Init(SDL_INIT_VIDEO))
 	{
 		std::cerr << "Error: SDL_Init()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE/* | SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE/* | SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+	_glcontext = SDL_GL_CreateContext(_window);
+	SDL_GL_SetSwapInterval(0);
+	
+	SDL_VERSION(&info.version);
+	if (!SDL_GetWindowWMInfo(_window, &info))
+	{
+		std::cerr << "Error: SDL_GetWindowWMInfo()" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
+	glViewport(0, 0, width, height);
+	glEnable(GL_TEXTURE_2D);
+	glGenTextures(1, &_texture);
+	glBindTexture(GL_TEXTURE_2D, _texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
+	glFinish();
+	
 	check_error(clGetPlatformIDs(0, 0, &platforms_count), "clGetPlatformIDs()");
 	platforms = new cl_platform_id[platforms_count];
 	check_error(clGetPlatformIDs(platforms_count, platforms, 0), "clGetPlatformIDs()");
-
+	
 	cl_context_properties const	properties[] =
 	{
-		CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0], 0
+		CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0],
+		CL_GL_CONTEXT_KHR, (cl_context_properties)_glcontext,
+		CL_WGL_HDC_KHR, (cl_context_properties)info.info.win.hdc,
+		0
 	};
+
 	_context = clCreateContextFromType(properties, CL_DEVICE_TYPE_GPU, 0, 0, &error);
 	check_error(error, "clCreateContextFromType()");
 	delete [] platforms;
@@ -168,8 +193,8 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_windo
 	check_error(error, "clCreateKernel()");
 	
 	//_camera_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, sizeof(Computedcamera), 0, &error);
-
-	set_resolution(width, height);
+	_image_mem = clCreateFromGLTexture(_context, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, _texture, &error);
+	check_error(error, "clCreateImage()");
 }
 
 Renderer::~Renderer()
@@ -187,29 +212,23 @@ Renderer::~Renderer()
 	clReleaseCommandQueue(_queue);
 	clReleaseContext(_context);
 
-	SDL_DestroyTexture(_texture);
-	SDL_DestroyRenderer(_renderer);
+	glDeleteTextures(1, &_texture);
+	SDL_GL_DeleteContext(_glcontext);
 	SDL_DestroyWindow(_window);
 	SDL_Quit();
 }
 
 void	Renderer::set_resolution(unsigned int const width, unsigned int const height)
 {
-	if (_texture)
-	{
-		SDL_DestroyTexture(_texture);
-		SDL_DestroyRenderer(_renderer);
-		clReleaseMemObject(_image_mem);
-	}
+	cl_int	error;
 
-	_renderer = SDL_CreateRenderer(_window, -1, 0);
-	_texture = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
+	glViewport(0, 0, width, height);
 
-	cl_int					error;
-	cl_image_format const	format = { CL_RGBA, CL_UNSIGNED_INT8 };
-	cl_image_desc const		desc = { CL_MEM_OBJECT_IMAGE2D, width, height, 1, 1, 0, 0, 0 };
-	
-	_image_mem = clCreateImage(_context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, &format, &desc, 0, &error);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
+	glFinish();
+
+	clReleaseMemObject(_image_mem);
+	_image_mem = clCreateFromGLTexture(_context, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, _texture, &error);
 	check_error(error, "clCreateImage()");
 }
 
@@ -249,6 +268,9 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 void	Renderer::render(Graphicengine const *ge)
 {
 	Computedcamera	cm;
+	
+	glFinish();
+	check_error(clEnqueueAcquireGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueAcquireGLObjects()");
 
 	_compute_camera(ge->camera, cm);
 	_set_buffer(ge);
@@ -268,14 +290,15 @@ void	Renderer::render(Graphicengine const *ge)
 	size_t const	image_size[3] = { ge->camera.resolution[0], ge->camera.resolution[1], 1 };
 
 	check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, image_size, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
+	check_error(clEnqueueReleaseGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueReleaseGLObjects()");
 	clFinish(_queue);
 
-	void			*data;
-	int				pitch;
-
-	SDL_LockTexture(_texture, 0, &data, &pitch);
-	check_error(clEnqueueReadImage(_queue, _image_mem, CL_TRUE, origin, image_size, pitch, 0, data, 0, 0, 0), "clEnqueueReadImage()");
-	SDL_UnlockTexture(_texture);
-	SDL_RenderCopy(_renderer, _texture, 0, 0);
-	SDL_RenderPresent(_renderer);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2f(-1.0f, 1.0f);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2f(1.0f, 1.0f);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2f(1.0f, -1.0f);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2f(-1.0f, -1.0f);
+	glEnd();
+	glFinish();
+	SDL_GL_SwapWindow(_window);
 }

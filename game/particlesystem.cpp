@@ -106,7 +106,7 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<fl
 		Aabb	aabb;
 		aabb.bottom = _particles[i].position;
 		aabb.top = aabb.bottom + _particles[i].size * 0.2f;
-		_particles[i].index = graphic->aabbtree.add_saabb(aabb, 3);
+		_particles[i].index = graphic->aabbtree.add_saabb(aabb, 6);
 	}
 }
 

@@ -30,7 +30,7 @@ void	Projectile::postinstanciation()
 		ps = new Particlesystem(engine->graphic, "projectile", &body);
 		engine->graphic->add_animation(ps);
 	}
-	engine->callback->start_callback(1, this, (bool (Entity::*)())&Projectile::selfdestroy, 8.0f, false);
+	engine->callback->start_callback(4, this, (bool (Entity::*)())&Projectile::selfdestroy, 8.0f, false);
 }
 
 void	Projectile::destroy()

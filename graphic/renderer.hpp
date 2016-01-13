@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RENDERE_H_
 #define RENDERE_H_
 
+#include <windows.h>
+#include <GL/gl.h>
 #include <CL/cl.h>
 #include <SDL.h>
 
@@ -41,8 +43,8 @@ class	Renderer
 	public:
 
 		SDL_Window			*_window;
-		SDL_Renderer		*_renderer;
-		SDL_Texture			*_texture;
+		SDL_GLContext		_glcontext;
+		GLuint				_texture;
 
 		cl_context			_context;
 		cl_command_queue	_queue;
