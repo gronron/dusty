@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <CL/cl.h>
 
-char const	*error_to_string(cl_int error)
+inline char const	*error_to_string(cl_int error)
 {
 	switch (error)
 	{

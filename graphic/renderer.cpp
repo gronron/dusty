@@ -79,33 +79,16 @@ struct				Computedcamera
 	float			padding[2];
 };
 
-void				_compute_camera(Camera const &camera, Computedcamera &cm)
+void	_compute_camera(Camera const &camera, Computedcamera &cm)
 {
-	vec<float, 4>	direction;
-
-	direction[0] = cos(camera.spherical_coord[1]) * cos(camera.spherical_coord[0]);
-	direction[1] = cos(camera.spherical_coord[1]) * sin(camera.spherical_coord[0]);
-	direction[2] = sin(camera.spherical_coord[1]);
-	direction[3] = 0.0f;
-
 	cm.position = camera.position;
-	cm.forward = (direction * (float)camera.resolution[0]) / (tan(camera.fov / 2.0f) * 2.0f);
-	cm.right[0] = sin(camera.spherical_coord[0]);
-	cm.right[1] = -cos(camera.spherical_coord[0]);
-	cm.right[2] = 0.0f;
-	cm.right[3] = 0.0f;
-	cm.right = vunit<float>(cm.right);
-	cm.up = vunit<float>(vcross(direction, cm.right));
-	
+	cm.forward = (camera.direction * (float)camera.resolution[0]) / (tan(camera.fov / 2.0f) * 2.0f);
+	cm.right = camera.right;
+	cm.up = vunit<float>(vcross(camera.direction, camera.right));
 	cm.half_resolution = (vec<float, 2>)camera.resolution / 2.0f;
 }
 
-Renderer::Renderer(unsigned int const width, unsigned int const height) :	_window(0),
-																			_glcontext(0),
-																			_texture(0),
-																			_nodes_mem_size(0),
-																			_materials_mem_size(0),
-																			_lights_mem_size(0)
+Renderer::Renderer(unsigned int const width, unsigned int const height) : _window(0), _glcontext(0), _texture(0), _nodes_mem_size(0), _materials_mem_size(0), _lights_mem_size(0)
 {
 	cl_int			error;
 	cl_uint			platforms_count;
@@ -155,9 +138,15 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_windo
 	check_error(error, "clCreateContextFromType()");
 	delete [] platforms;
 
-	clGetContextInfo(_context, CL_CONTEXT_DEVICES, 0, 0, &devices_count);
+	check_error(clGetContextInfo(_context, CL_CONTEXT_DEVICES, 0, 0, &devices_count), "clGetContextInfo()");
 	devices = new cl_device_id[devices_count];
-	clGetContextInfo(_context, CL_CONTEXT_DEVICES, devices_count, devices, 0);
+	check_error(clGetContextInfo(_context, CL_CONTEXT_DEVICES, devices_count, devices, 0), "clGetContextInfo()");
+
+	char	device_vendor[64];
+	char	device_name[64];
+	check_error(clGetDeviceInfo(devices[0], CL_DEVICE_VENDOR, 64, device_vendor, 0), "clGetDeviceInfo()");
+	check_error(clGetDeviceInfo(devices[0], CL_DEVICE_NAME, 64, device_name, 0), "clGetDeviceInfo()");
+	std::cout << "Device selected:\n\t" << device_vendor << " - " << device_name << std::endl;
 
 	_queue = clCreateCommandQueueWithProperties(_context, devices[0], 0, &error);
 	check_error(error, "clCreateCommandQueueWithProperties()");
@@ -177,9 +166,9 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) :	_windo
 		char			*build_log;
 
 		std::cerr << "clBuildProgram(): " << error_to_string(error) << std::endl;
-		check_error(clGetProgramBuildInfo(_program, devices[0], CL_PROGRAM_BUILD_LOG, 0, 0, &length), "");
+		check_error(clGetProgramBuildInfo(_program, devices[0], CL_PROGRAM_BUILD_LOG, 0, 0, &length), "clGetProgramBuildInfo()");
 		build_log = new char[length + 1];
-		check_error(clGetProgramBuildInfo(_program, devices[0], CL_PROGRAM_BUILD_LOG, length, build_log, 0), "");
+		check_error(clGetProgramBuildInfo(_program, devices[0], CL_PROGRAM_BUILD_LOG, length, build_log, 0), "clGetProgramBuildInfo()");
 		build_log[length] = '\0';
 		std::cerr << build_log << std::endl;
 		system("pause");

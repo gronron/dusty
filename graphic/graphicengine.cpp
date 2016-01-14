@@ -37,10 +37,11 @@ Graphicengine::Graphicengine() :	_animations_size(4096), _animations_count(0), _
 									_materials_size(0), _materials_count(0), _materials(0),
 									_renderer(1440, 900)
 {
+	camera.position = 0.0f;
+	camera.direction = 0.0f;
+	camera.right = 0.0f;
 	camera.resolution[0] = 1440;
 	camera.resolution[1] = 900;
-	camera.spherical_coord[0] = -2.2f;
-	camera.spherical_coord[1] = -0.7f;
 	camera.fov = 1.9198621771f;
 	
 	_animations = new Animation*[_animations_size];
@@ -68,16 +69,26 @@ void	Graphicengine::set_resolution(unsigned int const width, unsigned int const 
 	_renderer.set_resolution(width, height);
 }
 
+void	Graphicengine::set_camera(vec<float, 4> const &position, vec<float, 2> const &spherical_coord)
+{
+	camera.position = position;
+
+	camera.direction[0] = cos(spherical_coord[1]) * cos(spherical_coord[0]);
+	camera.direction[1] = cos(spherical_coord[1]) * sin(spherical_coord[0]);
+	camera.direction[2] = sin(spherical_coord[1]);
+	camera.direction[3] = 0.0f;
+	
+	camera.right[0] = sin(spherical_coord[0]);
+	camera.right[1] = -cos(spherical_coord[0]);
+	camera.right[2] = 0.0f;
+	camera.right[3] = 0.0f;
+}
+
 void	Graphicengine::tick(float const delta)
 {
 	for (unsigned int i = 0; i < _animations_count; ++i)
 		_animations[i]->tick(delta);
 
-	int	x;
-	int	y;
-	SDL_GetRelativeMouseState(&x, &y);
-	camera.spherical_coord[0] -= x / 200.0f;
-	camera.spherical_coord[1] -= y / 200.0f;
 	_renderer.render(this);
 }
 

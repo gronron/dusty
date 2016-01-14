@@ -39,7 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct						Camera
 {
 	vec<float, 4>			position;
-	vec<float, 2>			spherical_coord;
+	vec<float, 4>			direction;
+	vec<float, 4>			right;
 	vec<unsigned int, 2>	resolution;
 	float					fov;
 };
@@ -88,6 +89,7 @@ class	Graphicengine
 		~Graphicengine();
 
 		void	set_resolution(unsigned int const, unsigned int const);
+		void	set_camera(vec<float, 4> const &, vec<float, 2> const &);
 
 		void	tick(float const delta);
 
@@ -99,5 +101,6 @@ class	Graphicengine
 
 		void	_load_materials(char const *filename);
 };
+
 
 #endif
