@@ -94,9 +94,9 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 
 		_cull_world();
 		
-		vec<float, 3> v;
-		v = 16.0f;
-		//engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", v));
+		/*vec<float, 3> v;
+		v = 2.0f;
+		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", v));*/
 	}
 }
 

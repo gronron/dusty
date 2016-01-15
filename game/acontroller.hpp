@@ -19,6 +19,8 @@ class	AController : public Controller
 		vec<float, 4>	aim;
 		vec<float, 4>	move;
 		int				material;
+		
+		vec<float, 2>	spherical_coord;
 
 
 		AController(Gameengine *, Replication *, int const, short int const, Entity const *);

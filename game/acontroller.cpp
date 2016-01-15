@@ -35,16 +35,7 @@ void	AController::postinstanciation()
 
 void	AController::notified_by_owned(Entity *e, bool l)
 {
-	if (l)
-	{
-		controlled = (Player *)e;
-		if (engine->graphic && engine->_controllermap.find(id) != engine->_controllermap.end())
-		{
-			//am->ge->add(controlled->hud);
-		}
-	}
-	else
-		controlled = 0;
+	Controller::notified_by_owned(e, l);
 }
 
 void	AController::get_replication(Packet &pckt) const
@@ -73,27 +64,19 @@ void	AController::tick(float delta)
 	Controller::tick(delta);
 	if (controlled)
 	{
-		//beware
-		
-		vec<float, 4>	direction;
-		vec<float, 4>	right;
+		int	x;
+		int	y;
+		SDL_GetRelativeMouseState(&x, &y);
+		spherical_coord[0] -= x / 200.0f;
+		spherical_coord[1] -= y / 200.0f;
+
+		engine->graphic->set_camera(controlled->body->position, spherical_coord);
 	
-		direction[0] = cos(engine->graphic->camera.spherical_coord[1]) * cos(engine->graphic->camera.spherical_coord[0]);
-		direction[1] = cos(engine->graphic->camera.spherical_coord[1]) * sin(engine->graphic->camera.spherical_coord[0]);
-		direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
-		direction[3] = 0.0f;
-		
-		right[0] = sin(engine->graphic->camera.spherical_coord[0]);
-		right[1] = -cos(engine->graphic->camera.spherical_coord[0]);
-		right[2] = 0.0f;
-		right[3] = 0.0f;
-	
-		controlled->body->velocity = (direction * -move[1] + right * move[0]) * delta * 1000.0f;
-		engine->graphic->camera.position = controlled->body->position;
-		
+		controlled->body->velocity = (engine->graphic->camera.direction * move[1] + engine->graphic->camera.right * move[0]) * delta * 1000.0f;
+
 		controlled->firing = firing;
 		controlled->loadingfire = loadingfire;
-		controlled->dir = direction;
+		controlled->dir = engine->graphic->camera.direction;
 	}
 }
 
@@ -203,8 +186,8 @@ void	AController::forward(int const size, float const *data)
 	{
 		if (rp)
 			rp->needupdate = true;
-		if (*data > 0.0f || (*data == 0.0f && move[1] < 0.0f))
-			move[1] = -*data;
+		if (*data > 0.0f || (*data == 0.0f && move[1] > 0.0f))
+			move[1] = *data;
 	}
 }
 
@@ -214,8 +197,8 @@ void	AController::backward(int const size, float const *data)
 	{
 		if (rp)
 			rp->needupdate = true;
-		if (*data > 0.0f || (*data == 0.0f && move[1] > 0.0f))
-			move[1] = *data;
+		if (*data > 0.0f || (*data == 0.0f && move[1] < 0.0f))
+			move[1] = -*data;
 	}
 }
 
@@ -270,7 +253,7 @@ void	AController::save(int const size, float const *data)
 
 void	AController::create_block(int const size, float const *data)
 {
-	if (size == 1)
+/*	if (size == 1)
 	{
 		if (*data && controlled)
 		{
@@ -284,12 +267,12 @@ void	AController::create_block(int const size, float const *data)
 
 			((World*)engine->find_entity(0))->create_block(ray, material);
 		}
-	}
+	}*/
 }
 
 void	AController::destroy_block(int const size, float const *data)
 {
-	if (size == 1)
+/*	if (size == 1)
 	{
 		if (*data && controlled)
 		{
@@ -303,7 +286,7 @@ void	AController::destroy_block(int const size, float const *data)
 		
 			((World*)engine->find_entity(0))->destroy_block(ray);
 		}
-	}
+	}*/
 }
 
 void	AController::change_material(int const size, float const *data)

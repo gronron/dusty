@@ -70,15 +70,12 @@ class	Gameengine
 		Physicengine	*physic;
 		Networkengine	*network;
 
-
 		Console			*console;
 		Graphicengine	*graphic;
-		//Raytracer		*graphic;
 		Eventmanager	*event;
 		//Uimanager		*um;
 
 		std::string					controllerclass;
-		std::map<int, Controller *>	_controllermap;
 
 
 		Gameengine(Option const &);

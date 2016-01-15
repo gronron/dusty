@@ -52,11 +52,6 @@ void	Player::notified_by_owner(Entity *e, bool const)
 	AController	*c = (AController *)e;
 
 	c->controlled = this;
-	if (engine->graphic && engine->_controllermap.find(c->id) != engine->_controllermap.end())
-	{
-		//engine->graphic->cam_pos = bdb->loc;
-		//engine->graphic->add(hud);
-	}
 }
 
 void	Player::get_replication(Packet &pckt) const

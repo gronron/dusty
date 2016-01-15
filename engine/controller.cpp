@@ -46,13 +46,10 @@ Controller::~Controller()
 void	Controller::postinstanciation()
 {
 	Entity::postinstanciation();
-	if (engine->_controllermap.find(id) != engine->_controllermap.end())
-		bind();
 }
 
 void	Controller::bind()
 {
-	engine->_controllermap[id] = this;
 	if (engine->network)
 		rp->authority += Replication::LOCAL;
 }

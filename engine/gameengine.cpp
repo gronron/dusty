@@ -78,7 +78,6 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _ent
 	if (!network)
 	{
 		Controller *ctrl = (Controller *)create(controllerclass, 0, true);
-		_controllermap[ctrl->id] = ctrl;
 		ctrl->bind();
 	}
 }
@@ -161,8 +160,6 @@ void			Gameengine::control(int const id)
 
 	if ((ctrl = (Controller *)find_entity(id)))
 		ctrl->bind();
-	else
-		_controllermap[id] = ctrl;
 }
 
 void				Gameengine::tick(float const delta)

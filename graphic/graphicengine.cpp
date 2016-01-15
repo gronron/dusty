@@ -42,7 +42,7 @@ Graphicengine::Graphicengine() :	_animations_size(4096), _animations_count(0), _
 	camera.right = 0.0f;
 	camera.resolution[0] = 1440;
 	camera.resolution[1] = 900;
-	camera.fov = 1.9198621771f;
+	camera.fov = 1.745329251994f;
 	
 	_animations = new Animation*[_animations_size];
 
