@@ -46,6 +46,8 @@ Controller::~Controller()
 void	Controller::postinstanciation()
 {
 	Entity::postinstanciation();
+	if (id == engine->ctrlid)
+		bind();
 }
 
 void	Controller::bind()

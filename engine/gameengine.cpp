@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
-Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _entsize(1024), _entities(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
+Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrlid(-1), _entsize(1024), _entities(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
 {
 	Factory::get_instance().generate_type();
 
@@ -78,7 +78,7 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), _ent
 	if (!network)
 	{
 		Controller *ctrl = (Controller *)create(controllerclass, 0, true);
-		ctrl->bind();
+		ctrlid = ctrl->id;
 	}
 }
 
@@ -136,7 +136,7 @@ Entity		*Gameengine::create(Replication *r)
 
 Entity	*Gameengine::find_entity(int const id)
 {
-	return (id < (int)_entsize ? _entities[id] : 0);
+	return (id >= 0 && id < (int)_entsize ? _entities[id] : 0);
 }
 
 void	Gameengine::notify_owner(Entity *a, bool const l)
@@ -158,11 +158,12 @@ void			Gameengine::control(int const id)
 {
 	Controller	*ctrl;
 
-	if ((ctrl = (Controller *)find_entity(id)))
+	ctrlid = id;
+	if ((ctrl = (Controller *)find_entity(id)) && ctrl->state == Entity::OK)
 		ctrl->bind();
 }
 
-void				Gameengine::tick(float const delta)
+void	Gameengine::tick(float const delta)
 {
 	//std::cout << "em" << std::endl;
 	if (event)

@@ -196,7 +196,7 @@ void		Physicengine::tick(float const delta)
 	}
 	_sort_pairs(1);
 	
-	for (unsigned int i = 0; i < _prcount; ++i) // fix _currenttime
+	for (unsigned int i = 0; i < _prcount; ++i)
 	{
 		int const	a = _pairs[i].a;
 		int const	b = _pairs[i].b;

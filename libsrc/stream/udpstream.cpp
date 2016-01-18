@@ -30,15 +30,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring>
 #include <cstdio>
+#include "../new.hpp"
 #include "udpstream.hpp"
 
-Udp_server::Udp_server() : _id(INVALID_SOCKET), _tempid(0)
+Udp_server::Udp_server() : _id(INVALID_SOCKET), _maxclts(64)
 {
-
+	_clients = new Client[_maxclts];
+	for (unsigned int i = 0; i < _maxclts; ++i)
+		_clients[i].free = true;
 }
 
-Udp_server::Udp_server(char const *port, bool ipv6) : _id(INVALID_SOCKET), _tempid(0)
+Udp_server::Udp_server(char const *port, bool const ipv6) : _id(INVALID_SOCKET), _maxclts(64)
 {
+	_clients = new Client[_maxclts];
+	for (unsigned int i = 0; i < _maxclts; ++i)
+		_clients[i].free = true;
 	(*this)(port, ipv6);
 }
 
@@ -46,21 +52,22 @@ Udp_server::~Udp_server()
 {
 	if (_id != INVALID_SOCKET)
 		closesocket(_id);
+	delete [] _clients;
 }
 
 bool	Udp_server::operator()()
 {
 	if (_id != INVALID_SOCKET)
 	{
-		_tempid = 0;
-		_cltmap.clear();
+		for (unsigned int i = 0; i < _maxclts; ++i)
+			_clients[i].free = true;
 		closesocket(_id);
 		_id = INVALID_SOCKET;
 	}
 	return (true);
 }
 
-bool				Udp_server::operator()(char const *port, bool ipv6)
+bool				Udp_server::operator()(char const *port, bool const ipv6)
 {
 	struct addrinfo	*rs;
 	struct addrinfo	ai;
@@ -96,37 +103,42 @@ bool	Udp_server::is_good() const
 	return (_id != INVALID_SOCKET);
 }
 
-char const	*Udp_server::get_clientip(int id) const
+char const	*Udp_server::get_clientip(int const id) const
 {
-	std::map<int, Client>::const_iterator	i;
-
-	if ((i = _cltmap.find(id)) != _cltmap.end())
-		return (i->second.ip);
+	if (id >= 0 && !_clients[id].free)
+		return (_clients[id].ip);
 	else
 		return (0);
 }
 
-char const	*Udp_server::get_clientport(int id) const
+char const	*Udp_server::get_clientport(int const id) const
 {
-	std::map<int, Client>::const_iterator	i;
-
-	if ((i = _cltmap.find(id)) != _cltmap.end())
-		return (i->second.ip);
+	if (id >= 0 && !_clients[id].free)
+		return (_clients[id].port);
 	else
 		return (0);
 }
 
-int			Udp_server::add_client()
+int					Udp_server::add_client()
 {
-	int		err;
-	Client	clt;
-	socklen_t sl = sizeof(_tempaddr);
+	unsigned int	id;
+	int				err;
 
-	if (!(err = getnameinfo((struct sockaddr *)&_tempaddr, sl, clt.ip, IP_STRSIZE, clt.port, PORT_STRSIZE, NI_NUMERICHOST | NI_NUMERICSERV)))
+	for (id = 0; id < _maxclts; ++id)
+		if (_clients[id].free)
+			break;
+	if (id >= _maxclts)
 	{
-		clt.addr = _tempaddr;
-		_cltmap[_tempid] = clt;
-		return (_tempid++);
+		_maxclts <<= 1;
+		_clients = resize(_clients, id, _maxclts);
+		for (unsigned int i = id; i < _maxclts; ++i)
+			_clients[i].free = true;
+	}
+	if (!(err = getnameinfo((struct sockaddr *)&_tempaddr, sizeof(_tempaddr), _clients[id].ip, IP_STRSIZE, _clients[id].port, PORT_STRSIZE, NI_NUMERICHOST | NI_NUMERICSERV)))
+	{
+		_clients[id].addr = _tempaddr;
+		_clients[id].free = false;
+		return (id);
 	}
 	else
 	{
@@ -135,25 +147,25 @@ int			Udp_server::add_client()
 	}
 }
 
-void	Udp_server::rm_client(int id)
+void	Udp_server::rm_client(int const id)
 {
-	_cltmap.erase(id);
+	if (id >= 0 && !_clients[id].free)
+		_clients[id].free = true;
 }
 
-int		Udp_server::read(int &id, unsigned int size, void *data)
+int				Udp_server::read(int &id, unsigned int const size, void *data)
 {
-	std::map<int, Client>::iterator	i;
-	int	rsize;
-	socklen_t sl = sizeof(_tempaddr);
+	socklen_t	sl = sizeof(_tempaddr);
+	int			rsize;
 
 	id = -1;
 	if ((rsize = recvfrom(_id, (char *)data, size, 0, (struct sockaddr *)&_tempaddr, &sl)) >= 0)
 	{
-		for (i = _cltmap.begin(); i != _cltmap.end(); ++i)
+		for (unsigned int i = 0; i < _maxclts; ++i)
 		{
-			if (!memcmp(&i->second.addr, &_tempaddr, sl))
+			if (!_clients[i].free && !memcmp(&_clients[i].addr, &_tempaddr, sl))
 			{
-				id = i->first;
+				id = i;
 				break;
 			}
 		}
@@ -163,14 +175,13 @@ int		Udp_server::read(int &id, unsigned int size, void *data)
 	return (rsize);
 }
 
-int		Udp_server::write(int id, unsigned int size, void const *data)
+int		Udp_server::write(int const id, unsigned int const size, void const *data)
 {
-	std::map<int, Client>::const_iterator	i;
 	int	rsize;
 
-	if ((i = _cltmap.find(id)) != _cltmap.end())
+	if (id >= 0 && !_clients[id].free)
 	{
-		if ((rsize = sendto(_id, (char const *)data, size, 0, (struct sockaddr *)&i->second.addr, sizeof(i->second.addr))) < 0)
+		if ((rsize = sendto(_id, (char const *)data, size, 0, (struct sockaddr *)&_clients[id].addr, sizeof(_clients[id].addr))) < 0)
 			perror("Error: sendto()");
 		return (rsize);
 	}
@@ -185,12 +196,12 @@ Udpstream::Udpstream() : _id(INVALID_SOCKET)
 
 }
 
-Udpstream::Udpstream(char const *ip, char const *port, bool ipv6) : _id(INVALID_SOCKET)
+Udpstream::Udpstream(char const *ip, char const *port, bool const ipv6) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, port, ipv6);
 }
 
-Udpstream::Udpstream(char const *ip, char const *pin, char const *pout, bool ipv6) : _id(INVALID_SOCKET)
+Udpstream::Udpstream(char const *ip, char const *pin, char const *pout, bool const ipv6) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, pin, pout, ipv6);
 }
@@ -211,7 +222,7 @@ bool	Udpstream::operator()()
 	return (true);
 }
 
-bool				Udpstream::operator()(char const *ip, char const *port, bool ipv6)
+bool				Udpstream::operator()(char const *ip, char const *port, bool const ipv6)
 {
 	struct addrinfo	*rs;
 	struct addrinfo	ai;
@@ -241,7 +252,7 @@ bool				Udpstream::operator()(char const *ip, char const *port, bool ipv6)
 	return (_id != INVALID_SOCKET);
 }
 
-bool				Udpstream::operator()(char const *ip, char const *pin, char const *pout, bool ipv6)
+bool				Udpstream::operator()(char const *ip, char const *pin, char const *pout, bool const ipv6)
 {
 	struct addrinfo	*rs, *rb;
 	struct addrinfo	ai;
@@ -287,7 +298,7 @@ bool	Udpstream::is_good() const
 	return (_id != INVALID_SOCKET);
 }
 
-int			Udpstream::read(unsigned int size, void *data)
+int			Udpstream::read(unsigned int const size, void *data)
 {
 	int		rsize;
 
@@ -301,7 +312,7 @@ int			Udpstream::read(unsigned int size, void *data)
 		return (-1);
 }
 
-int			Udpstream::write(unsigned int size, void const *data)
+int			Udpstream::write(unsigned int const size, void const *data)
 {
 	int	rsize;
 

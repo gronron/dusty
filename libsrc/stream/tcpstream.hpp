@@ -69,8 +69,8 @@ class	Tcpstream : public Stream
 
 		bool	is_good() const;
 
-		int		read(unsigned int size, void *data);
-		int		write(unsigned int size, void const *data);
+		int		read(unsigned int const size, void *data);
+		int		write(unsigned int const size, void const *data);
 };
 
 #endif

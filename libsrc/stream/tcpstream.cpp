@@ -187,7 +187,7 @@ bool	Tcpstream::is_good() const
 	return (_id != INVALID_SOCKET);
 }
 
-int 		Tcpstream::read(unsigned int size, void *data)
+int 		Tcpstream::read(unsigned int const size, void *data)
 {
 	int	rsize;
 
@@ -201,7 +201,7 @@ int 		Tcpstream::read(unsigned int size, void *data)
 		return (-1);
 }
 
-int			Tcpstream::write(unsigned int size, void const *data)
+int			Tcpstream::write(unsigned int const size, void const *data)
 {
 	int	rsize;
 

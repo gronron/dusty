@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef GAMEENGINE_H_
 #define GAMEENGINE_H_
 
-#include <map>
 #include <string>
 
 class	Entity;
@@ -62,6 +61,7 @@ class	Gameengine
 
 
 		bool			master;
+		int				ctrlid;
 		
 		unsigned int	_entsize;
 		Entity			**_entities;
@@ -75,7 +75,7 @@ class	Gameengine
 		Eventmanager	*event;
 		//Uimanager		*um;
 
-		std::string					controllerclass;
+		std::string		controllerclass;
 
 
 		Gameengine(Option const &);

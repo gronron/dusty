@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define NETWORKENGINE_H_
 
 #include <string>
-#include <map>
 #include "replication.hpp"
 #include "messagequeue.hpp"
 #include "thread/thread.hpp"
@@ -57,7 +56,7 @@ class	Networkengine
 		unsigned int	_rsize;
 		Replication		*_replications;
 
-		std::map<int, int>				_playeridmap;
+		int				*_playerids;
 
 		Messagequeue	mq;
 

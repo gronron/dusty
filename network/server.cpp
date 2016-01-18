@@ -37,8 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float const	Server::pingrate = 0.5f;
 float const	Server::timeout = 5.0f;
 
-Server::Server(Messagequeue *m, std::string const &port) : mq(m), _tcpsrv(port.c_str(), false), _udpsrv(port.c_str(), false), _currentid(0)
+Server::Server(Messagequeue *m, std::string const &port) : mq(m), _tcpsrv(port.c_str(), false), _udpsrv(port.c_str(), false), _maxclts(64)
 {
+	_clients = new Client[_maxclts];
 	if (!_tcpsrv.is_good() || !_udpsrv.is_good())
 		exit(EXIT_FAILURE);
 	_slctr.add_socket(_tcpsrv);
@@ -47,17 +48,12 @@ Server::Server(Messagequeue *m, std::string const &port) : mq(m), _tcpsrv(port.c
 
 Server::~Server()
 {
-	for (std::list<Client>::iterator i = _cltlist.begin(); i != _cltlist.end(); i = _cltlist.erase(i))
-	{
-		delete i->tcp;
-		delete i->ping;
-	}
+	delete [] _clients;
+	//delete ping ??
 }
 
-void							Server::tick(float delta)
+void	Server::tick(float const delta)
 {
-	std::list<Client>::iterator	i;
-
 	_pingclient(delta);
 	while (_slctr.check(0.0f))
 	{
@@ -65,175 +61,160 @@ void							Server::tick(float delta)
 			_addclient();
 		if (_slctr.is_ready(_udpsrv))
 			_receivepacket();
-		for (i = _cltlist.begin(); i != _cltlist.end();)
-		{
-			if (!_slctr.is_ready(*i->tcp) || _comtcpclient(i))
-				++i;
-		}
+		for (unsigned int i = 0; i < _maxclts; ++i)
+			if (_clients[i].tcp.is_good() && _slctr.is_ready(_clients[i].tcp))
+				_comtcpclient(i);
 	}
 	_sendpacket();
 }
 
-void		Server::_addclient()
+void				Server::_addclient()
 {
-	Client	clt;
-	Header	hdr;
+	unsigned int	id;
+	Header			hdr;
 
-	clt.id = ++_currentid;
-	clt.tcp = new Tcpstream(_tcpsrv, clt.ip, clt.port);
-	if (!clt.tcp->is_good())
+	for (id = 0; id < _maxclts; ++id)
 	{
-		delete clt.tcp;
-		return;
+		if (!_clients[id].tcp.is_good())
+			break;
 	}
-	hdr.size = sizeof(clt.id);
+	if (id >= _maxclts)
+		; //don't accept client
+	
+	_clients[id].tcp(_tcpsrv, _clients[id].ip, _clients[id].port);
+	if (!_clients[id].tcp.is_good())
+		return;
+	hdr.size = sizeof(id);
 	hdr.type = CNTID;
-	if (clt.tcp->write(sizeof(Header), &hdr) < 0 || clt.tcp->write(hdr.size, &clt.id) < 0)
+	if (_clients[id].tcp.write(sizeof(Header), &hdr) < 0 || _clients[id].tcp.write(hdr.size, &id) < 0)
 	{
-		std::cerr << "Warning: Server::_addclient() fails to send connection id to: " << clt.port << " " << clt.ip << std::endl;
-		delete clt.tcp;
+		std::cerr << "Warning: Server::_addclient() fails to send connection id to: " << _clients[id].ip << ":" << _clients[id].port << std::endl;
+		_clients[id].tcp();
 		return;
 	}
-	clt.udpid = -1;
-	clt.ping = new Ping(8);
-	_slctr.add_socket(*clt.tcp);
-	mq->push_in_cnt(clt.id);
-	_cltlist.push_back(clt);
+	_clients[id].udpid = -1;
+	_clients[id].ping = new Ping(8);
+	_slctr.add_socket(_clients[id].tcp);
+	mq->push_in_cnt(id);
 }
 
-void	Server::_delclient(std::list<Client>::iterator	&i)
+void	Server::_delclient(int const id)
 {
 	std::cout << "Client disconected" << std::endl;
-	mq->push_in_discnt(i->id);
-	_udpsrv.rm_client(i->udpid);
-	_slctr.rm_socket(*i->tcp);
-	delete i->tcp;
-	delete i->ping;
-	i = _cltlist.erase(i);
+	mq->push_in_discnt(id);
+	_udpsrv.rm_client(_clients[id].udpid);
+	_slctr.rm_socket(_clients[id].tcp);
+	_clients[id].tcp();
+	delete _clients[id].ping;
 }
 
-void		Server::_pingclient(float delta)
+void		Server::_pingclient(float const delta)
 {
 	Header	hdr;
 
-	for (std::list<Client>::iterator i = _cltlist.begin(); i != _cltlist.end();)
+	for (unsigned int i = 0; i < _maxclts; ++i)
 	{
-		if  (i->ping->pinging)
+		if  (_clients[i].ping->pinging)
 		{
-			if ((i->ping->tempping[i->ping->idx] += delta) > timeout)
+			if ((_clients[i].ping->tempping[_clients[i].ping->idx] += delta) > timeout)
 				_delclient(i);
-			else
-				++i;
 		}
 		else
 		{
-			if ((i->ping->timer += delta) >= pingrate)
+			if ((_clients[i].ping->timer += delta) >= pingrate)
 			{
-				i->ping->start();
+				_clients[i].ping->start();
 				hdr.type = FPING;
-				i->tcp->write(sizeof(hdr), &hdr);
+				_clients[i].tcp.write(sizeof(hdr), &hdr);
 			}
-			++i;
 		}
 	}
 }
 
-bool		Server::_comtcpclient(std::list<Client>::iterator	&i)
+bool		Server::_comtcpclient(int const id)
 {
 	Header	hdr;
 	int		size;
 	char	data[Udpstream::MAXUDPSIZE];
 
-	if ((size = i->tcp->read(sizeof(hdr), &hdr)) > 0)
+	if ((size = _clients[id].tcp.read(sizeof(hdr), &hdr)) > 0)
 	{
 		if (hdr.type == SPING)
 		{
 			hdr.type = TPING;
-			i->tcp->write(sizeof(hdr), &hdr);
-			i->ping->stop();
+			_clients[id].tcp.write(sizeof(hdr), &hdr);
+			_clients[id].ping->stop();
 			return (true);
 		}
 		else if (hdr.type == TEXTMSG)
 		{
-			if ((size = i->tcp->read(hdr.size, data)) > 0)
+			if ((size = _clients[id].tcp.read(hdr.size, data)) > 0)
 			{
-				mq->push_in_textmsg(i->id, size, data);
+				mq->push_in_textmsg(id, size, data);
 				return (true);
 			}
 		}
 		else
-			std::cerr << "Warning: Server::_comtcpclient() receives bad data from: " << i->port << " " << i->ip << std::endl;
+			std::cerr << "Warning: Server::_comtcpclient() receives bad data from: " << _clients[id].ip << ":" << _clients[id].port << std::endl;
 	}
-	_delclient(i);
+	_delclient(id);
 	return (false);
 }
 
-void							Server::_receivepacket()
+void		Server::_receivepacket()
 {
-	std::list<Client>::iterator	i;
-	char						a[Udpstream::MAXUDPSIZE];
-	int							size;
-	int							cltid;
-	int							cltudpid;
+	char	a[Udpstream::MAXUDPSIZE];
+	int		size;
+	int		id;
+	int		udpid;
 
-	if ((size = _udpsrv.read(cltudpid, Udpstream::MAXUDPSIZE, a)) > 0)
+	if ((size = _udpsrv.read(udpid, Udpstream::MAXUDPSIZE, a)) > 0)
 	{
-		if (cltudpid >= 0)
+		if (udpid >= 0)
 		{
-			for (i = _cltlist.begin(); i != _cltlist.end(); ++i)
+			for (unsigned int i = 0; i < _maxclts; ++i)
 			{
-				if (i->udpid == cltudpid)
+				if (_clients[i].udpid == udpid && _clients[i].tcp.is_good())
 				{
-					mq->push_in_pckt(i->id, i->ping->ping, size, a);
+					mq->push_in_pckt(i, _clients[i].ping->ping, size, a);
 					break;
 				}
 			}
 
 		}
-		else if (size == 4)
+		else if (size == sizeof(short int))
 		{
-			memcpy(&cltid, a, sizeof(long int));
-			for (i = _cltlist.begin(); i != _cltlist.end(); ++i)
-			{
-				if (i->id == cltid)
-				{
-					i->udpid = _udpsrv.add_client();
-					break;
-				}
-			}
+			memcpy(&id, a, sizeof(short int));
+			if (id >= 0 && id < (int)_maxclts && _clients[id].tcp.is_good() && _clients[id].udpid < 0)
+				_clients[id].udpid = _udpsrv.add_client();
 		}
 	}
 	else if (size < 0)
 		std::cerr << "Warning: Server::_receivepacket() fails to read on udp" << std::endl;
 }
 
-void							Server::_sendpacket()
+void						Server::_sendpacket()
 {
-	std::list<Client>::iterator	i;
-	Messagequeue::Message		*msg;
-	Header						hdr;
+	Messagequeue::Message	*msg;
+	Header					hdr;
 
 	while ((msg = mq->get_out()))
 	{
 		if (msg->type == Messagequeue::UPDATE || msg->type == Messagequeue::DESTROY)
 		{
-			for (i = _cltlist.begin(); i != _cltlist.end(); ++i)
-				if (i->udpid >= 0)
-					_udpsrv.write(i->udpid, msg->pckt.get_size(), msg->pckt.get_data());
+			for (unsigned int i = 0; i < _maxclts; ++i)
+				if (_clients[i].udpid >= 0)
+					_udpsrv.write(_clients[i].udpid, msg->pckt.get_size(), msg->pckt.get_data());
 		}
 		else if (msg->type == Messagequeue::CONNECTION)
 		{
-			for (i = _cltlist.begin(); i != _cltlist.end(); ++i)
+			if (msg->cltid >= 0 && _clients[msg->cltid].tcp.is_good())
 			{
-				if (i->id == msg->cltid)
-				{
-					Header	hdr;
-					hdr.size = sizeof(msg->actid);
-					hdr.type = MID;
-					i->tcp->write(sizeof(hdr), &hdr);
-					i->tcp->write(hdr.size, &msg->actid);
-					break;
-				}
+				Header	hdr;
+				hdr.size = sizeof(msg->actid);
+				hdr.type = MID;
+				_clients[msg->cltid].tcp.write(sizeof(hdr), &hdr);
+				_clients[msg->cltid].tcp.write(hdr.size, &msg->actid);
 			}
 		}
 		else if (msg->type == Messagequeue::DISCONNECTION)
@@ -242,10 +223,13 @@ void							Server::_sendpacket()
 		{
 			hdr.size = msg->pckt.get_size();
 			hdr.type = TEXTMSG;
-			for (i = _cltlist.begin(); i != _cltlist.end(); ++i)
+			for (unsigned int i = 0; i < _maxclts; ++i)
 			{
-				i->tcp->write(sizeof(hdr), &hdr);
-				i->tcp->write(msg->pckt.get_size(), msg->pckt.get_data());
+				if (_clients[i].tcp.is_good())
+				{
+					_clients[i].tcp.write(sizeof(hdr), &hdr);
+					_clients[i].tcp.write(msg->pckt.get_size(), msg->pckt.get_data());
+				}
 			}
 		}
 		mq->pop_out();

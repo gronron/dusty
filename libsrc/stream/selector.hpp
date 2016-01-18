@@ -57,19 +57,19 @@ class	Selector
 };
 
 template<class T>
-void	Selector::add_socket(T const &x)
+inline void	Selector::add_socket(T const &x)
 {
 	_strmlist.push_back(x._id);
 }
 
 template<class T>
-void	Selector::rm_socket(T const &x)
+inline void	Selector::rm_socket(T const &x)
 {
 	_strmlist.remove(x._id);
 }
 
 template<class T>
-bool	Selector::is_ready(T const &x)
+inline bool	Selector::is_ready(T const &x)
 {
 	return (FD_ISSET(x._id, &_rfds) != 0);
 }

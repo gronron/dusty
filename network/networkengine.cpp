@@ -98,7 +98,6 @@ Replication		*Networkengine::new_replication(int const id)
 
 void								Networkengine::tick(float const delta)
 {
-	std::map<int, int>::iterator	j;
 	Messagequeue::Message			*msg;
 	int								id;
 
@@ -126,14 +125,17 @@ void								Networkengine::tick(float const delta)
 		else if (msg->type == Messagequeue::CONNECTION)
 		{
  			id = engine->create(engine->controllerclass, 0, true)->id;
-			_playeridmap[msg->cltid] = id;
+			_playerids[msg->cltid] = id;
 			mq.push_out_cnt(msg->cltid, id);
 		}
 		else if (msg->type == Messagequeue::DISCONNECTION)
 		{
-			if ((j = _playeridmap.find(msg->cltid)) != _playeridmap.end())
-				if (_replications[j->second].entity)
-					_replications[j->second].entity->destroy();
+			if (_playerids[msg->cltid] >= 0)
+			{
+				if (_replications[_playerids[msg->cltid]].entity)
+					_replications[_playerids[msg->cltid]].entity->destroy();
+				_playerids[msg->cltid] = -1;
+			}
 		}
 		else if (msg->type == Messagequeue::CONTROL)
 			engine->control(msg->actid);

@@ -43,13 +43,12 @@ class	Server
 {
 	public:
 
-		struct	Client
+		struct			Client
 		{
-			int			id;
+			Tcpstream	tcp;
+			int			udpid;
 			char		ip[IP_STRSIZE];
 			char		port[PORT_STRSIZE];
-			Tcpstream	*tcp;
-			int			udpid;
 			Ping		*ping;
 		};
 
@@ -63,20 +62,21 @@ class	Server
 		Selector			_slctr;
 		Tcp_server			_tcpsrv;
 		Udp_server			_udpsrv;
-		std::list<Client>	_cltlist;
-		int					_currentid;
+		unsigned int		_maxclts;
+		Client				*_clients;
+	
 
 		Server(Messagequeue *, std::string const &);
 		~Server();
 
-		void	tick(float);
+		void	tick(float const);
 
 		void	_addclient();
-		void	_pingclient(float);
-		bool	_comtcpclient(std::list<Client>::iterator &);
+		void	_pingclient(float const);
+		bool	_comtcpclient(int const);
 		void	_receivepacket();
 		void	_sendpacket();
-		void	_delclient(std::list<Client>::iterator	&);
+		void	_delclient(int const);
 };
 
 #endif

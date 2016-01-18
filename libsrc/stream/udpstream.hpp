@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UDP_STREAM_H_
 #define UDP_STREAM_H_
 
-#include <map>
 #include "socket.hpp"
 #include "stream.hpp"
 
@@ -44,33 +43,35 @@ class	Udp_server
 			sockaddr_in	addr;
 			char		ip[IP_STRSIZE];
 			char		port[PORT_STRSIZE];
+			bool		free;
 		};
 
 
-		Socket					_id;
+		Socket			_id;
 
-		std::map<int, Client>	_cltmap;
-		int						_tempid;
-		sockaddr_in				_tempaddr;
+		unsigned int	_maxclts;
+		Client			*_clients;
+		
+		sockaddr_in		_tempaddr;
 
 
 		Udp_server();
-		Udp_server(char const *port, bool ipv6);
+		Udp_server(char const *port, bool const ipv6);
 		~Udp_server();
 
 		bool		operator()();
-		bool		operator()(char const *port, bool ipv6);
+		bool		operator()(char const *port, bool const ipv6);
 
 		bool		is_good() const;
 
-		char const	*get_clientip(int id) const;
-		char const	*get_clientport(int id) const;
+		char const	*get_clientip(int const id) const;
+		char const	*get_clientport(int const id) const;
 
 		int			add_client();
-		void		rm_client(int id);
+		void		rm_client(int const id);
 
-		int			read(int &id, unsigned int size, void *data);
-		int			write(int id, unsigned int size, void const *data);
+		int			read(int &id, unsigned int const size, void *data);
+		int			write(int const id, unsigned int const size, void const *data);
 };
 
 class	Udpstream : public Stream
@@ -92,8 +93,8 @@ class	Udpstream : public Stream
 
 		bool	is_good() const;
 
-		int		read(unsigned int size, void *data);
-		int		write(unsigned int size, void const *data);
+		int		read(unsigned int const size, void *data);
+		int		write(unsigned int const size, void const *data);
 };
 
 #endif

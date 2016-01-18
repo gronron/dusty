@@ -37,7 +37,7 @@ class Istream
 
 		virtual ~Istream() {};
 
-		virtual int		read(unsigned int size, void *data) = 0;
+		virtual int		read(unsigned int const size, void *data) = 0;
 };
 
 class Ostream
@@ -46,7 +46,7 @@ class Ostream
 
 		virtual ~Ostream() {};
 
-		virtual int		write(unsigned int size, void const *data) = 0;
+		virtual int		write(unsigned int const size, void const *data) = 0;
 };
 
 class Stream : public Istream, public Ostream

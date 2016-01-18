@@ -51,7 +51,7 @@ class	Client
 		Selector		_slctr;
 		Tcpstream		_tcp;
 		Udpstream		_udp;
-		int				cntid;
+		short int		cntid;
 		Ping			ping;
 		bool			connected;
 		float			timer;
