@@ -33,18 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../new.hpp"
 #include "udpstream.hpp"
 
-Udp_server::Udp_server() : _id(INVALID_SOCKET), _maxclts(64)
+Udp_server::Udp_server() : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free(0)
 {
 	_clients = new Client[_maxclts];
 	for (unsigned int i = 0; i < _maxclts; ++i)
-		_clients[i].free = true;
+		_clients[i].next = i + 1;
+	_clients[_maxclts - 1].next = -1;
 }
 
-Udp_server::Udp_server(char const *port, bool const ipv6) : _id(INVALID_SOCKET), _maxclts(64)
+Udp_server::Udp_server(char const *port, bool const ipv6) : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free(0)
 {
 	_clients = new Client[_maxclts];
 	for (unsigned int i = 0; i < _maxclts; ++i)
-		_clients[i].free = true;
+		_clients[i].next = i + 1;
+	_clients[_maxclts - 1].next = -1;
 	(*this)(port, ipv6);
 }
 
@@ -60,7 +62,9 @@ bool	Udp_server::operator()()
 	if (_id != INVALID_SOCKET)
 	{
 		for (unsigned int i = 0; i < _maxclts; ++i)
-			_clients[i].free = true;
+			_clients[i].next = i + 1;
+		_clients[_maxclts - 1].next = -1;
+		_free = 0;
 		closesocket(_id);
 		_id = INVALID_SOCKET;
 	}
@@ -105,7 +109,7 @@ bool	Udp_server::is_good() const
 
 char const	*Udp_server::get_clientip(int const id) const
 {
-	if (id >= 0 && !_clients[id].free)
+	if (id >= 0 && _clients[id].next < 0)
 		return (_clients[id].ip);
 	else
 		return (0);
@@ -113,7 +117,7 @@ char const	*Udp_server::get_clientip(int const id) const
 
 char const	*Udp_server::get_clientport(int const id) const
 {
-	if (id >= 0 && !_clients[id].free)
+	if (id >= 0 && _clients[id].next < 0)
 		return (_clients[id].port);
 	else
 		return (0);
@@ -124,20 +128,21 @@ int					Udp_server::add_client()
 	unsigned int	id;
 	int				err;
 
-	for (id = 0; id < _maxclts; ++id)
-		if (_clients[id].free)
-			break;
-	if (id >= _maxclts)
+	if (_free < 0)
 	{
+		_free = _maxclts;
 		_maxclts <<= 1;
-		_clients = resize(_clients, id, _maxclts);
-		for (unsigned int i = id; i < _maxclts; ++i)
-			_clients[i].free = true;
+		_clients = resize(_clients, _free, _maxclts);
+		for (unsigned int i = _free; i < _maxclts; ++i)
+			_clients[i].next = i + 1;
+		_clients[_maxclts - 1].next = -1;
 	}
+	id = _free;
+	_free = _clients[_free].next;
 	if (!(err = getnameinfo((struct sockaddr *)&_tempaddr, sizeof(_tempaddr), _clients[id].ip, IP_STRSIZE, _clients[id].port, PORT_STRSIZE, NI_NUMERICHOST | NI_NUMERICSERV)))
 	{
 		_clients[id].addr = _tempaddr;
-		_clients[id].free = false;
+		_clients[id].next = -1;
 		return (id);
 	}
 	else
@@ -149,8 +154,11 @@ int					Udp_server::add_client()
 
 void	Udp_server::rm_client(int const id)
 {
-	if (id >= 0 && !_clients[id].free)
-		_clients[id].free = true;
+	if (id >= 0 && _clients[id].next < 0)
+	{
+		 _clients[id].next = _free;
+		_free = id;
+	}
 }
 
 int				Udp_server::read(int &id, unsigned int const size, void *data)
@@ -163,7 +171,7 @@ int				Udp_server::read(int &id, unsigned int const size, void *data)
 	{
 		for (unsigned int i = 0; i < _maxclts; ++i)
 		{
-			if (!_clients[i].free && !memcmp(&_clients[i].addr, &_tempaddr, sl))
+			if (_clients[i].next < 0 && !memcmp(&_clients[i].addr, &_tempaddr, sl))
 			{
 				id = i;
 				break;
@@ -179,7 +187,7 @@ int		Udp_server::write(int const id, unsigned int const size, void const *data)
 {
 	int	rsize;
 
-	if (id >= 0 && !_clients[id].free)
+	if (id >= 0 && _clients[id].next < 0)
 	{
 		if ((rsize = sendto(_id, (char const *)data, size, 0, (struct sockaddr *)&_clients[id].addr, sizeof(_clients[id].addr))) < 0)
 			perror("Error: sendto()");

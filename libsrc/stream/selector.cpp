@@ -31,32 +31,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include "selector.hpp"
 
-Selector::Selector()
+Selector::Selector() : _nfds(0)
 {
-
+	FD_ZERO(&_readfds);
+	FD_ZERO(&_tempfds);
 }
 
 Selector::~Selector()
 {
-	FD_ZERO(&_rfds);
+	FD_ZERO(&_readfds);
+	FD_ZERO(&_tempfds);
 }
 
-bool				Selector::check(float timeout)
+bool				Selector::check(float const timeout)
 {
 	struct timeval	tv;
-	Socket			max = 0;
 	int				ret;
 
 	tv.tv_sec = (int)timeout;
 	tv.tv_usec = (int)((timeout - tv.tv_sec) * 1000000);
-	FD_ZERO(&_rfds);
-	for (std::list<Socket>::iterator it = _strmlist.begin(); it != _strmlist.end(); it++)
-	{
-		if (max < *it)
-			max = *it;
-		FD_SET(*it, &_rfds);
-	}
-	if ((ret = select((int)max + 1, &_rfds, 0, 0, timeout < 0.0f ? 0 : &tv)) < 0)
+	memcpy(&_tempfds, &_readfds, sizeof(_readfds));
+	if ((ret = select((int)_nfds, &_tempfds, 0, 0, timeout < 0.0f ? 0 : &tv)) < 0)
 	{
 		perror("Error: select()");
 		return (false);

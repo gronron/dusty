@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SELECTOR_H_
 #define SELECTOR_H_
 
-#include <list>
 #include "socket.hpp"
 #include "stream.hpp"
 
@@ -39,8 +38,9 @@ class	Selector
 {
     public:
 
-		fd_set				_rfds;
-        std::list<Socket>	_strmlist;
+		Socket				_nfds;
+		fd_set				_readfds;
+		fd_set				_tempfds;
 
 
 		Selector();
@@ -59,19 +59,21 @@ class	Selector
 template<class T>
 inline void	Selector::add_socket(T const &x)
 {
-	_strmlist.push_back(x._id);
+	if (x._id >= _nfds)
+		_nfds = x._id + 1;
+	FD_SET(x._id, &_readfds);
 }
 
 template<class T>
 inline void	Selector::rm_socket(T const &x)
 {
-	_strmlist.remove(x._id);
+	FD_CLR(x._id, &_readfds);
 }
 
 template<class T>
 inline bool	Selector::is_ready(T const &x)
 {
-	return (FD_ISSET(x._id, &_rfds) != 0);
+	return (FD_ISSET(x._id, &_tempfds) != 0);
 }
 
 #endif

@@ -43,7 +43,7 @@ class	Udp_server
 			sockaddr_in	addr;
 			char		ip[IP_STRSIZE];
 			char		port[PORT_STRSIZE];
-			bool		free;
+			int			next;
 		};
 
 
@@ -51,6 +51,7 @@ class	Udp_server
 
 		unsigned int	_maxclts;
 		Client			*_clients;
+		int				_free;
 		
 		sockaddr_in		_tempaddr;
 
