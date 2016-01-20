@@ -181,7 +181,7 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) : _windo
 	_kernel = clCreateKernel(_program, "raytrace", &error);
 	check_error(error, "clCreateKernel()");
 	
-	//_camera_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, sizeof(Computedcamera), 0, &error);
+	_camera_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, sizeof(Computedcamera), 0, &error);
 	_image_mem = clCreateFromGLTexture(_context, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, _texture, &error);
 	check_error(error, "clCreateImage()");
 }
@@ -190,7 +190,7 @@ Renderer::~Renderer()
 {
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 	
-	//clReleaseMemObject(_camera_mem);
+	clReleaseMemObject(_camera_mem);
 	clReleaseMemObject(_nodes_mem);
 	clReleaseMemObject(_materials_mem);
 	clReleaseMemObject(_lights_mem);
@@ -240,7 +240,7 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		_materials_mem_size = ge->_materials_size;
 		_materials_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _materials_mem_size * sizeof(Material), 0, &error);
 		check_error(error, "clCreateBuffer()");
-		check_error(clEnqueueWriteBuffer(_queue, _materials_mem, CL_TRUE, 0, ge->_materials_count * sizeof(Material), (void *)ge->_materials, 0, 0, 0), "clEnqueueWriteBuffer()");
+		check_error(clEnqueueWriteBuffer(_queue, _materials_mem, CL_FALSE, 0, ge->_materials_count * sizeof(Material), (void *)ge->_materials, 0, 0, 0), "clEnqueueWriteBuffer()");
 	}
 	if (_lights_mem_size < ge->_lights_size)
 	{
@@ -250,24 +250,20 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		_lights_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _lights_mem_size * sizeof(Light), 0, &error);
 		check_error(error, "clCreateBuffer()");
 	}
-	check_error(clEnqueueWriteBuffer(_queue, _nodes_mem, CL_TRUE, 0, ge->aabbtree._size * sizeof(Node), (void *)ge->aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
-	check_error(clEnqueueWriteBuffer(_queue, _lights_mem, CL_TRUE, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights, 0, 0, 0), "clEnqueueWriteBuffer()");
+	check_error(clEnqueueWriteBuffer(_queue, _nodes_mem, CL_FALSE, 0, ge->aabbtree._size * sizeof(Node), (void *)ge->aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
+	check_error(clEnqueueWriteBuffer(_queue, _lights_mem, CL_FALSE, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights, 0, 0, 0), "clEnqueueWriteBuffer()");
 }
 
 void	Renderer::render(Graphicengine const *ge)
 {
 	Computedcamera	cm;
-	
-	glFinish();
-	check_error(clEnqueueAcquireGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueAcquireGLObjects()");
 
 	_compute_camera(ge->camera, cm);
 	_set_buffer(ge);
 
-	//check_error(clEnqueueWriteBuffer(_queue, _camera_mem, CL_TRUE, 0, sizeof(Computedcamera), (void *)&cm, 0, 0, 0), "clEnqueueWriteBuffer()");
-
-	//check_error(clSetKernelArg(_kernel, 0, sizeof(cl_mem), &_camera_mem), "clSetKernelArg(camera)");
-	check_error(clSetKernelArg(_kernel, 0, sizeof(Computedcamera), &cm), "clSetKernelArg(camera)");
+	check_error(clEnqueueWriteBuffer(_queue, _camera_mem, CL_FALSE, 0, sizeof(Computedcamera), (void *)&cm, 0, 0, 0), "clEnqueueWriteBuffer()");
+	check_error(clSetKernelArg(_kernel, 0, sizeof(cl_mem), &_camera_mem), "clSetKernelArg(camera)");
+	//check_error(clSetKernelArg(_kernel, 0, sizeof(Computedcamera), &cm), "clSetKernelArg(camera)");
 	check_error(clSetKernelArg(_kernel, 1, sizeof(int), &ge->aabbtree._root), "clSetKernelArg(root)");
 	check_error(clSetKernelArg(_kernel, 2, sizeof(cl_mem), &_nodes_mem), "clSetKernelArg(nodes)");
 	check_error(clSetKernelArg(_kernel, 3, sizeof(cl_mem), &_materials_mem), "clSetKernelArg(materials)");
@@ -278,6 +274,8 @@ void	Renderer::render(Graphicengine const *ge)
 	size_t const	origin[3] = { 0, 0, 0 };
 	size_t const	image_size[3] = { ge->camera.resolution[0], ge->camera.resolution[1], 1 };
 
+	glFinish();
+	check_error(clEnqueueAcquireGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueAcquireGLObjects()");
 	check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, image_size, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
 	check_error(clEnqueueReleaseGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueReleaseGLObjects()");
 	clFinish(_queue);
