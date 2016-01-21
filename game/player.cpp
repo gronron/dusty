@@ -93,7 +93,7 @@ void	Player::tick(float const delta)
 				p->body->position = body->position;
 				a[0] = (float)MT().genrand_real1(-1.0, 1.0);
 				a[1] = (float)MT().genrand_real1(-1.0, 1.0);
-				p->body->velocity = vunit<float>(a) * 2.0f;
+				p->body->velocity = (vec<float, 4>)vunit<float>(a) * 2.0f;
 			}
 			loadingtime = 0.0f;
 		}

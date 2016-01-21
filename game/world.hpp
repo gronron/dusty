@@ -45,18 +45,17 @@ class	World : public Entity
 		{
 			unsigned char	blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 		};
-	
+
+
 		vec<unsigned int, 4>	size;
 		Chunk					***chunks;
-		Light	*light;
-		double	time;
+
+		Light				*light;
 		
 		Axisalignedboxshape	shape;
 		Body				*body;
 
-		//int		teamids[2];
-		//Team	*teams;
-	
+
 		World(Gameengine *, Replication *, int const, short int const, Entity const *);
 		virtual ~World();
 

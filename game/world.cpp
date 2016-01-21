@@ -45,14 +45,13 @@ FACTORYREG(World);
 
 struct		Result
 {
-	int		bodyindex;
 	int		aabbindex;
 	float	near;
 	float	far;
 	
-	bool	callback(int const aabbidx, int const bdidx, float const nr, float const fr)
+	bool	callback(int const aabbidx, int const, float const nr, float const fr)
 	{
-		if (/*bdidx == bodyindex && */nr > 0.0f && nr < near)
+		if (nr > 0.0f && nr < near)
 		{
 			aabbindex = aabbidx;
 			near = nr;
@@ -64,6 +63,7 @@ struct		Result
 
 World::World(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o)
 {
+	
 	size = 2;
 	chunks = new_space<Chunk>(2, 2, 2);
 
@@ -108,7 +108,7 @@ World::~World()
 
 void	World::tick(float const delta)
 {
-	time += delta;
+	float time;
 	
 	time = 1.0f;
 	light->position[1] = (float)sin(time) * 4000.0f;
@@ -182,7 +182,7 @@ void					World::fill(vec<int, 4> const &start, vec<int, 4> const &end, char cons
 
 bool	World::create_block(Ray const &ray, char const value)
 {
-	Result	result = { id, -1, INFINITY, INFINITY };
+	Result	result = { -1, INFINITY, INFINITY };
 	
 	engine->graphic->aabbtree.raycast(ray, &result, &Result::callback);
 	if (result.aabbindex != -1)
@@ -191,12 +191,12 @@ bool	World::create_block(Ray const &ray, char const value)
 		intersect_rayaabb_n(ray, engine->graphic->aabbtree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
 
 		vec<float, 4> const	position = engine->graphic->aabbtree._nodes[result.aabbindex].aabb.bottom + normal;
-		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
-		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
+		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
+		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
-		if (!chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]])
+		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && !chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
 		{
-			chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = value;
+			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = value;
 
 			Aabb	aabb;
 			aabb.bottom = position;
@@ -211,18 +211,18 @@ bool	World::create_block(Ray const &ray, char const value)
 
 bool	World::destroy_block(Ray const &ray)
 {
-	Result	result = { id, -1, INFINITY, INFINITY };
+	Result	result = { -1, INFINITY, INFINITY };
 	
 	engine->graphic->aabbtree.raycast(ray, &result, &Result::callback);
 	if (result.aabbindex != -1)
 	{
 		vec<float, 4> const	position = engine->graphic->aabbtree._nodes[result.aabbindex].aabb.bottom;
-		vec<float, 4> const	wp = vcall(floor, position / (float)CHUNK_SIZE);
-		vec<float, 4> const	cp = vcall(round, position - wp * (float)CHUNK_SIZE);
+		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
+		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 		
-		if (chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]])
+		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
 		{
-			chunks[(int)wp[0]][(int)wp[1]][(int)wp[2]].blocks[(int)cp[0]][(int)cp[1]][(int)cp[2]] = 0;
+			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = 0;
 			engine->graphic->aabbtree.remove_aabb(result.aabbindex);
 			
 			Aabb	aabb;
@@ -253,9 +253,9 @@ void	World::_cull_chunk(Chunk &chunk, vec<float, 4> const &position)
 			for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
 			{
 				if (chunk.blocks[x][y][z])/* &&
-					(!chunk.blocks[x - 1][y][z] || !chunk.blocks[x + 1][y][z] ||
-					!chunk.blocks[x][y - 1][z] || !chunk.blocks[x][y + 1][z] ||
-					!chunk.blocks[x][y][z - 1] || !chunk.blocks[x][y][z + 1]))*/
+					(!(x > 0 && chunk.blocks[x - 1][y][z]) || !(x < CHUNK_SIZE && chunk.blocks[x + 1][y][z]) ||
+					!(y > 0 && chunk.blocks[x][y - 1][z]) || !(y < CHUNK_SIZE && chunk.blocks[x][y + 1][z]) ||
+					!(z > 0 && chunk.blocks[x][y][z - 1]) || !(z < CHUNK_SIZE && chunk.blocks[x][y][z + 1]))*/
 				{
 					Aabb	aabb;
 
