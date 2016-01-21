@@ -253,40 +253,34 @@ void	AController::save(int const size, float const *data)
 
 void	AController::create_block(int const size, float const *data)
 {
-/*	if (size == 1)
+	if (size == 1)
 	{
 		if (*data && controlled)
 		{
 			Ray	ray;
 			
-			ray.origin = controlled->body->position;
-			ray.direction[0] = cos(engine->graphic->camera.spherical_coord[1]) * cos(engine->graphic->camera.spherical_coord[0]);
-			ray.direction[1] = cos(engine->graphic->camera.spherical_coord[1]) * sin(engine->graphic->camera.spherical_coord[0]);
-			ray.direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
-			ray.direction[3] = 0.0f;
+			ray.origin = engine->graphic->camera.position;
+			ray.direction = engine->graphic->camera.direction;
 
 			((World*)engine->find_entity(0))->create_block(ray, material);
 		}
-	}*/
+	}
 }
 
 void	AController::destroy_block(int const size, float const *data)
 {
-/*	if (size == 1)
+	if (size == 1)
 	{
 		if (*data && controlled)
 		{
 			Ray	ray;
-			
-			ray.origin = controlled->body->position;
-			ray.direction[0] = cos(engine->graphic->camera.spherical_coord[1]) * cos(engine->graphic->camera.spherical_coord[0]);
-			ray.direction[1] = cos(engine->graphic->camera.spherical_coord[1]) * sin(engine->graphic->camera.spherical_coord[0]);
-			ray.direction[2] = sin(engine->graphic->camera.spherical_coord[1]);
-			ray.direction[3] = 0.0f;
-		
+
+			ray.origin = engine->graphic->camera.position;
+			ray.direction = engine->graphic->camera.direction;
+
 			((World*)engine->find_entity(0))->destroy_block(ray);
 		}
-	}*/
+	}
 }
 
 void	AController::change_material(int const size, float const *data)

@@ -38,9 +38,9 @@ struct	vec
 
 
 	template<class V, unsigned int W>
-	operator vec<V, W>();
+	explicit operator vec<V, W>();
 	template<class V, unsigned int W>
-	operator vec<V, W>() const;
+	explicit operator vec<V, W>() const;
 
 	T		&operator[](unsigned int const x);
 	T const	&operator[](unsigned int const x) const;

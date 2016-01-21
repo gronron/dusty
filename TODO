@@ -1,5 +1,9 @@
--remove stl from network and libsrc/stream
--use a good sorting algo for the first phase of collision solving in the physic engine
--maybe rethink the collision callback to the gamelogic
--add the missing continuous collision in narrowphase
--think about continuous collision detection of rotating object
+
+graphic engine:
+	-think about largest box volume for the raytracer or fix the culling construction
+
+physic engine:
+	-use a good sorting algo for the first phase of collision solving in the physic engine
+	-maybe rethink the collision callback to the gamelogic
+	-add the missing continuous collision in narrowphase
+	-think about continuous collision detection of rotating object
