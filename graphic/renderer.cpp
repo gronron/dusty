@@ -230,7 +230,7 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		if (_nodes_mem_size)
 			clReleaseMemObject(_nodes_mem);
 		_nodes_mem_size = ge->aabbtree._size;
-		_nodes_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _nodes_mem_size * sizeof(Node), 0, &error);
+		_nodes_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _nodes_mem_size * sizeof(Aabbtree::Node), 0, &error);
 		check_error(error, "clCreateBuffer()");
 	}
 	if (_materials_mem_size < ge->_materials_size)
@@ -250,7 +250,7 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		_lights_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _lights_mem_size * sizeof(Light), 0, &error);
 		check_error(error, "clCreateBuffer()");
 	}
-	check_error(clEnqueueWriteBuffer(_queue, _nodes_mem, CL_FALSE, 0, ge->aabbtree._size * sizeof(Node), (void *)ge->aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
+	check_error(clEnqueueWriteBuffer(_queue, _nodes_mem, CL_FALSE, 0, ge->aabbtree._size * sizeof(Aabbtree::Node), (void *)ge->aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clEnqueueWriteBuffer(_queue, _lights_mem, CL_FALSE, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights, 0, 0, 0), "clEnqueueWriteBuffer()");
 }
 
