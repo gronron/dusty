@@ -35,31 +35,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
-struct		Node
-{
-	union
-	{
-		int	parent;
-		int	next;
-	};
-	
-	union
-	{
-		struct
-		{
-			int	left;
-			int	right;
-		};
-		unsigned int	data;
-	};
-
-	int		height;
-	Aabb	aabb;
-};
-
 class	Aabbtree
 {
 	public:
+	
+		struct	Node
+		{
+			union
+			{
+				int	parent;
+				int	next;
+			};
+			
+			union
+			{
+				struct
+				{
+					int	left;
+					int	right;
+				};
+				unsigned int	data;
+			};
+
+			int		height;
+			Aabb	aabb;
+		};
+	
 
 		unsigned int	_size;
 		Node			*_nodes;
@@ -83,9 +84,9 @@ class	Aabbtree
 		template<class T>
 		void	query(Aabb const &, T *, void (T::*)(int const, int const)) const;
 		template <class T>
-		void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
+		void	raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
 		template <class T>
-		void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
+		void	raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
 
 		int		_allocate_node();
 		void	_free_node(int const);
