@@ -43,7 +43,7 @@ inline float	perimeter(Aabb const &x)
 
 inline float	merged_perimeter(Aabb const &x, Aabb const &y)
 {
-	return (vsum(max(x.top, y.top) - min(x.bottom, y.bottom)));
+	return (vsum(vmax(x.top, y.top) - vmin(x.bottom, y.bottom)));
 }
 
 Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)
