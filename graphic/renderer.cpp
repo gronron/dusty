@@ -148,8 +148,10 @@ Renderer::Renderer(unsigned int const width, unsigned int const height) : _windo
 	check_error(clGetDeviceInfo(devices[0], CL_DEVICE_NAME, 64, device_name, 0), "clGetDeviceInfo()");
 	std::cout << "Device selected:\n\t" << device_vendor << " - " << device_name << std::endl;
 
-	_queue = clCreateCommandQueueWithProperties(_context, devices[0], 0, &error);
-	check_error(error, "clCreateCommandQueueWithProperties()");
+	/*_queue = clCreateCommandQueueWithProperties(_context, devices[0], 0, &error); //OpenCL 2.0
+	check_error(error, "clCreateCommandQueueWithProperties()");*/
+	_queue = clCreateCommandQueue(_context, devices[0], 0, &error);
+	check_error(error, "clCreateCommandQueue()");
 
 	char const	*source = read_file("raytracer.cl");
 

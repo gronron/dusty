@@ -140,8 +140,8 @@ void				Graphicengine::_load_materials(char const *filename)
 {
 	Df_node const	*nd = Configmanager::get_instance().get(filename);
 	
-	_materials_count = nd->data_size;
-	_materials_size = nd->data_size;
+	_materials_count = nd->data_size / sizeof(Material);
+	_materials_size = nd->data_size / sizeof(Material);
 	_materials = new Material[_materials_size];
 	memcpy(_materials, nd->data_storage, nd->data_size);
 }

@@ -38,10 +38,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class	Shape;
 class	Collider;
 
+class	Querycallback
+{
+	public:
+
+		virtual ~Querycallback() { }
+
+		virtual void	report_encounter(Body *, int const) = 0;
+};
+
+class	Raycastcallback
+{
+	public:
+
+		virtual ~Raycastcallback() { }
+
+		virtual bool	report_encounter(Body *, int const, float const, float const) = 0;
+};
+
 class	Physicengine
 {
 	public:
-	
+
 		struct				Pair
 		{
 			int				a;
@@ -80,9 +98,13 @@ class	Physicengine
 		
 		void	add_aabb(Body *, Aabb const &);
 		void	remove_aabb(Body *, Aabb const &);
+		
+		void	query(Aabb const &, Querycallback *, bool const d, bool const s) const;
+		void	raycast_through(Ray const &, Raycastcallback *, bool const d, bool const s) const;
+		void	raycast(Ray const &, Raycastcallback *, bool const d, bool const s) const;
 
 		void	tick(float const);
-		
+
 		void	_add_pair(int const, int const);
 		void	_sort_pairs();
 		void	_sort_pairs(unsigned int const);

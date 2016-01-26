@@ -67,8 +67,8 @@ void	AController::tick(float delta)
 		int	x;
 		int	y;
 		SDL_GetRelativeMouseState(&x, &y);
-		spherical_coord[0] -= x / 200.0f;
-		spherical_coord[1] -= y / 200.0f;
+		spherical_coord[0] -= x / 350.0f;
+		spherical_coord[1] -= y / 350.0f;
 
 		engine->graphic->set_camera(controlled->body->position, spherical_coord);
 	
@@ -287,6 +287,7 @@ void	AController::change_material(int const size, float const *data)
 {
 	if (size == 1)
 	{
+		std::cout << engine->graphic->_materials_count << std::endl;
 		material = (material + (int)*data) % engine->graphic->_materials_count;
 		if (!material)
 			material = 1;

@@ -323,5 +323,8 @@
     <ClInclude Include="..\..\..\engine\controller.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\physic\aabb.hpp">
+      <Filter>Header Files\physic</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

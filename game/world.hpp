@@ -44,8 +44,8 @@ class	World : public Entity
 		struct	Chunk
 		{
 			unsigned char	blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+			int				graphicids[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 		};
-
 
 		vec<unsigned int, 4>	size;
 		Chunk					***chunks;

@@ -61,6 +61,7 @@ class	Gameengine
 
 
 		bool			master;
+		int				rootid;
 		int				ctrlid;
 		
 		unsigned int	_entsize;
