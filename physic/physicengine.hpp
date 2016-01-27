@@ -97,7 +97,8 @@ class	Physicengine
 		void	delete_body(Body *);
 		
 		void	add_aabb(Body *, Aabb const &);
-		void	remove_aabb(Body *, Aabb const &);
+		void	remove_aabbs(Body *);
+		void	remove_aabbs(Body *, Aabb const &);
 		
 		void	query(Aabb const &, Querycallback *, bool const d, bool const s) const;
 		void	raycast_through(Ray const &, Raycastcallback *, bool const d, bool const s) const;

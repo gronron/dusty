@@ -140,7 +140,13 @@ void	Physicengine::add_aabb(Body *body, Aabb const &aabb)
 		_statictree.add_saabb(aabb, (unsigned int)(body - _bodies));
 }
 
-void	Physicengine::remove_aabb(Body *body, Aabb const &aabb)
+void	Physicengine::remove_aabbs(Body *body)
+{
+	if (body->index == -1 && !body->dynamic)
+		_statictree.remove_aabbs((unsigned int)(body - _bodies));
+}
+
+void	Physicengine::remove_aabbs(Body *body, Aabb const &aabb)
 {
 	if (body->index == -1 && !body->dynamic)
 	{

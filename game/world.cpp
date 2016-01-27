@@ -68,7 +68,7 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 {
 	
 	size = 2;
-	chunks = new_space<Chunk>(size[0], size[1], size[2]);
+	_init();
 
 	shape.size = 1.0f;
 	engine->physic->new_body(&body, &shape, this);
@@ -78,8 +78,6 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 	vec<int, 4>	start;
 	vec<int, 4>	end;
 	start = 0;
-	end = 64;
-	fill(start, end, 0);
 	end[0] = 64;
 	end[1] = 64;
 	end[2] = 1;
@@ -123,10 +121,12 @@ bool				World::load(char const *filename)
 
 	if (is.good())
 	{
+		_clear();
+
 		is.read((char *)&size, sizeof(vec<unsigned int, 4>));
 		if (chunks)
 			delete_space(chunks);
-		chunks = new_space<Chunk>(size[0], size[1], size[2]);
+		_init();
 		unsigned int const	buffer_size = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
 		for (unsigned int x = 0; x < size[0]; ++x)
@@ -232,9 +232,11 @@ bool	World::destroy_block(Ray const &ray)
 
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
 		{
-			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = 0;
 			engine->physic->_statictree.remove_aabb(result.aabbindex);
 			engine->graphic->aabbtree.remove_aabb(chunks[wp[0]][wp[1]][wp[2]].graphicids[cp[0]][cp[1]][cp[2]]);
+			
+			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = 0;
+			chunks[wp[0]][wp[1]][wp[2]].graphicids[cp[0]][cp[1]][cp[2]] = -1;
 			return (true);
 		}
 	}
@@ -243,12 +245,14 @@ bool	World::destroy_block(Ray const &ray)
 
 void	World::_cull_world()
 {
-	//engine->graphic->aabbtree.reset();
+	engine->physic->remove_aabbs(body);
 	for (unsigned int x = 0; x < size[0]; ++x)
 		for (unsigned int y = 0; y < size[1]; ++y)
 			for (unsigned int z = 0; z < size[2]; ++z)
 				_cull_chunk(chunks[x][y][z], { (float)x * CHUNK_SIZE, (float)y * CHUNK_SIZE, (float)z * CHUNK_SIZE, 0.0f });
 }
+
+
 
 void	World::_cull_chunk(Chunk &chunk, vec<float, 4> const &position)
 {
@@ -274,4 +278,33 @@ void	World::_cull_chunk(Chunk &chunk, vec<float, 4> const &position)
 			}
 		}
 	}
+}
+
+void	World::_init()
+{
+	chunks = new_space<Chunk>(size[0], size[1], size[2]);
+	unsigned int const	buffer_size = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
+	for (unsigned int x = 0; x < size[0]; ++x)
+		for (unsigned int y = 0; y < size[1]; ++y)
+			for (unsigned int z = 0; z < size[2]; ++z)
+				for (unsigned int i = 0; i < buffer_size; ++i)
+				{
+					chunks[x][y][z].blocks[0][0][i] = 0;
+					chunks[x][y][z].graphicids[0][0][i] = -1;
+				}
+}
+
+void	World::_clear()
+{
+	engine->physic->remove_aabbs(body);
+	unsigned int const	buffer_size = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
+	for (unsigned int x = 0; x < size[0]; ++x)
+		for (unsigned int y = 0; y < size[1]; ++y)
+			for (unsigned int z = 0; z < size[2]; ++z)
+				for (unsigned int i = 0; i < buffer_size; ++i)
+					if (chunks[x][y][z].graphicids[0][0][i] != -1)
+					{
+						engine->graphic->aabbtree.remove_aabb(chunks[x][y][z].graphicids[0][0][i]);
+						chunks[x][y][z].graphicids[0][0][i] = -1;
+					}
 }

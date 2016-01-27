@@ -77,6 +77,8 @@ class	World : public Entity
 		
 		void	_cull_world();
 		void	_cull_chunk(Chunk &chunk, vec<float, 4> const &position);
+		void	_init();
+		void	_clear();
 };
 
 #endif

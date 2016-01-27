@@ -233,6 +233,7 @@
     <ClInclude Include="..\..\..\network\networkproto.hpp" />
     <ClInclude Include="..\..\..\network\replication.hpp" />
     <ClInclude Include="..\..\..\network\server.hpp" />
+    <ClInclude Include="..\..\..\physic\aabb.hpp" />
     <ClInclude Include="..\..\..\physic\aabbtree.hpp" />
     <ClInclude Include="..\..\..\physic\body.hpp" />
     <ClInclude Include="..\..\..\physic\physicengine.hpp" />
