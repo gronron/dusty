@@ -43,7 +43,7 @@ class	Animation
 		Animation(Graphicengine *);
 		virtual ~Animation();
 
-		virtual bool	tick(float) = 0;
+		virtual bool	tick(float const) = 0;
 };
 
 #endif

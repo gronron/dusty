@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,70 +28,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include <iostream>
-#include <cstring>
-#include <cstdlib>
-#include "time/time.hpp"
-#include "gameengine.hpp"
-#include "eventmanager.hpp"
+#include "crc32.hpp"
 
-bool	parse_option(char ac, char **av, Gameengine::Option &opt)
+unsigned int		crc32(const char *str)
 {
-	opt.master = true;
-	opt.local = true;
-	opt.graphic = true;
-	opt.audio = true;
-	opt.level = "Level";
+	unsigned int	crc = 0xFFFFFFFF;
 
-	for (int i = 1; i < ac; ++i)
-	{
-		if (!strcmp(av[i], "-ng"))
-			opt.graphic = false;
-		else if (!strcmp(av[i], "-na"))
-			opt.audio = false;
-		else if (opt.local)
-		{
-			opt.port = av[i];
-			opt.local = false;
-		}
-		else if (opt.master)
-		{
-			opt.ip = av[i];
-			opt.master = false;
-		}
-		else
-			return (false);
-	}
-	return (true);
+	while (*str)
+		crc = crc32_table[(crc ^ *str++) & 0x000000FF] ^ (crc >> 8);
+	return (crc);
 }
 
-int			main(int ac, char **av)
+unsigned int	crc32(unsigned int crc, const char *str)
 {
-	Gameengine::Option	opt;
-	double	c;
-	double	d;
-	double	l;
-	double	t = 0.0f;
-	int		i = 0;
-
-	if (!parse_option(ac, av, opt))
-		return (EXIT_FAILURE);
-
-	Gameengine	engine(opt);
-
-	c = dclock();
-	while (engine.event->running)
-	{
-		l = c;
-		d = (c = dclock()) - l;
-		engine.tick((float)d);
-		++i;
-		if ((t += d) > 1.0f)
-		{
-			std::cout <<  i / t << std::endl;
-			t = 0.0;
-			i = 0;
-		}
-	}
-	return (EXIT_SUCCESS);
+	while (*str)
+		crc = crc32_table[(crc ^ *str++) & 0x000000FF] ^ (crc >> 8);
+	return (crc);
 }

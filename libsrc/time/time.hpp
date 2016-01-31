@@ -31,12 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TIME_H_
 #define TIME_H_
 
-namespace src
-{
-
-	void	sleep(double const second);
-	double	clock();
-
-}
+void	dsleep(double const second);
+double	dclock();
 
 #endif

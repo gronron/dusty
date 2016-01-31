@@ -49,12 +49,12 @@ void				*Networkengine::runthrd(void *data)
 	else
 		ne->clt = new Client(&ne->mq, ne->ip, ne->port);
 
-	c = src::clock();
+	c = dclock();
 	while (ne->running)
 	{
 		l = c;
-		d = (c = src::clock()) - l;
-		src::sleep(0.001);
+		d = (c = dclock()) - l;
+		dsleep(0.001);
 		if (ne->master)
 			ne->srv->tick((float)d);
 		else

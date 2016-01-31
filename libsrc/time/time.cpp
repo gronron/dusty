@@ -37,42 +37,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "time.hpp"
 
-namespace	src
+#if defined(_WIN32) || defined(__WIN32__)
+
+void				dsleep(double const second)
 {
-
-	#if defined(_WIN32) || defined(__WIN32__)
-	void				sleep(double const second)
-	{
-		Sleep((DWORD)(second * 1000.0));
-	}
-
-	double				clock()
-	{
-		LARGE_INTEGER	a, b;
-
-		QueryPerformanceFrequency(&a);
-		QueryPerformanceCounter(&b);
-		return ((double)b.QuadPart / a.QuadPart);
-	}
-
-	#else
-
-	void				sleep(double const second)
-	{
-		struct timespec	a;
-
-		a.tv_sec = (int)second;
-		a.tv_nsec = (int)((second - a.tv_sec) * 1000000000.0);
-		clock_nanosleep(CLOCK_REALTIME, 0, &a, 0);
-	}
-
-	double				clock()
-	{
-		struct timespec	a;
-
-		clock_gettime(CLOCK_REALTIME, &a); // CLOCK_MONOTONIC
-		return (a.tv_sec + a.tv_nsec / 1000000000.0);
-	}
-	#endif
-
+	Sleep((DWORD)(second * 1000.0));
 }
+
+double				dclock()
+{
+	LARGE_INTEGER	a, b;
+
+	QueryPerformanceFrequency(&a);
+	QueryPerformanceCounter(&b);
+	return ((double)b.QuadPart / a.QuadPart);
+}
+
+#else
+
+void				dsleep(double const second)
+{
+	struct timespec	a;
+
+	a.tv_sec = (int)second;
+	a.tv_nsec = (int)((second - a.tv_sec) * 1000000000.0);
+	clock_nanosleep(CLOCK_MONOTONIC, 0, &a, 0);
+}
+
+double				dclock()
+{
+	struct timespec	a;
+
+	clock_gettime(CLOCK_MONOTONIC, &a);
+	return (a.tv_sec + a.tv_nsec / 1000000000.0);
+}
+
+#endif
