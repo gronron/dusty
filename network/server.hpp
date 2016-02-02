@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include <string>
 #include "stream/selector.hpp"
 #include "stream/tcpstream.hpp"
 #include "stream/udpstream.hpp"
@@ -66,7 +65,7 @@ class	Server
 		Client				*_clients;
 	
 
-		Server(Messagequeue *, std::string const &);
+		Server(Messagequeue *, char const *port);
 		~Server();
 
 		void	tick(float const);

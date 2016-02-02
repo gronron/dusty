@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float const	Server::pingrate = 0.5f;
 float const	Server::timeout = 5.0f;
 
-Server::Server(Messagequeue *m, std::string const &port) : mq(m), _tcpsrv(port.c_str(), false), _udpsrv(port.c_str(), false), _maxclts(64)
+Server::Server(Messagequeue *m, char const *port) : mq(m), _tcpsrv(port, false), _udpsrv(port, false), _maxclts(64)
 {
 	_clients = new Client[_maxclts];
 	if (!_tcpsrv.is_good() || !_udpsrv.is_good())

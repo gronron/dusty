@@ -174,6 +174,9 @@
     <ClCompile Include="..\..\..\engine\controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\hash\crc32.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">
@@ -325,6 +328,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\physic\aabb.hpp">
       <Filter>Header Files\physic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\hash\crc32.hpp">
+      <Filter>Header Files\libsrc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

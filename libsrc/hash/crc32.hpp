@@ -106,12 +106,7 @@ unsigned int	crc32(unsigned int crc, const char *str);
 
 unsigned int constexpr	crc32_r(unsigned int const crc, const char *str)
 {
-	return (!*str ? crc ^ 0xFFFFFFFF : crc32_r(crc32_table[(crc ^ *str) & 0x000000FF] ^ (crc >> 8), s + 1));
-}
-
-unsigned int constexpr	operator ""_hash(char const *str, size_t const)
-{
-	return (crc32_r(0xFFFFFFFF, str));
+	return (!*str ? crc ^ 0xFFFFFFFF : crc32_r(crc32_table[(crc ^ *str) & 0x000000FF] ^ (crc >> 8), str + 1));
 }
 
 template<unsigned int x>
