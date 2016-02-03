@@ -16,7 +16,7 @@ modification, are permitted provided that the following conditions are met:
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"0
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
@@ -28,49 +28,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#inclde "file.hpp"
+#ifndef SELECTOR_H_
+#define SELECTOR_H_
 
-#if defined(_WIN32) || defined(__WIN32__)
+#include "socket.hpp"
 
-#include <io.h>
-#include <fcntl.h>
-
-char		*read_file(char const *filename)
+class	Selector
 {
-	int		id;
-	int		size;
-	char	*buffer;
+    public:
 
-	buffer = 0;
-	_sopen_s(&id, filename, _O_RDONLY, _SH_DENYNO, _S_IREAD);
-	if (id >= 0)
-	{
-		buffer = new char[65536];
-		size = _read(id, buffer, 65536);
-		if (size >= 0)
-			buffer[size] = '\0';
-		else
-		{
-			delete [] buffer;
-			buffer = 0;
-		}
-		_close(id);
-	}
-	else
-		perror("read_file(): ");
-	return (buffer);
+		Socket				_nfds;
+		fd_set				_readfds;
+		fd_set				_tempfds;
+
+
+		Selector();
+		~Selector();
+
+		template<class T>
+        void	add_socket(T const &);
+        template<class T>
+        void	rm_socket(T const &);
+        template<class T>
+        bool	is_ready(T const &);
+
+        bool	check(float timeout);
+};
+
+template<class T>
+inline void	Selector::add_socket(T const &x)
+{
+	if (x._id >= _nfds)
+		_nfds = x._id + 1;
+	FD_SET(x._id, &_readfds);
 }
 
-#else
-	
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-char	*read_file(char const *filename)
+template<class T>
+inline void	Selector::rm_socket(T const &x)
 {
-	
+	FD_CLR(x._id, &_readfds);
+}
+
+template<class T>
+inline bool	Selector::is_ready(T const &x)
+{
+	return (FD_ISSET(x._id, &_tempfds) != 0);
 }
 
 #endif

@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring>
 #include <cstdio>
-#include "tcpstream.hpp"
+#include "tcpsocket.hpp"
 
 Tcp_server::Tcp_server() : _id(INVALID_SOCKET)
 {
@@ -101,28 +101,28 @@ bool	Tcp_server::is_good() const
 
 ///////////////////////////////////////
 
-Tcpstream::Tcpstream() : _id(INVALID_SOCKET)
+Tcpsocket::Tcpsocket() : _id(INVALID_SOCKET)
 {
 
 }
 
-Tcpstream::Tcpstream(Tcp_server &x, char *ip, char *port) : _id(INVALID_SOCKET)
+Tcpsocket::Tcpsocket(Tcp_server &x, char *ip, char *port) : _id(INVALID_SOCKET)
 {
 	(*this)(x, ip, port);
 }
 
-Tcpstream::Tcpstream(char const *ip, char const *port) : _id(INVALID_SOCKET)
+Tcpsocket::Tcpsocket(char const *ip, char const *port) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, port);
 }
 
-Tcpstream::~Tcpstream()
+Tcpsocket::~Tcpsocket()
 {
 	if (_id != INVALID_SOCKET)
 		closesocket(_id);
 }
 
-bool	Tcpstream::operator()()
+bool	Tcpsocket::operator()()
 {
 	if (_id != INVALID_SOCKET)
 	{
@@ -132,7 +132,7 @@ bool	Tcpstream::operator()()
 	return (true);
 }
 
-bool	Tcpstream::operator()(Tcp_server &x, char *ip, char *port)
+bool	Tcpsocket::operator()(Tcp_server &x, char *ip, char *port)
 {
 	(*this)();
 	if (x._id != INVALID_SOCKET)
@@ -151,7 +151,7 @@ bool	Tcpstream::operator()(Tcp_server &x, char *ip, char *port)
 	return (_id != INVALID_SOCKET);
 }
 
-bool				Tcpstream::operator()(char const *ip, char const *port)
+bool				Tcpsocket::operator()(char const *ip, char const *port)
 {
 	struct addrinfo	*res;
 	struct addrinfo	hints;
@@ -182,12 +182,12 @@ bool				Tcpstream::operator()(char const *ip, char const *port)
 	return (_id != INVALID_SOCKET);
 }
 
-bool	Tcpstream::is_good() const
+bool	Tcpsocket::is_good() const
 {
 	return (_id != INVALID_SOCKET);
 }
 
-int 		Tcpstream::read(unsigned int const size, void *data)
+int 		Tcpsocket::read(unsigned int const size, void *data)
 {
 	int	rsize;
 
@@ -201,7 +201,7 @@ int 		Tcpstream::read(unsigned int const size, void *data)
 		return (-1);
 }
 
-int			Tcpstream::write(unsigned int const size, void const *data)
+int			Tcpsocket::write(unsigned int const size, void const *data)
 {
 	int	rsize;
 

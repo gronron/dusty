@@ -37,37 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "opencl_error.hpp"
 #include "new.hpp"
 #include "math/vec_util.hpp"
+#include "file/file.hpp"
 #include "graphicengine.hpp"
 #include "renderer.hpp"
-
-#include <io.h>
-#include <fcntl.h>
-
-static char		*read_file(char const *filename)
-{
-	int			id;
-	int			size;
-	char		*buffer;
-
-	buffer = 0;
-	_sopen_s(&id, filename, _O_RDONLY, _SH_DENYNO, _S_IREAD);
-	if (id >= 0)
-	{
-		buffer = new char[65536];
-		size = _read(id, buffer, 65536);
-		if (size >= 0)
-			buffer[size] = '\0';
-		else
-		{
-			delete [] buffer;
-			buffer = 0;
-		}
-		_close(id);
-	}
-	else
-		perror("read_file(): ");
-	return (buffer);
-}
 
 struct				Computedcamera
 {

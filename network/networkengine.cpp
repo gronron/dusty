@@ -45,9 +45,9 @@ void				*Networkengine::runthrd(void *data)
 	double			l;
 
 	if (ne->master)
-		ne->srv = new Server(&ne->mq, ne->port);
+		ne->srv = new Server(&ne->mq, ne->port.c_str());
 	else
-		ne->clt = new Client(&ne->mq, ne->ip, ne->port);
+		ne->clt = new Client(&ne->mq, ne->ip.c_str(), ne->port.c_str());
 
 	c = dclock();
 	while (ne->running)

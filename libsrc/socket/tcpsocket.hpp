@@ -28,52 +28,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef SELECTOR_H_
-#define SELECTOR_H_
+#ifndef TCPSOCKET_H_
+#define TCPSOCKET_H_
 
 #include "socket.hpp"
-#include "stream.hpp"
 
-class	Selector
+class	Tcp_server
 {
-    public:
+	public:
 
-		Socket				_nfds;
-		fd_set				_readfds;
-		fd_set				_tempfds;
+		Socket	_id;
 
 
-		Selector();
-		~Selector();
+		Tcp_server();
+		Tcp_server(char const *port, bool ipv6);
+		~Tcp_server();
 
-		template<class T>
-        void	add_socket(T const &);
-        template<class T>
-        void	rm_socket(T const &);
-        template<class T>
-        bool	is_ready(T const &);
+		bool	operator()();
+		bool	operator()(char const *port, bool ipv6);
 
-        bool	check(float timeout);
+		bool	is_good() const;
 };
 
-template<class T>
-inline void	Selector::add_socket(T const &x)
+class	Tcpsocket
 {
-	if (x._id >= _nfds)
-		_nfds = x._id + 1;
-	FD_SET(x._id, &_readfds);
-}
+	public:
 
-template<class T>
-inline void	Selector::rm_socket(T const &x)
-{
-	FD_CLR(x._id, &_readfds);
-}
+		Socket	_id;
 
-template<class T>
-inline bool	Selector::is_ready(T const &x)
-{
-	return (FD_ISSET(x._id, &_tempfds) != 0);
-}
+
+		Tcpsocket();
+		Tcpsocket(Tcp_server &srv, char *ip, char *port);
+		Tcpsocket(char const *ip, char const *port);
+		~Tcpsocket();
+
+		bool	operator()();
+		bool	operator()(Tcp_server &, char *ip, char *port);
+		bool	operator()(char const *ip, char const *port);
+
+		bool	is_good() const;
+
+		int		read(unsigned int const size, void *data);
+		int		write(unsigned int const size, void const *data);
+};
 
 #endif

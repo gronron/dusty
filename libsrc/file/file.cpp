@@ -16,7 +16,7 @@ modification, are permitted provided that the following conditions are met:
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"0
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
@@ -28,108 +28,86 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include <cstdio>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include "file.hpp"
+
+#if defined(_WIN32) || defined(__WIN32__)
+
+#include <io.h>
+
+char		*read_file(char const *filename)
+{
+	int		fd;
+	int		size;
+	int		rdsize;
+	char	*buffer;
+
+	buffer = 0;
+	_sopen_s(&fd, filename, _O_RDONLY, _SH_DENYNO, _S_IREAD);
+	if (fd >= 0)
+	{
+		size = _lseek(fd, 0, SEEK_END);
+		_lseek(fd, 0, SEEK_SET);
+		if (size >= 0)
+		{
+			buffer = new char[size + 1];
+			rdsize = _read(fd, buffer, size);
+			if (rdsize >= 0)
+				buffer[rdsize] = '\0';
+			else
+			{
+				delete [] buffer;
+				buffer = 0;
+			}
+		}
+		else
+			perror("read_file(): ");
+		_close(fd);
+	}
+	else
+		perror("read_file(): ");
+	return (buffer);
+}
+
+#else
+	
 #include <unistd.h>
-#include <stdio.h>
-#include "stream.hpp"
-#include "fstream.hpp"
 
-File_stream::File_stream()
+char		*read_file(char const *filename)
 {
-	id = -1;
-}
+	int		fd;
+	int		size;
+	int		rdsize;
+	char	*buffer;
 
-File_stream::File_stream(char *name, int flag)
-{
-	id = open(name, flag);
-}
-
-File_stream::File_stream(char *name, int flag, int mode)
-{
-	id = open(name, flag, mode);
-}
-
-File_stream::~File_stream()
-{
-	if (id >= 0)
-		close(id);
-}
-
-File_stream::operator bool()
-{
-	return (id >= 0);
-}
-
-bool	File_stream::operator()()
-{
-	if (id >= 0)
+	buffer = 0;
+	open(&fd, filename, O_RDONLY);
+	if (fd >= 0)
 	{
-		close(id);
-		id = -1;
+		size = lseek(fd, 0, SEEK_END);
+		lseek(fd, 0, SEEK_SET);
+		if (size >= 0)
+		{
+			buffer = new char[size + 1];
+			rdsize = read(fd, buffer, size);
+			if (rdsize >= 0)
+				buffer[rdsize] = '\0';
+			else
+			{
+				delete [] buffer;
+				buffer = 0;
+			}
+		}
+		else
+			perror("read_file(): ");
+		close(fd);
 	}
-	return (true);
+	else
+		perror("read_file(): ");
+	return (buffer);
 }
 
-bool	File_stream::operator()(char *name, int flag)
-{
-	if (id >= 0)
-	{
-		close(id);
-		id = -1;
-	}
-	if ((id = open(name, flag)) < 0)
-		perror("open()");
-	return (id >= 0);
-}
-
-bool	File_stream::operator()(char *name, int flag, int mode)
-{
-	if (id >= 0)
-	{
-		close(id);
-		id = -1;
-	}
-	if ((id = open(name, flag, mode)) < 0)
-		perror("open()");
-	return (id >= 0);
-}
-
-Ifstream::Ifstream() : File_stream()
-{
-
-}
-
-Ifstream::Ifstream(char *name) : File_stream(name, O_RDONLY)
-{
-
-}
-
-Ifstream::~Ifstream()
-{
-
-}
-
-int	Ifstream::read(uint size, void *data)
-{
-	return (id < 0 ? id : ::read(id, data, size));
-}
-
-///////////////////////////////////////
-
-int	Ofstream::write(uint size, void *data)
-{
-	return (id < 0 ? id : ::write(id, data, size));
-}
-
-///////////////////////////////////////
-
-int	Fstream::read(uint size, void *data)
-{
-	return (id < 0 ? id : ::read(id, data, size));
-}
-
-int	Fstream::write(uint size, void *data)
-{
-	return (id < 0 ? id : ::write(id, data, size));
-}
-
+#endif

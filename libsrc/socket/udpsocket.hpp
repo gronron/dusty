@@ -28,21 +28,73 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include <unistd.h>
-#include "stream.hpp"
-#include "ioxstream.hpp"
+#ifndef UDPSOCKET_H_
+#define UDPSOCKET_H_
 
-int	Ixstream::read(uint size, void *data)
-{
-	return (::read(0, data, size));
-}
+#include "socket.hpp"
 
-int	Oxstream::write(uint size, void *data)
+class	Udp_server
 {
-	return (::write(1, data, size));
-}
+	public:
 
-int	Exstream::write(uint size, void *data)
+		struct	Client
+		{
+			sockaddr_in	addr;
+			char		ip[IP_STRSIZE];
+			char		port[PORT_STRSIZE];
+			int			next;
+		};
+
+
+		Socket			_id;
+
+		unsigned int	_maxclts;
+		Client			*_clients;
+		int				_free;
+		
+		sockaddr_in		_tempaddr;
+
+
+		Udp_server();
+		Udp_server(char const *port, bool const ipv6);
+		~Udp_server();
+
+		bool		operator()();
+		bool		operator()(char const *port, bool const ipv6);
+
+		bool		is_good() const;
+
+		char const	*get_clientip(int const id) const;
+		char const	*get_clientport(int const id) const;
+
+		int			add_client();
+		void		rm_client(int const id);
+
+		int			read(int &id, unsigned int const size, void *data);
+		int			write(int const id, unsigned int const size, void const *data);
+};
+
+class	Udpsocket
 {
-	return (::write(2, data, size));
-}
+	public:
+
+		static int const	MAXUDPSIZE = 65535;
+
+		Socket	_id;
+
+		Udpsocket();
+		Udpsocket(char const *ip, char const *port, bool ipv6);
+		Udpsocket(char const *ip, char const *pin, char const *pout, bool ipv6);
+		~Udpsocket();
+
+		bool	operator()();
+		bool	operator()(char const *ip, char const *port, bool ipv6);
+		bool	operator()(char const *ip, char const *pin, char const *pout, bool ipv6);
+
+		bool	is_good() const;
+
+		int		read(unsigned int const size, void *data);
+		int		write(unsigned int const size, void const *data);
+};
+
+#endif

@@ -54,16 +54,10 @@
     <ClCompile Include="..\..\..\libsrc\stream\winsock_init.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\stream\udpstream.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libsrc\time\time.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\thread\thread.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\stream\tcpstream.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\stream\selector.cpp">
@@ -177,6 +171,15 @@
     <ClCompile Include="..\..\..\libsrc\hash\crc32.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\file\file.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\socket\tcpsocket.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\socket\udpsocket.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">
@@ -191,19 +194,10 @@
     <ClInclude Include="..\..\..\libsrc\math\vec.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\stream\udpstream.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libsrc\time\time.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\thread\thread.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\stream\tcpstream.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\stream\stream.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\stream\socket.hpp">
@@ -330,6 +324,15 @@
       <Filter>Header Files\physic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\hash\crc32.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\socket\tcpsocket.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\socket\udpsocket.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\file\file.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
   </ItemGroup>

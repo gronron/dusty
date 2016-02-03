@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 #include <cstdio>
 #include "../new.hpp"
-#include "udpstream.hpp"
+#include "udpsocket.hpp"
 
 Udp_server::Udp_server() : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free(0)
 {
@@ -199,28 +199,28 @@ int		Udp_server::write(int const id, unsigned int const size, void const *data)
 
 ///////////////////////////////////////
 
-Udpstream::Udpstream() : _id(INVALID_SOCKET)
+Udpsocket::Udpsocket() : _id(INVALID_SOCKET)
 {
 
 }
 
-Udpstream::Udpstream(char const *ip, char const *port, bool const ipv6) : _id(INVALID_SOCKET)
+Udpsocket::Udpsocket(char const *ip, char const *port, bool const ipv6) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, port, ipv6);
 }
 
-Udpstream::Udpstream(char const *ip, char const *pin, char const *pout, bool const ipv6) : _id(INVALID_SOCKET)
+Udpsocket::Udpsocket(char const *ip, char const *pin, char const *pout, bool const ipv6) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, pin, pout, ipv6);
 }
 
-Udpstream::~Udpstream()
+Udpsocket::~Udpsocket()
 {
 	if (_id != INVALID_SOCKET)
 		closesocket(_id);
 }
 
-bool	Udpstream::operator()()
+bool	Udpsocket::operator()()
 {
 	if (_id != INVALID_SOCKET)
 	{
@@ -230,7 +230,7 @@ bool	Udpstream::operator()()
 	return (true);
 }
 
-bool				Udpstream::operator()(char const *ip, char const *port, bool const ipv6)
+bool				Udpsocket::operator()(char const *ip, char const *port, bool const ipv6)
 {
 	struct addrinfo	*rs;
 	struct addrinfo	ai;
@@ -260,7 +260,7 @@ bool				Udpstream::operator()(char const *ip, char const *port, bool const ipv6)
 	return (_id != INVALID_SOCKET);
 }
 
-bool				Udpstream::operator()(char const *ip, char const *pin, char const *pout, bool const ipv6)
+bool				Udpsocket::operator()(char const *ip, char const *pin, char const *pout, bool const ipv6)
 {
 	struct addrinfo	*rs, *rb;
 	struct addrinfo	ai;
@@ -301,12 +301,12 @@ bool				Udpstream::operator()(char const *ip, char const *pin, char const *pout,
 	return (_id != INVALID_SOCKET);
 }
 
-bool	Udpstream::is_good() const
+bool	Udpsocket::is_good() const
 {
 	return (_id != INVALID_SOCKET);
 }
 
-int			Udpstream::read(unsigned int const size, void *data)
+int			Udpsocket::read(unsigned int const size, void *data)
 {
 	int		rsize;
 
@@ -320,7 +320,7 @@ int			Udpstream::read(unsigned int const size, void *data)
 		return (-1);
 }
 
-int			Udpstream::write(unsigned int const size, void const *data)
+int			Udpsocket::write(unsigned int const size, void const *data)
 {
 	int	rsize;
 

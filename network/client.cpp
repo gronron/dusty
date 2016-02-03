@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float const	Client::timeout = 5.0f;
 
-Client::Client(Messagequeue *m, std::string const &ip, std::string const &port) : mq(m), _tcp(ip.c_str(), port.c_str()), _udp(ip.c_str(), port.c_str(), false), cntid(-1), ping(8), connected(false), timer(0.0f)
+Client::Client(Messagequeue *m, char const *ip, char const *port) : mq(m), _tcp(ip, port), _udp(ip, port, false), cntid(-1), ping(8), connected(false), timer(0.0f)
 {
 	Header	hdr;
 
@@ -59,7 +59,7 @@ Client::~Client()
 
 void						Client::tick(float delta)
 {
-	char					a[Udpstream::MAXUDPSIZE];
+	char					a[Udpsocket::MAXUDPSIZE];
 	int						size;
 	Messagequeue::Message	*msg;
 	Header					hdr;
@@ -72,7 +72,7 @@ void						Client::tick(float delta)
 		{
 			if (!connected)
 				connected = true;
-			if ((size = _udp.read(Udpstream::MAXUDPSIZE, a)) > 0)
+			if ((size = _udp.read(Udpsocket::MAXUDPSIZE, a)) > 0)
 				mq->push_in_pckt(-1, ping.ping, size, a);
 			else if (size < 0)
 				std::cerr << "Error: Client::tick() fails to read on udp" << std::endl;
@@ -106,7 +106,7 @@ void		Client::_comtcp()
 	Header	hdr;
 	int		size;
 	int		id;
-	char	data[Udpstream::MAXUDPSIZE];
+	char	data[Udpsocket::MAXUDPSIZE];
 
 	if ((size = _tcp.read(sizeof(hdr), &hdr)) > 0)
 	{

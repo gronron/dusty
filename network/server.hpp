@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include "stream/selector.hpp"
-#include "stream/tcpstream.hpp"
-#include "stream/udpstream.hpp"
+#include "socket/selector.hpp"
+#include "socket/tcpsocket.hpp"
+#include "socket/udpsocket.hpp"
 #include "networkproto.hpp"
 
 class	Messagequeue;
@@ -44,7 +44,7 @@ class	Server
 
 		struct			Client
 		{
-			Tcpstream	tcp;
+			Tcpsocket	tcp;
 			int			udpid;
 			char		ip[IP_STRSIZE];
 			char		port[PORT_STRSIZE];

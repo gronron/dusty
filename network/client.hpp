@@ -31,10 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CLIENT_H_
 #define CLIENT_H_
 
-#include <string>
-#include "stream/selector.hpp"
-#include "stream/tcpstream.hpp"
-#include "stream/udpstream.hpp"
+#include "socket/selector.hpp"
+#include "socket/tcpsocket.hpp"
+#include "socket/udpsocket.hpp"
 #include "networkproto.hpp"
 
 class	Messagequeue;
@@ -49,18 +48,18 @@ class	Client
 		Messagequeue	*mq;
 
 		Selector		_slctr;
-		Tcpstream		_tcp;
-		Udpstream		_udp;
+		Tcpsocket		_tcp;
+		Udpsocket		_udp;
 		short int		cntid;
 		Ping			ping;
 		bool			connected;
 		float			timer;
 
 
-		Client(Messagequeue *, std::string const &ip, std::string const &port);
+		Client(Messagequeue *, char const *ip, char const *port);
 		~Client();
 
-		void	tick(float);
+		void	tick(float const);
 
 		void	_comtcp();
 };

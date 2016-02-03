@@ -135,7 +135,7 @@ bool		Server::_comtcpclient(int const id)
 {
 	Header	hdr;
 	int		size;
-	char	data[Udpstream::MAXUDPSIZE];
+	char	data[Udpsocket::MAXUDPSIZE];
 
 	if ((size = _clients[id].tcp.read(sizeof(hdr), &hdr)) > 0)
 	{
@@ -163,12 +163,12 @@ bool		Server::_comtcpclient(int const id)
 
 void		Server::_receivepacket()
 {
-	char	a[Udpstream::MAXUDPSIZE];
+	char	a[Udpsocket::MAXUDPSIZE];
 	int		size;
 	int		id;
 	int		udpid;
 
-	if ((size = _udpsrv.read(udpid, Udpstream::MAXUDPSIZE, a)) > 0)
+	if ((size = _udpsrv.read(udpid, Udpsocket::MAXUDPSIZE, a)) > 0)
 	{
 		if (udpid >= 0)
 		{
