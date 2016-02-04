@@ -167,10 +167,10 @@
     <ClCompile Include="..\..\..\libsrc\hash\crc32.cpp" />
     <ClCompile Include="..\..\..\libsrc\random\mt19937.cpp" />
     <ClCompile Include="..\..\..\libsrc\random\prbg.cpp" />
+    <ClCompile Include="..\..\..\libsrc\socket\selector.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\tcpsocket.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\udpsocket.cpp" />
-    <ClCompile Include="..\..\..\libsrc\stream\selector.cpp" />
-    <ClCompile Include="..\..\..\libsrc\stream\winsock_init.cpp" />
+    <ClCompile Include="..\..\..\libsrc\socket\winsock_init.cpp" />
     <ClCompile Include="..\..\..\libsrc\thread\conditionvariable.cpp" />
     <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp" />
     <ClCompile Include="..\..\..\libsrc\thread\mutex.cpp" />
@@ -219,9 +219,9 @@
     <ClInclude Include="..\..\..\libsrc\new.hpp" />
     <ClInclude Include="..\..\..\libsrc\random\mt19937.hpp" />
     <ClInclude Include="..\..\..\libsrc\random\prbg.hpp" />
+    <ClInclude Include="..\..\..\libsrc\socket\selector.hpp" />
     <ClInclude Include="..\..\..\libsrc\socket\tcpsocket.hpp" />
     <ClInclude Include="..\..\..\libsrc\socket\udpsocket.hpp" />
-    <ClInclude Include="..\..\..\libsrc\stream\selector.hpp" />
     <ClInclude Include="..\..\..\libsrc\stream\socket.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\conditionvariable.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp" />

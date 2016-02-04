@@ -51,16 +51,10 @@
     <ClCompile Include="..\..\..\engine\factory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\stream\winsock_init.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libsrc\time\time.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\thread\thread.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\stream\selector.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\random\prbg.cpp">
@@ -180,6 +174,12 @@
     <ClCompile Include="..\..\..\libsrc\socket\udpsocket.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\socket\selector.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\socket\winsock_init.cpp">
+      <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">
@@ -201,9 +201,6 @@
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\stream\socket.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\stream\selector.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\random\prbg.hpp">
@@ -333,6 +330,9 @@
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\file\file.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\socket\selector.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
   </ItemGroup>

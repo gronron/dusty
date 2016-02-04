@@ -35,6 +35,8 @@ class	Collider
 {
 	public:
 
+		virtual	~Collider() { }
+
 		virtual bool	should_collide(Collider const *) const = 0;
 		virtual bool	collide(Collider *) = 0;
 		/*virtual bool	touch() = 0;
