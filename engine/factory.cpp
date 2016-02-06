@@ -66,7 +66,7 @@ short int									Factory::get_type(std::string const &name) const
 		return (i->second.type);
 	else
     {
-		std::cerr << "Error: Factory::get_type() fails to find class: " << name << std::endl;
+		std::cerr << "Error! Factory::get_type() fails to find class: " << name << std::endl;
 		exit(EXIT_FAILURE);
 		return (-1);
 	}
@@ -81,7 +81,7 @@ Entity										*Factory::create(Gameengine *g, Replication *r) const
 		if (i->second.type == r->type)
 			return (i->second.cf(g, r, r->id, r->type, 0));
 	}
-	std::cerr << "Error: Factory::create() fails to find id: " << r->type << std::endl;
+	std::cerr << "Error! Factory::create() fails to find id: " << r->type << std::endl;
 	exit(EXIT_FAILURE);
 	return (0);
 }
@@ -94,7 +94,7 @@ Entity												*Factory::create(Gameengine *g, Replication *r, int const id, 
 		return (i->second.cf(g, r, id, i->second.type, owner));
 	else
     {
-		std::cerr << "Error: Factory::create() fails to find class: " << name << std::endl;
+		std::cerr << "Error! Factory::create() fails to find class: " << name << std::endl;
 		exit(EXIT_FAILURE);
 		return (0);
 	}

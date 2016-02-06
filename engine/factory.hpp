@@ -75,14 +75,12 @@ Entity	*create(Gameengine *am, Replication *r, int const i, short int const t, E
 }
 
 template<class T>
-class	Factoryregister
+struct	Factoryregister
 {
-	public:
-
-		Factoryregister(std::string const &name)
-		{
-			Factory::get_instance().register_class(name, &create<T>);
-		}
+	Factoryregister(std::string const &name)
+	{
+		Factory::get_instance().register_class(name, &create<T>);
+	}
 };
 
 #endif

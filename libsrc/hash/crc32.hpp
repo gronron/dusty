@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CRC32_H_
 #define CRC32_H_
 
-#define HASH(x) force_constexpr<crc32_r(0xFFFFFFFF, s)>()
+#define HASH(x) force_constexpr<crc32_r(0xFFFFFFFF, x)>()
 
 static unsigned int constexpr	crc32_table[256] =
 {
