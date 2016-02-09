@@ -118,8 +118,10 @@ void	Df_node::print() const
 	std::cout << name << ' ' << type << std::endl;
 	if (type == BLOCK)
 	{
+		std::cout << '{' << std::endl;
 		for (unsigned int i = 0; i < size; ++i)
 			node[i]->print();
+		std::cout << '}' << std::endl;
 	}
 	else if (type == INT)
 	{

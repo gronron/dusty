@@ -169,58 +169,6 @@ void	_query(Body const *body, Physicengine *pe)
 }
 */
 
-struct	Querywrapper
-{
-	Physicengine const	*physic;
-	Querycallback		*qcb;
-
-	void	callback(int const aabbidx, int const bdidx)
-	{
-		qcb->report_encounter(physic->_bodies + bdidx, aabbidx);
-	}
-};
-
-void	Physicengine::query(Aabb const &aabb, Querycallback *qcb, bool const d, bool const s) const
-{
-	Querywrapper	qwp = { this, qcb };
-
-	if (d)
-		_dynamictree.query(aabb, &qwp, &Querywrapper::callback);
-	if (s)
-		_statictree.query(aabb, &qwp, &Querywrapper::callback);
-}
-
-struct	Raycastwrapper
-{
-	Physicengine const	*physic;
-	Raycastcallback		*rcb;
-
-	bool	callback(int const aabbidx, int const bdidx, float const near, float const far)
-	{
-		return (rcb->report_encounter(physic->_bodies + bdidx, aabbidx, near, far));
-	}
-};
-
-void		Physicengine::raycast_through(Ray const &ray, Raycastcallback *rcb, bool const d, bool const s) const
-{
-	Raycastwrapper	rwp = { this, rcb };
-
-	if (d)
-		_dynamictree.raycast_through(ray, &rwp, &Raycastwrapper::callback);
-	if (s)
-		_statictree.raycast_through(ray, &rwp, &Raycastwrapper::callback);
-}
-
-void	Physicengine::raycast(Ray const &ray, Raycastcallback *rcb, bool const d, bool const s) const
-{
-	Raycastwrapper	rwp = { this, rcb };
-
-	if (d)
-		_dynamictree.raycast(ray, &rwp, &Raycastwrapper::callback);
-	if (s)
-		_statictree.raycast(ray, &rwp, &Raycastwrapper::callback);
-}
-
 void		Physicengine::tick(float const delta)
 {
 	_delta = delta;
@@ -335,7 +283,7 @@ void	Physicengine::_sort_pairs(unsigned int const start)
 	for (unsigned int i = start; i < _prcount; ++i)
 	{
 		Pair	a = _pairs[i];
-		unsigned int j;
+		unsigned int	j;
 		for (j = i; j && _pairs[j - 1].time > a.time; --j)
 			_pairs[j] = _pairs[j - 1];
 		_pairs[j] = a;

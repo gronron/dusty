@@ -36,12 +36,12 @@ unsigned int		crc32(const char *str)
 
 	while (*str)
 		crc = crc32_table[(crc ^ *str++) & 0x000000FF] ^ (crc >> 8);
-	return (crc);
+	return (crc ^ 0xFFFFFFFF);
 }
 
 unsigned int	crc32(unsigned int crc, const char *str)
 {
 	while (*str)
 		crc = crc32_table[(crc ^ *str++) & 0x000000FF] ^ (crc >> 8);
-	return (crc);
+	return (crc ^ 0xFFFFFFFF);
 }

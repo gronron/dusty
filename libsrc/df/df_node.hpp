@@ -41,6 +41,7 @@ class			Df_node
 		{
 			NONE,
 			BLOCK,
+			REFERENCE,
 			INT,
 			FLOAT,
 			DOUBLE,

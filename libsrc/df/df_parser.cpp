@@ -34,10 +34,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 #include "df_parser.hpp"
 
+struct				Reference
+{
+	unsigned int	idx;
+	char			name[64];
+};
+
 struct	Parser_state
 {
 	std::istream			*is;
-	std::list<Df_node *>	*ndlist;
+	std::list<Df_node *>	ndlist;
+	std::list<Reference>	reflist;
 	unsigned int			size;
 	char					*data;
 	bool					error;
@@ -53,13 +60,43 @@ static void	_add_name(std::list<Df_node *> &ndlist, std::string const &name)
 	ndlist.push_back(node);
 }
 
-static void			_add_data(Parser_state &ps, Df_node::Type type, unsigned int size, void *data)
+static void	_add_reference(Parser_state &ps, std::string const &reference)
+{
+	Df_node			*node;
+
+	ps.size += ps.size % sizeof(void *) ? sizeof(void *) + sizeof(void *) - ps.size % sizeof(void *) : sizeof(void *);
+	ps.data = (char *)realloc(ps.data, ps.size);
+	node = ps.ndlist.back();
+	if (node->type == Df_node::NONE)
+	{
+		node->type = Df_node::REFERENCE;
+		node->size = 1;
+		node->idx = ps.size - sizeof(void *);
+	}
+	else if (node->type != Df_node::REFERENCE)
+	{
+		node = new Df_node();
+		node->size = 1;
+		node->type = Df_node::REFERENCE;
+		node->idx = ps.size - sizeof(void *);
+		ps.ndlist.push_back(node);
+	}
+	else
+		++node->size;
+
+	Reference	ref;
+	ref.idx = node->idx + (node->size - 1) * sizeof(void *);
+	strcpy(ref.name, reference.c_str());
+	ps.reflist.push_back(ref);
+}
+
+static void			_add_data(Parser_state &ps, Df_node::Type const type, unsigned int const size, void const *data)
 {
 	Df_node			*node;
 
 	ps.size += ps.size % size ? size + size - ps.size % size : size;
 	ps.data = (char *)realloc(ps.data, ps.size);
-	node = ps.ndlist->back();
+	node = ps.ndlist.back();
 	if (node->type == Df_node::NONE)
 	{
 		node->type = type;
@@ -73,7 +110,7 @@ static void			_add_data(Parser_state &ps, Df_node::Type type, unsigned int size,
 		node->size = 1;
 		node->type = type;
 		node->idx = ps.size - size;
-		ps.ndlist->push_back(node);
+		ps.ndlist.push_back(node);
 		memcpy(ps.data + node->idx, data, size);
 	}
 	else
@@ -90,7 +127,6 @@ static void	_begin_block(std::list<Df_node *> &ndlist)
 		node = new Df_node();
 		ndlist.push_back(node);
 	}
-	node->size = 0;
 	node->type = Df_node::BLOCK;
 }
 
@@ -101,15 +137,16 @@ static void			_end_block(std::list<Df_node *> &ndlist)
 
 	for (std::list<Df_node *>::reverse_iterator i = ndlist.rbegin(); i != ndlist.rend(); ++i)
 	{
-		if ((*i)->type == Df_node::BLOCK)
+		if ((*i)->type == Df_node::BLOCK && (*i)->size == 0)
 		{
 			node = *i;
 			break;
 		}
 		size++;
 	}
-	if (size > 1)
+	if (size > 1 || (size == 1 && ndlist.back()->name != ""))
 	{
+		node->type = Df_node::BLOCK;
 		node->size = size;
 		node->node = new Df_node*[size];
 		for (unsigned int i = size; i > 0;)
@@ -127,6 +164,18 @@ static void			_end_block(std::list<Df_node *> &ndlist)
 		node->size = a->size;
 		node->idx = a->idx;
 		delete a;
+	}
+}
+
+static void	_set_ref(Parser_state &ps, Df_node *root)
+{
+	while (!ps.reflist.empty())
+	{
+		Reference	ref;
+
+		ref = ps.reflist.front();
+		ps.reflist.pop_front();
+		*(Df_node const **)((char *)ps.data + ref.idx) = root->get(ref.name);
 	}
 }
 
@@ -193,8 +242,49 @@ static bool		_read_symbol(Parser_state &ps)
 			c = ps.is->get();
 		}
 		ps.is->unget();
-		_add_name(*ps.ndlist, str);
+		_add_name(ps.ndlist, str);
 		return (true);
+	}
+	else
+	{
+		ps.is->unget();
+		return (false);
+	}
+}
+
+static bool		_read_reference(Parser_state &ps)
+{
+	char		c;
+	std::string	str;
+	
+	if (!_skip_space(*ps.is))
+		return (false);
+	c = ps.is->get();
+	if (c == '@' && !ps.is->fail())
+	{
+		c = ps.is->get();
+		if (((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_') && !ps.is->fail())
+		{
+			str += c;
+			c = ps.is->get();
+			while (((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_' || (c >= '0' && c <= '9')) && !ps.is->fail())
+			{
+				str += c;
+				c = ps.is->get();
+			}
+			ps.is->unget();
+			_add_reference(ps, str);
+			return (true);
+		}
+		else
+		{
+			char	line[256];
+
+			ps.is->getline(line, 256);
+			std::cerr << "error! _read_reference() fails on line :\n\t" << line << std::endl;
+			ps.error = true;
+			return (false);
+		}
 	}
 	else
 	{
@@ -205,8 +295,8 @@ static bool		_read_symbol(Parser_state &ps)
 
 static bool		_read_number(Parser_state &ps)
 {
-	std::string	str;
 	char		c;
+	std::string	str;
 
 	if (!_skip_space(*ps.is))
 		return (false);
@@ -300,7 +390,7 @@ static bool	_read_open_bracket(Parser_state &ps)
 		return (false);
 	if (ps.is->get() == '{' && !ps.is->fail())
 	{
-		_begin_block(*ps.ndlist);
+		_begin_block(ps.ndlist);
 		return (true);
 	}
 	else
@@ -316,7 +406,7 @@ static bool	_read_close_bracket(Parser_state &ps)
 		return (false);
 	if (ps.is->get() == '}' && !ps.is->fail())
 	{
-		_end_block(*ps.ndlist);
+		_end_block(ps.ndlist);
 		return (true);
 	}
 	else
@@ -342,6 +432,8 @@ static bool	_read_xdata(Parser_state &ps)
 static bool	_read_data(Parser_state &ps)
 {
 	if (_read_open_bracket(ps) && _read_xdata(ps) && _read_close_bracket(ps))
+		return (true);
+	else if (_read_reference(ps))
 		return (true);
 	else if (_read_number(ps))
 		return (true);
@@ -403,7 +495,6 @@ Df_node				*df_parse(std::istream &is)
 
 	node = 0;
 	ps.is = &is;
-	ps.ndlist = new std::list<Df_node *>;
 	ps.size = 0;
 	ps.data = 0;
 	ps.error = false;
@@ -416,24 +507,24 @@ Df_node				*df_parse(std::istream &is)
 	else
 	{
 		node = new Df_node;
-		node->size = (unsigned int)ps.ndlist->size();
+		node->size = (unsigned int)ps.ndlist.size();
 		node->type = Df_node::BLOCK;
 		node->name = "";
 		node->node = new Df_node*[node->size];
 		for (unsigned int i = 0; i < node->size; ++i)
 		{
-			node->node[i] = ps.ndlist->front();
-			ps.ndlist->pop_front();
+			node->node[i] = ps.ndlist.front();
+			ps.ndlist.pop_front();
 		}
 		node->data_size = ps.size;
 		node->data_storage = ps.data;
+		_set_ref(ps, node);
 		_set_ptr(node, ps.data);
 	}
-	delete ps.ndlist;
 	return (node);
 }
 
-Df_node				*df_parse(std::string const &filename)
+Df_node				*df_parse(char const *filename)
 {
 	std::ifstream	isf(filename);
 
