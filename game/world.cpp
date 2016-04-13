@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "new.hpp"
 #include "aabb.hpp"
 
-#include "particlesystem.hpp"
+//#include "particle/particlesystem.hpp"
 
 FACTORYREG(World);
 
@@ -94,9 +94,9 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 
 		_cull_world();
 		
-		/*vec<float, 3> v;
+		/*vec<float, 4> v;
 		v = 2.0f;
-		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", v));*/
+		engine->graphic->add_animation(new Particlesystem(engine->graphic, "projectile", v));*/
 	}
 }
 
@@ -308,3 +308,11 @@ void	World::_clear()
 						chunks[x][y][z].graphicids[0][0][i] = -1;
 					}
 }
+/*
+void	World::explosion(vec<float, 4> const &position, float const radius, float const power)
+{
+	//get block
+	//fill particle and remove block
+	//create particles systeme
+}
+*/

@@ -28,41 +28,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PROJECTILE_H_
-#define PROJECTILE_H_
+#include "math/vec_util.hpp"
+#include "random/mt19937.hpp"
+#include "configmanager.hpp"
+#include "particlesystem.hpp"
+#include "particleeffect.hpp"
 
-#include "entity.hpp"
-#include "shape.hpp"
-#include "particle/particlesystem.hpp"
-
-class	Projectile : public Entity
+Particleeffect::Particleeffect(Particlesystem *p, float const t, Df_node const *) : ps(p), timer(t)
 {
-	public:
+	
+}
 
-		Body				*body;
-		Axisalignedboxshape	shape;
-
-		float	damage;
-
-		Particlesystem	*ps;
-
-
-		Projectile(Gameengine *, Replication *, int const, short int const, Entity const *);
-		virtual ~Projectile();
-
-		void	postinstanciation();
-		void	destroy();
-
-		//void	notified_by_owner(Entity *, bool const);
-
-		void	get_replication(Packet &) const;
-		void	replicate(Packet &, float const);
-
-		//void	tick(float const);
-		bool	should_collide(Collider const *) const;
-		bool	collide(Collider *);
-
-		bool	selfdestroy();
-};
-
-#endif
+Particleeffect::~Particleeffect()
+{
+	
+}

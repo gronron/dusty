@@ -75,7 +75,7 @@ class	Networkengine
 
 		void	connect(std::string const &, std::string const &);
 
-		void	sendtextmsg(std::string const &);
+		void	send_textmsg(char const *);
 };
 
 #endif

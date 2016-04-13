@@ -143,7 +143,7 @@ bool	Player::fire()
 			p->damage = damage;
 			p->body->position = body->position;
 			p->body->velocity = dir * 10.0f;
-			p->body->acceleration = { 0.0f, 0.0f, -10.0f, 0.0f };
+			p->body->acceleration = { 0.0f, 0.0f, -9.0f, 0.0f };
 		}
 		return (true);
 	}

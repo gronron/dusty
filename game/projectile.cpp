@@ -30,7 +30,7 @@ void	Projectile::postinstanciation()
 		ps = new Particlesystem(engine->graphic, "projectile", &body);
 		engine->graphic->add_animation(ps);
 	}
-	engine->callback->start_callback(4, this, (bool (Entity::*)())&Projectile::selfdestroy, 8.0f, false);
+	engine->callback->start_callback(4, this, (bool (Entity::*)())&Projectile::selfdestroy, 16.0f, false);
 }
 
 void	Projectile::destroy()
@@ -67,7 +67,7 @@ bool	Projectile::collide(Collider *x)
 {
 	if (dynamic_cast<World const *>(x))
 	{
-		engine->graphic->add_animation(new Particlesystem(engine->graphic, "player", body->position));
+		engine->graphic->add_animation(new Particlesystem(engine->graphic, "explosion", body->position));
 		//destroy();
 		return (true);
 	}

@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MESSAGEQUEUE_H_
 #define MESSAGEQUEUE_H_
 
-#include <string>
 #include "endian/packet.hpp"
 
 class	Messagequeue
@@ -75,8 +74,8 @@ class	Messagequeue
 		void	push_out_pckt(int actorid);
 		void	push_out_cnt(int cltid, int actid);
 		void	push_out_discnt(int cltid);
-		void	push_out_textmsg(std::string const &msg);
-		void	push_out_textmsg(int cltid, std::string const &msg);
+		void	push_out_textmsg(char const *msg);
+		void	push_out_textmsg(int cltid, char const *msg);
 
 		Message	*get_in();
 		void	pop_in();

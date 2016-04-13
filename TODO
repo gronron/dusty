@@ -1,6 +1,14 @@
 
+df:
+	-brace compacting???
+	-debug
+
 physic engine:
 	-use a good sorting algo for the first phase of collision solving in the physic engine
 	-maybe rethink the collision callback to the gamelogic
 	-add the missing continuous collision in narrowphase
 	-think about continuous collision detection of rotating object
+
+graphic engine:
+	-oriented box rendering
+	-multi line text renderer

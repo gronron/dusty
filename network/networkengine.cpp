@@ -140,7 +140,10 @@ void								Networkengine::tick(float const delta)
 		else if (msg->type == Messagequeue::CONTROL)
 			engine->control(msg->actid);
 		else if (msg->type == Messagequeue::TEXTMSG)
-			engine->console->puttext(std::string(msg->pckt.get_data(), msg->pckt.get_size()));
+		{
+			msg->pckt.write('\0');
+			engine->console->put_text(msg->pckt.get_data());
+		}
 		mq.pop_in();
 	}
 
@@ -178,7 +181,7 @@ void	Networkengine::connect(std::string const &i, std::string const &p)
 	thrd.create(Networkengine::runthrd, this);
 }
 
-void	Networkengine::sendtextmsg(std::string const &str)
+void	Networkengine::send_textmsg(char const *str)
 {
 	mq.push_out_textmsg(str);
 }

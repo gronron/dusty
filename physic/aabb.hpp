@@ -68,7 +68,7 @@ inline bool	Aabb::is_containing(Aabb const &inner) const
 	return ((vec<float, 3>)bottom <= inner.bottom && (vec<float, 3>)top >= inner.top);
 }
 
-inline	bool	intersect_rayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
+inline bool				intersect_rayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
 {
 	vec<float, 3> const	invdir = 1.0f / ray.direction;
 	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * invdir;
@@ -82,7 +82,7 @@ inline	bool	intersect_rayaabb(Ray const &ray, Aabb const &aabb, float &tnear, fl
 	return (tfar >= 0 && tnear <= tfar);
 }
 
-inline	bool	intersect_invrayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
+inline bool				intersect_invrayaabb(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar)
 {
 	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
 	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
@@ -95,7 +95,7 @@ inline	bool	intersect_invrayaabb(Ray const &ray, Aabb const &aabb, float &tnear,
 	return (tfar >= 0 && tnear <= tfar);
 }
 
-inline	bool	intersect_rayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)
+inline bool				intersect_rayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)
 {
 	vec<float, 3> const	invdir = 1.0f / ray.direction;
 	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * invdir;
@@ -124,7 +124,7 @@ inline	bool	intersect_rayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, 
 	return (tfar >= 0 && tnear <= tfar);
 }
 
-inline	bool	intersect_invrayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)
+inline bool				intersect_invrayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)
 {
 	vec<float, 3> const	tbot = (aabb.bottom - ray.origin) * ray.direction;
 	vec<float, 3> const	ttop = (aabb.top - ray.origin) * ray.direction;
@@ -150,6 +150,15 @@ inline	bool	intersect_invrayaabb_n(Ray const &ray, Aabb const &aabb, float &tnea
 	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
 
 	return (tfar >= 0 && tnear <= tfar);
+}
+
+inline bool				intersect_sphereaabb(vec<float, 4> const &center, float const radius, Aabb const &aabb)
+{
+	vec<float, 4> const	zero = { 0.0f, 0.0f, 0.0f, 0.0f };
+	vec<float, 4>		e = vmax(aabb.bottom - center, zero) + vmax(center - aabb.top, zero);
+	e *= e;
+
+    return (vsum(e) <= radius * radius);
 }
 
 #endif

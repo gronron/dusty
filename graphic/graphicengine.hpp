@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GRAPHICENGINE_H_
 
 #include "math/vec.hpp"
-#include "aabbtree.hpp"
+#include "haabbtree.hpp"
 #include "renderer.hpp"
 #include "animation.hpp"
 
@@ -81,9 +81,10 @@ class	Graphicengine
 		unsigned int	_materials_count;
 		Material		*_materials;
 
-		Aabbtree		aabbtree;
+		Haabbtree		aabbtree;
 
 		Renderer		_renderer;
+
 
 		Graphicengine();
 		~Graphicengine();
@@ -101,6 +102,5 @@ class	Graphicengine
 
 		void	_load_materials(char const *filename);
 };
-
 
 #endif

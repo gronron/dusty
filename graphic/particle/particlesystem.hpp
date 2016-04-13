@@ -28,41 +28,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PROJECTILE_H_
-#define PROJECTILE_H_
+#ifndef PARTICLESYSTEM_H_
+#define PARTICLESYSTEM_H_
 
-#include "entity.hpp"
-#include "shape.hpp"
-#include "particle/particlesystem.hpp"
+#include <string>
+#include "body.hpp"
+#include "animation.hpp"
+#include "graphicengine.hpp"
+#include "particleeffect.hpp"
 
-class	Projectile : public Entity
+class	Df_node;
+
+class	Particlesystem : public Animation
 {
 	public:
 
-		Body				*body;
-		Axisalignedboxshape	shape;
+		struct	Particle
+		{
+			vec<float, 4>	position;
+			vec<float, 4>	velocity;
 
-		float	damage;
+			float			size;
+			float			fade_rate;
+			bool			active;
+		};
+		
+		struct	Effect
+		{
+			Particleeffect	*pe;
+			Df_node	const	*next;
+		};
 
-		Particlesystem	*ps;
+
+		bool			running;
+		vec<float, 4>	position;
+		Body 			**body;
+		unsigned int	material;
+		float			scale;
+
+		unsigned int	_prtclssize;
+		Particle		*_particles;
+
+		Effect			_effects[8];
 
 
-		Projectile(Gameengine *, Replication *, int const, short int const, Entity const *);
-		virtual ~Projectile();
+		Particlesystem(Graphicengine *, std::string const &, Body **);
+		Particlesystem(Graphicengine *, std::string const &, vec<float, 4> const &);
+		Particlesystem(Graphicengine *, std::string const &, vec<float, 4> const &, unsigned int, Particle *);
+		virtual ~Particlesystem();
 
-		void	postinstanciation();
-		void	destroy();
+		void	stop();
+		void	attach(Body **);
+		void	detach();
 
-		//void	notified_by_owner(Entity *, bool const);
+		bool	tick(float const);
 
-		void	get_replication(Packet &) const;
-		void	replicate(Packet &, float const);
-
-		//void	tick(float const);
-		bool	should_collide(Collider const *) const;
-		bool	collide(Collider *);
-
-		bool	selfdestroy();
+		void	add_effects(Df_node const *);
+		void	remove_effect();
 };
 
 #endif

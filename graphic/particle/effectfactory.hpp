@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,41 +28,58 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PROJECTILE_H_
-#define PROJECTILE_H_
+#ifndef EFFECTFACTORY_H_
+#define EFFECTFACTORY_H_
 
-#include "entity.hpp"
-#include "shape.hpp"
-#include "particle/particlesystem.hpp"
+#include "hash/crc32.hpp"
 
-class	Projectile : public Entity
+#define EFFECTFACTORYREG(name) Effectfactoryregister<name> const	registered_effect_##name(HASH(#name))
+
+class	Df_node;
+class	Particleeffect;
+class	Particlesystem;
+
+class	Effectfactory
 {
 	public:
 
-		Body				*body;
-		Axisalignedboxshape	shape;
+		typedef Particleeffect *(*CF)(Particlesystem *, float const, Df_node const *);
 
-		float	damage;
+		struct	Pair
+		{
+			unsigned int	hash;
+			CF				cf;
+		};
 
-		Particlesystem	*ps;
+
+		static Effectfactory	&get_instance();
 
 
-		Projectile(Gameengine *, Replication *, int const, short int const, Entity const *);
-		virtual ~Projectile();
+		unsigned int	_prscount;
+		unsigned int	_prssize;
+		Pair			*_pairs;
 
-		void	postinstanciation();
-		void	destroy();
 
-		//void	notified_by_owner(Entity *, bool const);
+		Effectfactory();
+		~Effectfactory();
 
-		void	get_replication(Packet &) const;
-		void	replicate(Packet &, float const);
+		void			register_class(unsigned int const, CF);
+		Particleeffect	*create(unsigned int const, Particlesystem *, float const, Df_node const *) const;
+};
 
-		//void	tick(float const);
-		bool	should_collide(Collider const *) const;
-		bool	collide(Collider *);
+template<class T>
+Particleeffect	*create_effect(Particlesystem *p, float const t, Df_node const *d)
+{
+	return (new T(p, t, d));
+}
 
-		bool	selfdestroy();
+template<class T>
+struct	Effectfactoryregister
+{
+	Effectfactoryregister(unsigned int const hash)
+	{
+		Effectfactory::get_instance().register_class(hash, &create_effect<T>);
+	}
 };
 
 #endif

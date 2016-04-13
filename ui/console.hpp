@@ -31,44 +31,56 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CONSOLE_H_
 #define CONSOLE_H_
 
-#include <string>
-#include <list>
+#define MAXCHARACTER 1024
+#define MAXHISTORY 1024
 
 class	Gameengine;
 
 class	Console
 {
 	public:
+	
+		Gameengine	*engine;
+
+		
+		Console(Gameengine *);
+		virtual ~Console();
+
+		virtual void	tick(float const);
+
+		virtual void	put_text(char const *);
+};
+
+class	Gameconsole : public Console
+{
+	public:
 
 		enum	Cursormove { UP, DOWN, LEFT, RIGHT };
-
-		struct			Recentmessage
+		
+		struct	Line
 		{
-			float		time;
-			std::string	msg;
+			char			text[MAXCHARACTER];
+			unsigned int	size;
 		};
 
 
-		Gameengine	*engine;
-
-		bool		_blink;
-		float		_blinktime;
-		int			_cursor;
-		std::string	_text;
-
-		std::list<std::string>		_history;
-		std::list<Recentmessage>	_recentmsg;
+		unsigned int	_cursor;
+		bool			_blink;
+		float			_blinktimer;
+		float			_lastmsgtimer;
+		int				_iterator;
+		char			_text[MAXCHARACTER];
+		Line			_lines[MAXHISTORY];
 
 
-		Console(Gameengine *);
-		~Console();
-
-		void	tick(float);
+		Gameconsole(Gameengine *);
+		~Gameconsole();
+		
+		void	tick(float const);
 		void	draw();
-
-		void	movecursor(Cursormove);
-		void	putchar(char);
-		void	puttext(std::string const &);
+		
+		void	put_text(char const *);
+		void	update_text(char const *, unsigned int const);
 };
 
 #endif

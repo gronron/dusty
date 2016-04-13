@@ -160,6 +160,11 @@ bool	Aabbtree::move_saabb(int const index, Aabb const &aabb)
 	return (true);
 }
 
+void	Aabbtree::update_aabbdata(int const index, int const data)
+{
+	_nodes[index].data = data;
+}
+
 int		Aabbtree::_allocate_node()
 {
 	int	index;

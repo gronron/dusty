@@ -28,13 +28,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#if defined(_WIN32) || defined(__WIN32__)
+	#include <SDKDDKVer.h>
+	#include <winsock2.h>
+	#include <io.h>
+#else
+	#include <sys/select.h>
+	#include <sys/time.h>
+	#include <sys/types.h>
+	#include <unistd.h>
+#endif
+
+#include <stdio.h>
 #include "gameengine.hpp"
+
 #include "eventmanager.hpp"
 #include "networkengine.hpp"
 #include "graphicengine.hpp"
 #include "console.hpp"
 
-Console::Console(Gameengine *g) : engine(g), _blink(false), _blinktime(0.0f), _cursor(0), _text("")
+Console::Console(Gameengine *e) : engine(e)
 {
 
 }
@@ -44,64 +57,117 @@ Console::~Console()
 
 }
 
-void	Console::tick(float delta)
+void				Console::tick(float const delta)
 {
-	_blinktime += delta;
-	if (_blinktime >= 0.5f)
+	fd_set			readfds;
+	struct timeval	tv = { 0, 0 };
+	int				ret;
+/*
+	FD_ZERO(&readfds);
+	FD_SET(0, &readfds);
+
+	if ((ret = select(1, &readfds, 0, 0, &tv)) < 0)
 	{
-		_blinktime -= 0.5f;
+		perror("Error! select psst");
+		exit(EXIT_FAILURE);
+	}
+	else if (ret == 1 && FD_ISSET(0, &readfds))
+	{
+		char		str[65536];
+#if defined(_WIN32) || defined(__WIN32__)
+		int	const	size = _read(0, str, 65536);
+#else
+		int	const	size = read(0, str, 65536);
+#endif
+
+		if (size > 0)
+		{
+			str[size] = '\0';
+			if (engine->network)
+				engine->network->send_textmsg(str);
+		}
+	}*/
+}
+
+void	Console::put_text(char const *str)
+{
+#if defined(_WIN32) || defined(__WIN32__)
+	_write(1, str, strlen(str));
+	_write(1, "\n", 1);
+#else
+	write(1, str, strlen(str));
+	write(1, "\n", 1);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Gameconsole::Gameconsole(Gameengine *e) : Console(e), _cursor(0), _blink(false), _blinktimer(0.0f), _lastmsgtimer(0.0f)
+{
+	/*for (unsigned int i = 0; i < MAXHISTORY; ++i)
+	{
+		*_lines[i].text = '\0';
+		_lines[i].size = 0;
+	}*/
+}
+
+Gameconsole::~Gameconsole()
+{
+
+}
+
+void	Gameconsole::tick(float const delta)
+{
+	/*if ((_blinktimer += delta_ >= 0.5f)
+	{
+		_blinktimer -= 0.5f;
 		_blink = !_blink;
 	}
+	if (_lastmsgtimer >= 0.0f)
+		_lastmsgtimer -= delta;*/
 }
 
-void											Console::draw()
+void					Gameconsole::draw()
 {
-	std::list<std::string>::reverse_iterator	i;
-	vec<float, 2>								loc;
-	vec<float, 2>								s;
-	vec<float, 4>								color;
-	std::string									text;
-	int											j;
+	/*vec<float, 2>		position = 8.0f;
+	vec<float, 2> const	scale = 0.0f;
+	vec<float, 4> const	color = 1.0f;
 
-	color = 1.0f;
-	//loc = vec<float, 2>::cast(engine->graphic->screensize) / -2.0f;
-	loc[1] += _history.size() < 4 ? _history.size() * 32.0f : 128.0f;
-	s = 0.5f;
-	if (engine->event->typing)
+	if (_lastmsgtimer >= 0.0f)
 	{
-		text = _text;
+		for (unsigned int i = (_iterator - 8) % MAXHISTORY; i != _iterator; i = (i + 1) % MAXHISTORY)
+		{
+			engine->graphic->draw_text(_lines[i].text, position, scale, color);
+			position[1] -= 32.0f;
+		}
+	}
+	if (_text[0])
+	{
+		char	str[MAXCHARACTER];
+		
+		strcpy(str, _text);
 		if (_blink)
-			text.replace(_cursor, 1, 1, '_');
-		//engine->ge->draw_text(text, loc + *engine->ge->cam, s, color);
-	}
-	j = 0;
-	for (i = _history.rbegin(); i != _history.rend() && j < 4; ++i)
-	{
-		loc[1] -= 32;
-		j++;
-		//engine->ge->draw_text(*i, loc + *engine->ge->cam, s, color);
-	}
+			str[_cursor] = '_';
+		engine->graphic->draw_text(str, position, scale, color);
+	}*/
 }
 
-void	Console::movecursor(Cursormove a)
+void	Gameconsole::put_text(char const *str)
 {
-	if (a == UP)
-		_cursor = 0;
-	else if (a == DOWN)
-		_cursor = _text.size();
-	else if (a == LEFT)
-	{
-		if (_cursor > 0)
-			--_cursor;
-	}
-	else if (a == RIGHT)
-	{
-		if (_cursor < _text.size())
-			++_cursor;
-	}
+	/*strcpy(_lines[_iterator].text, str);
+	_iterator = (_iterator + 1 ) % MAXHISTORY;
+	if (engine->network && engine->master)
+		engine->network->sendtextmsg(str);*/
+	
 }
 
-void	Console::putchar(char c)
+void	Gameconsole::update_text(char const *str, unsigned int cursor)
+{
+	/*_cursor = cursor;
+	strcpy(_text, str); */
+}
+/*
+void	Gameconsole::put_char(char const c)
 {
 	if (c == '\r' || c == '\n')
 	{
@@ -127,9 +193,21 @@ void	Console::putchar(char c)
 		_text.insert(_cursor++, 1, c);
 }
 
-void	Console::puttext(std::string const &str)
+void	Gameconsole::move_cursor(Cursormove const a)
 {
-	if (engine->network && engine->master)
-		engine->network->sendtextmsg(str);
-	_history.push_back(str);
+	if (a == UP)
+		_cursor = 0;
+	else if (a == DOWN)
+		_cursor = _text.size();
+	else if (a == LEFT)
+	{
+		if (_cursor > 0)
+			--_cursor;
+	}
+	else if (a == RIGHT)
+	{
+		if (_cursor < _text.size())
+			++_cursor;
+	}
 }
+*/

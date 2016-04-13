@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,41 +28,61 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PROJECTILE_H_
-#define PROJECTILE_H_
+#ifndef COMMONEFFECT_H_
+#define COMMONEFFECT_H_
 
-#include "entity.hpp"
-#include "shape.hpp"
 #include "particle/particlesystem.hpp"
 
-class	Projectile : public Entity
+class	Expulsor : public Particleeffect
 {
 	public:
 
-		Body				*body;
-		Axisalignedboxshape	shape;
-
-		float	damage;
-
-		Particlesystem	*ps;
+		vec<float, 2>	velocity;
 
 
-		Projectile(Gameengine *, Replication *, int const, short int const, Entity const *);
-		virtual ~Projectile();
+		Expulsor(Particlesystem *, float const, Df_node const *);
+		virtual ~Expulsor();
 
-		void	postinstanciation();
-		void	destroy();
+		virtual void	tick(float const);
+};
 
-		//void	notified_by_owner(Entity *, bool const);
+class	Attractor : public Particleeffect
+{
+	public:
 
-		void	get_replication(Packet &) const;
-		void	replicate(Packet &, float const);
+		vec<float, 2>	velocity;
 
-		//void	tick(float const);
-		bool	should_collide(Collider const *) const;
-		bool	collide(Collider *);
 
-		bool	selfdestroy();
+		Attractor(Particlesystem *, float const, Df_node const *);
+		virtual ~Attractor();
+
+		virtual void	tick(float const);
+};
+
+class	Appear : public Particleeffect
+{
+	public:
+
+		vec<float, 2>	fade_rate;
+	
+
+		Appear(Particlesystem *, float const, Df_node const *);
+		virtual ~Appear();
+
+		virtual void	tick(float const);
+};
+
+class	Disappear : public Particleeffect
+{
+	public:
+
+		vec<float, 2>	fade_rate;
+
+
+		Disappear(Particlesystem *, float const, Df_node const *);
+		virtual ~Disappear();
+
+		virtual void	tick(float const);
 };
 
 #endif

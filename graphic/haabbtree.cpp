@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,50 +28,79 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PARTICLESYSTEM_H_
-#define PARTICLESYSTEM_H_
+#include "haabbtree.hpp"
 
-#include <string>
-#include "body.hpp"
-#include "animation.hpp"
-#include "graphicengine.hpp"
-
-class	Particlesystem : public Animation
+Haabbtree::Haabbtree() : Aabbtree(), _realroot(-1), _transitory(false)
 {
-	public:
 
-		struct	Particle
-		{
-			vec<float, 4>	position;
-			vec<float, 4>	velocity;
+}
 
-			float			size;
-			float			fade_rate;
-			int				index;
-		};
+void	Haabbtree::add_transient_aabb(Aabb const &aabb, int const data)
+{
+	if (!_transitory)
+	{
+		_transitory = true;
+		_realroot = _root;
+		_root = -1;
+	}
 
-		Body					**body;
-		vec<float, 4>			position;
+	int const	index = _allocate_node();
+
+	_nodes[index].left = -1;
+	_nodes[index].right = -1;
+	_nodes[index].height = 0;
+	_nodes[index].aabb.bottom = aabb.bottom;
+	_nodes[index].aabb.top = aabb.top;
+	_nodes[index].data = data;
+	_insert_leaf(index);
+}
+
+void	Haabbtree::attach_transient_tree()
+{
+	if (_transitory && _realroot != -1)
+	{
+		int const	newroot = _allocate_node();
 		
-		unsigned int		_size;
-		Particle			*_particles;
+		_nodes[newroot].parent = -1;
+		_nodes[newroot].left = _realroot;
+		_nodes[newroot].right = _root;
+		_nodes[newroot].height = (_nodes[_realroot].height > _nodes[_root].height ? _nodes[_realroot].height : _nodes[_root].height) + 1;
+		_nodes[newroot].aabb.merge(_nodes[_realroot].aabb, _nodes[_root].aabb);
+		_root = newroot;
+	}
+}
 
-		bool				attractor;
-		float				spawnrate;
-		float				spawntime;
-		float				time;
+void	Haabbtree::delete_transient_tree()
+{
+	if (_transitory)
+	{
+		_transitory = false;
 
-		vec<float, 2>	fade_rate;
-		vec<float, 2>	velocity;
+		int	stack[32];
+		int	top = 0;
 
-		Particlesystem(Graphicengine *, std::string const &, Body **);
-		Particlesystem(Graphicengine *, std::string const &, vec<float, 4> const &);
-		virtual ~Particlesystem();
+		if (_realroot == -1)
+			stack[top++] = _root;
+		else
+		{
+			stack[top++] = _nodes[_root].right;
 
-		bool	tick(float);
+			_free_node(_root);
+			_root = _realroot;
+		}
 
-		void	stop();
-		void	reverse();
-};
+		do
+		{
+			int	index = stack[--top];
 
-#endif
+			if (_nodes[index].right != -1)
+			{
+				stack[top++] = _nodes[index].left;
+				stack[top++] = _nodes[index].right;
+			}
+			_free_node(index);
+		}
+		while (top);
+
+	}
+}

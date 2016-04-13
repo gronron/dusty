@@ -176,7 +176,7 @@ void	Messagequeue::push_out_discnt(int cltid)
 	}
 }
 
-void	Messagequeue::push_out_textmsg(std::string const &str)
+void	Messagequeue::push_out_textmsg(char const *str)
 {
 	if ((_frontout + 1) % _size != _backout)
 	{
@@ -184,12 +184,12 @@ void	Messagequeue::push_out_textmsg(std::string const &str)
 		_msgout[_frontout].cltid = 0;
 		_msgout[_frontout].actid = 0;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt((unsigned int)str.length() + 1, str.c_str());
+		_msgout[_frontout].pckt((unsigned int)(strlen(str) + 1), str);
 		_frontout = (_frontout + 1) % _size;
 	}
 }
 
-void	Messagequeue::push_out_textmsg(int cltid, std::string const &str)
+void	Messagequeue::push_out_textmsg(int cltid, char const *str)
 {
 	if ((_frontout + 1) % _size != _backout)
 	{
@@ -197,7 +197,7 @@ void	Messagequeue::push_out_textmsg(int cltid, std::string const &str)
 		_msgout[_frontout].cltid = cltid;
 		_msgout[_frontout].actid = 0;
 		_msgout[_frontout].ping = 0.0f;
-		_msgout[_frontout].pckt((unsigned int)str.length() + 1, str.c_str());
+		_msgout[_frontout].pckt((unsigned int)(strlen(str) + 1), str);
 		_frontout = (_frontout + 1) % _size;
 	}
 }

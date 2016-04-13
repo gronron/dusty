@@ -28,41 +28,60 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PROJECTILE_H_
-#define PROJECTILE_H_
+#include <iostream>
+#include <cstdlib>
+#include "new.hpp"
+#include "effectfactory.hpp"
 
-#include "entity.hpp"
-#include "shape.hpp"
-#include "particle/particlesystem.hpp"
-
-class	Projectile : public Entity
+Effectfactory		&Effectfactory::get_instance()
 {
-	public:
+	static Effectfactory	instance;
 
-		Body				*body;
-		Axisalignedboxshape	shape;
+	return (instance);
+}
 
-		float	damage;
+Effectfactory::Effectfactory() : _prscount(0), _prssize(64), _pairs(0)
+{
+	_pairs = new Pair[_prssize];
+}
 
-		Particlesystem	*ps;
+Effectfactory::~Effectfactory()
+{
+	delete [] _pairs;
+}
 
+void	Effectfactory::register_class(unsigned int const hash, CF cf)
+{
+	if (_prscount >= _prssize)
+	{
+		_prssize <<= 1;
+		_pairs = resize(_pairs, _prscount, _prssize);
+	}
 
-		Projectile(Gameengine *, Replication *, int const, short int const, Entity const *);
-		virtual ~Projectile();
+	unsigned int	i;
+	for (i = _prscount++; i && _pairs[i - 1].hash > hash; --i)
+		_pairs[i] = _pairs[i - 1];
+	_pairs[i].hash = hash;
+	_pairs[i].cf = cf;
+}
 
-		void	postinstanciation();
-		void	destroy();
+Particleeffect		*Effectfactory::create(unsigned int const hash, Particlesystem *p, float const t, Df_node const *d) const
+{
+	int				imin = 0;
+	int				imax = _prscount;
 
-		//void	notified_by_owner(Entity *, bool const);
+	while (imin <= imax)
+	{
+		int const	imid = (imin + imax) >> 1;
 
-		void	get_replication(Packet &) const;
-		void	replicate(Packet &, float const);
-
-		//void	tick(float const);
-		bool	should_collide(Collider const *) const;
-		bool	collide(Collider *);
-
-		bool	selfdestroy();
-};
-
-#endif
+		if (hash < _pairs[imid].hash)
+			imax = imid - 1;
+		else if (hash > _pairs[imid].hash)
+			imin = imid + 1;
+		else
+			return (_pairs[imid].cf(p, t, d));
+	}
+	std::cerr << "Error! Effectfactory::create() fails to find hash: " << hash << std::endl;
+	exit(EXIT_FAILURE);
+	return (0);
+}

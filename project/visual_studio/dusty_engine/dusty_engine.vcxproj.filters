@@ -43,6 +43,12 @@
     <Filter Include="Source Files\graphic">
       <UniqueIdentifier>{76418ee6-b9bb-4d2d-96f3-89f5c303d835}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphic\particle">
+      <UniqueIdentifier>{7b5e28f9-e3cf-4cd1-9912-7246cf01894c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphic\particle">
+      <UniqueIdentifier>{5e30b490-4f12-40f8-a503-2dff6809b8ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\engine\configmanager.cpp">
@@ -147,9 +153,6 @@
     <ClCompile Include="..\..\..\graphic\renderer.cpp">
       <Filter>Source Files\graphic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\particlesystem.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\projectile.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
@@ -179,6 +182,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\socket\winsock_init.cpp">
       <Filter>Source Files\libsrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\particle\effectfactory.cpp">
+      <Filter>Source Files\graphic\particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\particle\particleeffect.cpp">
+      <Filter>Source Files\graphic\particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\particle\particlesystem.cpp">
+      <Filter>Source Files\graphic\particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\physic\physicengine_query.cpp">
+      <Filter>Source Files\physic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\commoneffect.cpp">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\haabbtree.cpp">
+      <Filter>Source Files\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -305,9 +326,6 @@
     <ClInclude Include="..\..\..\graphic\renderer.hpp">
       <Filter>Header Files\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\game\particlesystem.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\game\projectile.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
@@ -334,6 +352,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\socket\selector.hpp">
       <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\particle\effectfactory.hpp">
+      <Filter>Header Files\graphic\particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\particle\particleeffect.hpp">
+      <Filter>Header Files\graphic\particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\particle\particlesystem.hpp">
+      <Filter>Header Files\graphic\particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\commoneffect.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\haabbtree.hpp">
+      <Filter>Header Files\graphic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

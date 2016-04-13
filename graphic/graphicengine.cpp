@@ -87,9 +87,17 @@ void	Graphicengine::set_camera(vec<float, 4> const &position, vec<float, 2> cons
 void	Graphicengine::tick(float const delta)
 {
 	for (unsigned int i = 0; i < _animations_count; ++i)
-		_animations[i]->tick(delta);
+	{
+		if (!_animations[i]->tick(delta))
+		{
+			delete _animations[i];
+			_animations[i--] = _animations[--_animations_count];
+		}
+	}
 
+	aabbtree.attach_transient_tree();
 	_renderer.render(this);
+	aabbtree.delete_transient_tree();
 }
 
 void	Graphicengine::add_animation(Animation *animation)
