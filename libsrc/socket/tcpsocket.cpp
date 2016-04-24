@@ -76,17 +76,17 @@ bool				Tcp_server::operator()(char const *port, bool ipv6)
 		{
 			if (bind(_id, res->ai_addr, res->ai_addrlen))
 			{
-				perror("Error: bind()");
+				p_perror("Error: bind()");
 				(*this)();
 			}
 			else if (listen(_id, 5))
 			{
-				perror("Error: listen()");
+				p_perror("Error: listen()");
 				(*this)();
 			}
 		}
 		else
-			perror("Error: socket()");
+			p_perror("Error: socket()");
 		freeaddrinfo(res);
 	}
 	else
@@ -140,7 +140,7 @@ bool	Tcpsocket::operator()(Tcp_server &x, char *ip, char *port)
 		struct sockaddr_in	b;
 		socklen_t c = sizeof(b);
 		if ((_id = accept(x._id, (struct sockaddr *)&b, &c)) == INVALID_SOCKET)
-			perror("Error: accept()");
+			p_perror("Error: accept()");
 		else if (ip || port)
 		{
 			int	err;
@@ -169,12 +169,12 @@ bool				Tcpsocket::operator()(char const *ip, char const *port)
 		{
 			if (connect(_id, res->ai_addr, res->ai_addrlen))
 			{
-				perror("Error: connect()");
+				p_perror("Error: connect()");
 				(*this)();
 			}
 		}
 		else
-			perror("Error: socket()");
+			p_perror("Error: socket()");
 		freeaddrinfo(res);
 	}
 	else
@@ -194,7 +194,7 @@ int 		Tcpsocket::read(unsigned int const size, void *data)
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = recv(_id, (char *)data, size, 0)) < 0)
-			perror("Error: recv()");
+			p_perror("Error: recv()");
 		return (rsize);
 	}
 	else
@@ -208,7 +208,7 @@ int			Tcpsocket::write(unsigned int const size, void const *data)
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = send(_id, (char const *)data, size, 0)) < 0)
-			perror("Error: send()");
+			p_perror("Error: send()");
 		return (rsize);
 	}
 	else

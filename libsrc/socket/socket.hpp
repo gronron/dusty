@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 
+	void	p_perror(char const *);
+	
 	typedef	SOCKET	Socket;
 #else
 	#include <sys/types.h>
@@ -47,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	#define INVALID_SOCKET	-1
 	#define closesocket(id)	close(id)
+
+	#define	p_perror(x)	perror(x)
 
 	typedef int		Socket;
 #endif

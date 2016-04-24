@@ -37,6 +37,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <winsock2.h>
 #include <windows.h>
 
+void	p_perror(char const *msg)
+{
+	char	*errorstr;
+
+	if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY, 0, WSAGetLastError(), LANG_NEUTRAL, (LPTSTR)&errorstr, 0, 0))
+	{
+		std::cerr << msg << ": " << errorstr;
+		LocalFree(errorstr);
+	}
+	else
+	{
+		std::cerr << "Error: perror fails on FormatMessage" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
 class	Winsock_init
 {
 	public:

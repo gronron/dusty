@@ -53,7 +53,7 @@ bool				Selector::check(float const timeout)
 	memcpy(&_tempfds, &_readfds, sizeof(_readfds));
 	if ((ret = select((int)_nfds, &_tempfds, 0, 0, timeout < 0.0f ? 0 : &tv)) < 0)
 	{
-		perror("Error: select()");
+		p_perror("Error: select()");
 		return (false);
 	}
 	return (ret != 0);

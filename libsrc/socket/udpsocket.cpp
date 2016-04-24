@@ -89,12 +89,12 @@ bool				Udp_server::operator()(char const *port, bool const ipv6)
 		{
 			if (bind(_id, rs->ai_addr, rs->ai_addrlen))
 			{
-				perror("Error: bind()");
+				p_perror("Error: bind()");
 				(*this)();
 			}
 		}
 		else
-			perror("Error: socket()");
+			p_perror("Error: socket()");
 		freeaddrinfo(rs);
 	}
 	else
@@ -179,7 +179,7 @@ int				Udp_server::read(int &id, unsigned int const size, void *data)
 		}
 	}
 	else
-		perror("Error: recvfrom()");
+		p_perror("Error: recvfrom()");
 	return (rsize);
 }
 
@@ -190,7 +190,7 @@ int		Udp_server::write(int const id, unsigned int const size, void const *data)
 	if (id >= 0 && _clients[id].next < 0)
 	{
 		if ((rsize = sendto(_id, (char const *)data, size, 0, (struct sockaddr *)&_clients[id].addr, sizeof(_clients[id].addr))) < 0)
-			perror("Error: sendto()");
+			p_perror("Error: sendto()");
 		return (rsize);
 	}
 	else
@@ -247,12 +247,12 @@ bool				Udpsocket::operator()(char const *ip, char const *port, bool const ipv6)
 		{
 			if (connect(_id, rs->ai_addr, rs->ai_addrlen))
 			{
-				perror("Error: connect()");
+				p_perror("Error: connect()");
 				(*this)();
 			}
 		}
 		else
-			perror("Error: socket()");
+			p_perror("Error: socket()");
 	}
 	else
 		fprintf(stderr, "Error: getaddrinfo() %s\n", gai_strerror(err));
@@ -279,17 +279,17 @@ bool				Udpsocket::operator()(char const *ip, char const *pin, char const *pout,
 			{
 				if (bind(_id, rb->ai_addr, rb->ai_addrlen))
 				{
-					perror("Error: bind()");
+					p_perror("Error: bind()");
 					(*this)();
 				}
 				else if (connect(_id, rs->ai_addr, rs->ai_addrlen))
 				{
-					perror("Error: connect()");
+					p_perror("Error: connect()");
 					(*this)();
 				}
 			}
 			else
-				perror("Error: socket()");
+				p_perror("Error: socket()");
 			freeaddrinfo(rb);
 		}
 		else
@@ -313,7 +313,7 @@ int			Udpsocket::read(unsigned int const size, void *data)
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = recv(_id, (char *)data, size, 0)) < 0)
-			perror("Error: recv()");
+			p_perror("Error: recv()");
 		return (rsize);
 	}
 	else
@@ -327,7 +327,7 @@ int			Udpsocket::write(unsigned int const size, void const *data)
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = send(_id, (char const *)data, size, 0)) < 0)
-			perror("Error: recv()");
+			p_perror("Error: recv()");
 		return (rsize);
 	}
 	else

@@ -1,7 +1,17 @@
+///////////////////////////////////////
+
+error! function_name: what happned
+
+warning! function_name: what happned
+
+///////////////////////////////////////
+
+console:
+	make it work 0
 
 df:
 	-brace compacting???
-	-debug
+	-debug 0
 
 physic engine:
 	-use a good sorting algo for the first phase of collision solving in the physic engine
@@ -10,5 +20,6 @@ physic engine:
 	-think about continuous collision detection of rotating object
 
 graphic engine:
-	-oriented box rendering
-	-multi line text renderer
+	-oriented box rendering 1
+	-multi line text renderer 1
+	-ui renderer 3

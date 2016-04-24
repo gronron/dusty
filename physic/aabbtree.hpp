@@ -112,7 +112,7 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const,
 		stack[top++] = _root;
 		do
 		{
-			int	index = stack[--top];
+			int const	index = stack[--top];
 
 			if (aabb.is_overlapping(_nodes[index].aabb))
 			{
@@ -141,9 +141,9 @@ void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(in
 		stack[top++] = _root;
 		do
 		{
-			int		index = stack[--top];
-			float	near;
-			float	far;
+			int const	index = stack[--top];
+			float		near;
+			float		far;
 			
 			if (intersect_invrayaabb(invray, _nodes[index].aabb, near, far))
 			{
