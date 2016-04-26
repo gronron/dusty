@@ -113,8 +113,7 @@ inline void	check_error(cl_int error, char const *str)
 {
 	if (error != CL_SUCCESS)
 	{
-		std::cerr << str << ": " << error_to_string(error) << std::endl;
-		system("pause");
+		std::cerr << "error! " << str << ": " << error_to_string(error) << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }

@@ -63,7 +63,10 @@ Df_node											*Configmanager::get(std::string const &name)
 		Df_node	*node = df_parse(temp.c_str());
 
 		if (node)
+		{
+			//node->print();
 			_nodemap[name] = node;
+		}
 		else
 			exit(EXIT_FAILURE);
 		return (node);

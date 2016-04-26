@@ -149,7 +149,7 @@ Disappear::Disappear(Particlesystem *p, float const t, Df_node const *d) : Parti
 	{
 		if (!ps->_particles[i].active && ps->running)
 		{
-			ps->_particles[i].size = (float)MT().genrand_real1(0.0, 1.0);
+			ps->_particles[i].size = (float)MT().genrand_real1(0.0, 0.8);
 			ps->_particles[i].fade_rate = (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
 		}
 	}
