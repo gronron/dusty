@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType Multiple Master font interface (specification).             */
 /*                                                                         */
-/*  Copyright 1996-2001, 2003, 2004, 2006, 2009, 2013 by                   */
+/*  Copyright 1996-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,8 +16,8 @@
 /***************************************************************************/
 
 
-#ifndef __FTMM_H__
-#define __FTMM_H__
+#ifndef FTMM_H_
+#define FTMM_H_
 
 
 #include <ft2build.h>
@@ -95,8 +95,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    num_designs :: Number of designs; should be normally 2^num_axis    */
   /*                   even though the Type~1 specification strangely      */
-  /*                   allows for intermediate designs to be present. This */
-  /*                   number cannot exceed~16.                            */
+  /*                   allows for intermediate designs to be present.      */
+  /*                   This number cannot exceed~16.                       */
   /*                                                                       */
   /*    axis        :: A table of axis descriptors.                        */
   /*                                                                       */
@@ -201,11 +201,15 @@ FT_BEGIN_HEADER
   /*                       associated with them.  The font can tell the    */
   /*                       user that, for example, Weight=1.5 is `Bold'.   */
   /*                                                                       */
-  /*    axis            :: A table of axis descriptors.                    */
+  /*    axis            :: An axis descriptor table.                       */
   /*                       GX fonts contain slightly more data than MM.    */
+  /*                       Memory management of this pointer is done       */
+  /*                       internally by FreeType.                         */
   /*                                                                       */
-  /*    namedstyles     :: A table of named styles.                        */
+  /*    namedstyle      :: A named style table.                            */
   /*                       Only meaningful with GX.                        */
+  /*                       Memory management of this pointer is done       */
+  /*                       internally by FreeType.                         */
   /*                                                                       */
   typedef struct  FT_MM_Var_
   {
@@ -255,7 +259,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Output>                                                              */
   /*    amaster :: The Multiple Masters/GX var descriptor.                 */
-  /*               Allocates a data structure, which the user must free.   */
+  /*               Allocates a data structure, which the user must         */
+  /*               deallocate with `free' after use.                       */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0~means success.                             */
@@ -280,8 +285,10 @@ FT_BEGIN_HEADER
   /*    face       :: A handle to the source face.                         */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    num_coords :: The number of design coordinates (must be equal to   */
-  /*                  the number of axes in the font).                     */
+  /*    num_coords :: The number of available design coordinates.  If it   */
+  /*                  is larger than the number of axes, ignore the excess */
+  /*                  values.  If it is smaller than the number of axes,   */
+  /*                  use default values for the remaining axes.           */
   /*                                                                       */
   /*    coords     :: An array of design coordinates.                      */
   /*                                                                       */
@@ -307,8 +314,10 @@ FT_BEGIN_HEADER
   /*    face       :: A handle to the source face.                         */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    num_coords :: The number of design coordinates (must be equal to   */
-  /*                  the number of axes in the font).                     */
+  /*    num_coords :: The number of available design coordinates.  If it   */
+  /*                  is larger than the number of axes, ignore the excess */
+  /*                  values.  If it is smaller than the number of axes,   */
+  /*                  use default values for the remaining axes.           */
   /*                                                                       */
   /*    coords     :: An array of design coordinates.                      */
   /*                                                                       */
@@ -334,8 +343,10 @@ FT_BEGIN_HEADER
   /*    face       :: A handle to the source face.                         */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    num_coords :: The number of design coordinates (must be equal to   */
-  /*                  the number of axes in the font).                     */
+  /*    num_coords :: The number of available design coordinates.  If it   */
+  /*                  is larger than the number of axes, ignore the excess */
+  /*                  values.  If it is smaller than the number of axes,   */
+  /*                  use default values for the remaining axes.           */
   /*                                                                       */
   /*    coords     :: The design coordinates array (each element must be   */
   /*                  between 0 and 1.0).                                  */
@@ -367,7 +378,7 @@ FT_BEGIN_HEADER
 
 FT_END_HEADER
 
-#endif /* __FTMM_H__ */
+#endif /* FTMM_H_ */
 
 
 /* END */
