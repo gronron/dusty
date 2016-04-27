@@ -28,6 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include <cstdlib>
 #include "new.hpp"
 #include "configmanager.hpp"
 #include "graphicengine.hpp"
@@ -35,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Graphicengine::Graphicengine() :	_animations_size(4096), _animations_count(0), _animations(0),
 									_lights_size(4096), _lights_count(0), _lights(0), _lights_links(0),
 									_materials_size(0), _materials_count(0), _materials(0),
-									_renderer(1440, 900)
+									_renderer(1440, 900, false)
 {
 	camera.position = 0.0f;
 	camera.direction = 0.0f;
@@ -95,6 +96,9 @@ void	Graphicengine::tick(float const delta)
 		}
 	}
 
+	char	str[16];
+	_renderer.draw_text(itoa((int)(1.0f / delta), str, 10), {camera.resolution[0] - 64.0f, 16.0f}, {0.3f, 0.3f}, {0.35f, 0.6f, 0.35f, 1.0f});
+
 	aabbtree.attach_transient_tree();
 	_renderer.render(this);
 	aabbtree.delete_transient_tree();
@@ -142,6 +146,11 @@ void	Graphicengine::delete_light(Light *light)
 	index = (int)(light - _lights);
 	_lights[index] = _lights[--_lights_count];
 	_lights_links[index] = _lights_links[_lights_count];
+}
+
+void	Graphicengine::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
+{
+	_renderer.draw_text(text, position, scale, color);
 }
 
 void				Graphicengine::_load_materials(char const *filename)

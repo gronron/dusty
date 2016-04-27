@@ -61,7 +61,14 @@ struct				Material
 	float			shining;
 	float			padding;
 };
-
+/*
+struct				Rotation
+{
+	vec<float, 4>	center;
+	vec<float, 9>	matrix;
+	int				index;
+};
+*/
 class	Graphicengine
 {
 	public:
@@ -99,6 +106,8 @@ class	Graphicengine
 
 		void	new_light(Light **);
 		void	delete_light(Light *);
+		
+		void	draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
 
 		void	_load_materials(char const *filename);
 };

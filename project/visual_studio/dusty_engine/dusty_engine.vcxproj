@@ -90,7 +90,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype263.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -103,7 +103,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype263.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\x64\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -120,7 +120,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype263.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\win32\$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
@@ -133,15 +133,17 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game\actors;$(SolutionDir)..\..\game\animations;$(AMDAPPSDKROOT)\include;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype255.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype263.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\x64\$(TargetName)$(TargetExt)</OutputFile>
-      <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -163,6 +165,7 @@
     <ClCompile Include="..\..\..\graphic\particle\particleeffect.cpp" />
     <ClCompile Include="..\..\..\graphic\particle\particlesystem.cpp" />
     <ClCompile Include="..\..\..\graphic\renderer.cpp" />
+    <ClCompile Include="..\..\..\graphic\renderer_text.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_node.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp" />
     <ClCompile Include="..\..\..\libsrc\endian\endian.cpp" />

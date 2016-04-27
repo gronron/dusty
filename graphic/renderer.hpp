@@ -35,16 +35,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GL/gl.h>
 #include <CL/cl.h>
 #include <SDL.h>
+#include "math/vec.hpp"
 
 class	Graphicengine;
+
+struct	Glyph
+{
+	vec<float, 2>	size;
+	vec<float, 2>	topleft;
+	vec<float, 2>	bottomright;
+	vec<float, 2>	step;
+	vec<float, 2>	center;
+};
 
 class	Renderer
 {
 	public:
 
+		unsigned int		width;
+		unsigned int		height;
+
 		SDL_Window			*_window;
 		SDL_GLContext		_glcontext;
 		GLuint				_texture;
+
+		GLuint				_glyphstexture;
+		Glyph				_glyphs[128];
 
 		cl_context			_context;
 		cl_command_queue	_queue;
@@ -62,11 +78,11 @@ class	Renderer
 		cl_mem				_image_mem;
 
 
-		Renderer(unsigned int const, unsigned int const);
+		Renderer(unsigned int const, unsigned int const, bool const);
 		~Renderer();
 
 		void	set_resolution(unsigned int const, unsigned int const);
-
+		void	draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
 		void	render(Graphicengine const *);
 
 		void	_set_buffer(Graphicengine const *);

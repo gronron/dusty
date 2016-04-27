@@ -201,6 +201,9 @@
     <ClCompile Include="..\..\..\graphic\haabbtree.cpp">
       <Filter>Source Files\graphic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\graphic\renderer_text.cpp">
+      <Filter>Source Files\graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">

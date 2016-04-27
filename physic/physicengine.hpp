@@ -68,12 +68,6 @@ class	Physicengine
 			float			time;
 			vec<float, 4>	normal;
 		};
-		
-		struct		Encounter
-		{
-			Body	*body;
-			int		aabbidx;
-		};
 
 
 		unsigned int	_bdsize;
@@ -106,10 +100,10 @@ class	Physicengine
 		void	remove_aabbs(Body *);
 		void	remove_aabbs(Body *, Aabb const &);
 		
-		void	query(Aabb const &, Querycallback *, bool const d, bool const s) const;
-		//void	query(Aabb const &, bool const d, bool const s) const;
-		void	raycast_through(Ray const &, Raycastcallback *, bool const d, bool const s) const;
-		void	raycast(Ray const &, Raycastcallback *, bool const d, bool const s) const;
+		void	query(Aabb const &, Querycallback *, bool const, bool const) const;
+		void	query(vec<float, 4> const &, float const, Querycallback *, bool const, bool const) const;
+		void	raycast_through(Ray const &, Raycastcallback *, bool const, bool const) const;
+		void	raycast(Ray const &, Raycastcallback *, bool const, bool const) const;
 
 		void	tick(float const);
 

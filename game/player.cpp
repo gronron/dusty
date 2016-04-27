@@ -141,7 +141,7 @@ bool	Player::fire()
 			Projectile *p = (Projectile *)engine->create("Projectile", this, true);
 			p->ownerid = id;
 			p->damage = damage;
-			p->body->position = body->position;
+			p->body->position = body->position + dir * 1.0f;
 			p->body->velocity = dir * 10.0f;
 			p->body->acceleration = { 0.0f, 0.0f, -9.0f, 0.0f };
 		}

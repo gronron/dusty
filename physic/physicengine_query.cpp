@@ -45,6 +45,26 @@ struct	Querywrapper
 	}
 };
 
+struct	Sphericalquerywrapper
+{
+	Physicengine const	*physic;
+	Querycallback		*qcb;
+	vec<float, 4>		center;
+	float				radius;
+
+	void	dcallback(int const aabbidx, int const bdidx)
+	{
+		//check if aabb is in
+		qcb->report_encounter(physic->_bodies + bdidx, aabbidx);
+	}
+	
+	void	scallback(int const aabbidx, int const bdidx)
+	{
+		if (intersect_sphereaabb(center, radius, physic->_statictree._nodes[aabbidx].aabb))
+			qcb->report_encounter(physic->_bodies + bdidx, aabbidx);
+	}
+};
+
 struct	Raycastwrapper
 {
 	Physicengine const	*physic;
@@ -66,6 +86,20 @@ void				Physicengine::query(Aabb const &aabb, Querycallback *qcb, bool const d, 
 		_statictree.query(aabb, &qwp, &Querywrapper::callback);
 }
 
+void						Physicengine::query(vec<float, 4> const &center, float const radius, Querycallback *qcb, bool const d, bool const s) const
+{
+	Sphericalquerywrapper	sqwp = { this, qcb, center, radius };
+	Aabb					aabb;
+
+	aabb.bottom = center - radius;
+	aabb.top = center + radius;
+
+	if (d)
+		_dynamictree.query(aabb, &sqwp, &Sphericalquerywrapper::dcallback);
+	if (s)
+		_statictree.query(aabb, &sqwp, &Sphericalquerywrapper::scallback);
+}
+
 void				Physicengine::raycast_through(Ray const &ray, Raycastcallback *rcb, bool const d, bool const s) const
 {
 	Raycastwrapper	rwp = { this, rcb };
@@ -85,78 +119,3 @@ void				Physicengine::raycast(Ray const &ray, Raycastcallback *rcb, bool const d
 	if (s)
 		_statictree.raycast(ray, &rwp, &Raycastwrapper::callback);
 }
-
-///////////////////////////////////////
-/*
-struct	Queryaabbnocb
-{
-	Physicengine const		*physic;
-	unsigned int			count;
-	unsigned int			size;
-	Physicengine::Encounter	*report;
-
-	void	callback(int const aabbidx, int const bdidx)
-	{
-		if (count >= size)
-		{
-			size <<= 1;
-			report = resize(report, count, size);
-		}
-		report[count++] = { physic->_bodies + bdidx, aabbidx };
-	}
-};
-
-struct	Queryspherenocb
-{
-	Physicengine const		*physic;
-	unsigned int			count;
-	unsigned int			size;
-	Physicengine::Encounter	*report;
-
-	void	callback(int const aabbidx, int const bdidx)
-	{
-		if (count >= size)
-		{
-			size <<= 1;
-			report = resize(report, count, size);
-		}
-		report[count++] = { physic->_bodies + bdidx, aabbidx };
-	}
-};
-
-Physicengine::Encounter	*Physicengine::query(Aabb const &aabb, bool const d, bool const s, unsigned int &count) const
-{
-	Queryaabbnocb	yesyes;
-	
-	yesyes.physic = this;
-	yesyes.count = 0;
-	yesyes.size = 256;
-	yesyes.report = new Physicengine::Encounter[yesyes.size];
-	
-	if (d)
-		_dynamictree.query(aabb, &qwp, &Querywrapper::callback);
-	if (s)
-		_statictree.query(aabb, &qwp, &Querywrapper::callback);
-	count = yesyes.count;
-	return (yesyes.report);
-}
-
-Physicengine::Encounter	*Physicengine::query(vec<float, 4> const &position, float const radius, bool const d, bool const s, unsigned int &count) const
-{
-	Queryspherenocb	yesyes;
-	
-	yesyes.physic = this;
-	yesyes.count = 0;
-	yesyes.size = 256;
-	yesyes.report = new Physicengine::Encounter[yesyes.size];
-	
-	Aabb	aabb = { position - radius, position + radius };
-	
-	if (d)
-		_dynamictree.query(aabb, &qwp, &Querywrapper::callback);
-	if (s)
-		_statictree.query(aabb, &qwp, &Querywrapper::callback);
-	count = yesyes.count;
-	return (yesyes.report);
-}
-*/

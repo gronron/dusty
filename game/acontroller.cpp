@@ -67,12 +67,12 @@ void	AController::tick(float delta)
 		int	x;
 		int	y;
 		SDL_GetRelativeMouseState(&x, &y);
-		spherical_coord[0] -= x / 350.0f;
-		spherical_coord[1] -= y / 350.0f;
+		spherical_coord[0] -= x * 0.0016f;
+		spherical_coord[1] -= y * 0.0016f;
 
 		engine->graphic->set_camera(controlled->body->position, spherical_coord);
 	
-		controlled->body->velocity = (engine->graphic->camera.direction * move[1] + engine->graphic->camera.right * move[0]) * delta * 1000.0f;
+		controlled->body->velocity = (engine->graphic->camera.direction * move[1] + engine->graphic->camera.right * move[0]) * 8.0f;
 
 		controlled->firing = firing;
 		controlled->loadingfire = loadingfire;
