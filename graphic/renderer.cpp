@@ -48,7 +48,6 @@ struct				Computedcamera
 	vec<float, 4>	right;
 	vec<float, 4>	up;
 	vec<float, 2>	half_resolution;
-	float			padding[2];
 };
 
 void	_compute_camera(Camera const &camera, Computedcamera &cm)
@@ -60,38 +59,49 @@ void	_compute_camera(Camera const &camera, Computedcamera &cm)
 	cm.half_resolution = (vec<float, 2>)camera.resolution / 2.0f;
 }
 
-Renderer::Renderer(unsigned int const width, unsigned int const height) : _window(0), _glcontext(0), _texture(0), _nodes_mem_size(0), _materials_mem_size(0), _lights_mem_size(0)
+unsigned int	_load_font(char const *, Glyph *);
+
+Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullscreen) : width(w), height(h), _window(0), _glcontext(0), _texture(0), _nodes_mem_size(0), _materials_mem_size(0), _lights_mem_size(0)
 {
 	cl_int			error;
 	cl_uint			platforms_count;
 	cl_platform_id	*platforms;
 	size_t			devices_count;
 	cl_device_id	*devices;
-	SDL_SysWMinfo info;
+	SDL_SysWMinfo 	info;
 
 	if (SDL_Init(SDL_INIT_VIDEO))
 	{
-		std::cerr << "Error: SDL_Init()" << std::endl;
+		std::cerr << "error! SDL_Init()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE/* | SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
 	_glcontext = SDL_GL_CreateContext(_window);
 	SDL_GL_SetSwapInterval(0);
-	
+
 	SDL_VERSION(&info.version);
 	if (!SDL_GetWindowWMInfo(_window, &info))
 	{
-		std::cerr << "Error: SDL_GetWindowWMInfo()" << std::endl;
+		std::cerr << "error! SDL_GetWindowWMInfo()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
-	glViewport(0, 0, width, height);
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0f);
+	glViewport(0, 0, width, height);
+	glOrtho(0, width, height, 0, -1000, 1000);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glGenTextures(1, &_texture);
 	glBindTexture(GL_TEXTURE_2D, _texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
+	_glyphstexture = _load_font("cousine-regular.ttf", _glyphs);
 	glFinish();
 	
 	check_error(clGetPlatformIDs(0, 0, &platforms_count), "clGetPlatformIDs()");
@@ -181,12 +191,16 @@ Renderer::~Renderer()
 	SDL_Quit();
 }
 
-void	Renderer::set_resolution(unsigned int const width, unsigned int const height)
+void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
 {
 	cl_int	error;
 
+	width = w;
+	height = h;
 	glViewport(0, 0, width, height);
+	glOrtho(0, width, height, 0, -1, 1);
 
+	glBindTexture(GL_TEXTURE_2D, _texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
 	glFinish();
 
@@ -237,7 +251,6 @@ void	Renderer::render(Graphicengine const *ge)
 
 	check_error(clEnqueueWriteBuffer(_queue, _camera_mem, CL_FALSE, 0, sizeof(Computedcamera), (void *)&cm, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clSetKernelArg(_kernel, 0, sizeof(cl_mem), &_camera_mem), "clSetKernelArg(camera)");
-	//check_error(clSetKernelArg(_kernel, 0, sizeof(Computedcamera), &cm), "clSetKernelArg(camera)");
 	check_error(clSetKernelArg(_kernel, 1, sizeof(int), &ge->aabbtree._root), "clSetKernelArg(root)");
 	check_error(clSetKernelArg(_kernel, 2, sizeof(cl_mem), &_nodes_mem), "clSetKernelArg(nodes)");
 	check_error(clSetKernelArg(_kernel, 3, sizeof(cl_mem), &_materials_mem), "clSetKernelArg(materials)");
@@ -254,12 +267,17 @@ void	Renderer::render(Graphicengine const *ge)
 	check_error(clEnqueueReleaseGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueReleaseGLObjects()");
 	clFinish(_queue);
 
+	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+	glBindTexture(GL_TEXTURE_2D, _texture);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2f(-1.0f, 1.0f);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2f(1.0f, 1.0f);
-		glTexCoord2f(1.0f, 1.0f);	glVertex2f(1.0f, -1.0f);
-		glTexCoord2f(0.0f, 1.0f);	glVertex2f(-1.0f, -1.0f);
+		glTexCoord2f(0.0f, 0.0f);	glVertex3f(0.0, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 0.0f);	glVertex3f((float)width, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 1.0f);	glVertex3f((float)width, (float)height, 0.0f);
+		glTexCoord2f(0.0f, 1.0f);	glVertex3f(0.0, (float)height, 0.0f);
 	glEnd();
+
 	glFinish();
 	SDL_GL_SwapWindow(_window);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
