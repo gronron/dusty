@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "new.hpp"
 #include "aabb.hpp"
 
-//#include "particle/particlesystem.hpp"
-
 FACTORYREG(World);
 
 #undef far
@@ -93,10 +91,6 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 		light->power = 4000.0f;
 
 		_cull_world();
-		
-		/*vec<float, 4> v;
-		v = 2.0f;
-		engine->graphic->add_animation(new Particlesystem(engine->graphic, "projectile", v));*/
 	}
 }
 

@@ -21,5 +21,4 @@ physic engine:
 
 graphic engine:
 	-oriented box rendering 1
-	-multi line text renderer 1
 	-ui renderer 3

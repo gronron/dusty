@@ -146,6 +146,7 @@ void	Graphicengine::delete_light(Light *light)
 	index = (int)(light - _lights);
 	_lights[index] = _lights[--_lights_count];
 	_lights_links[index] = _lights_links[_lights_count];
+	*_lights_links[index] = _lights + index;
 }
 
 void	Graphicengine::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
