@@ -63,10 +63,10 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrl
 
 	
 	Df_node	*nd = Configmanager::get_instance().get("game.df");
-	
-	console = new Console(this);
+
 	if (opt.graphic)
 	{
+		console = new Console(this);
 		graphic = new Graphicengine();
 		event = new Eventmanager(this);
 	}
@@ -169,7 +169,8 @@ void	Gameengine::tick(float const delta)
 	if (event)
 		event->event();
 	//std::cout << "cl" << std::endl;
-	console->tick(delta);
+	if (console)
+		console->tick(delta);
 	//std::cout << "ne" << std::endl;
 	if (network)
 		network->tick(delta);
@@ -197,6 +198,8 @@ void	Gameengine::tick(float const delta)
 		}
 	}
 	//std::cout << "ge" << std::endl;
+	if (console)
+		console->draw();
 	if (graphic)
 		graphic->tick(delta);
 	//std::cout << "end" << std::endl;

@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -81,11 +81,14 @@ class	Renderer
 		Renderer(unsigned int const, unsigned int const, bool const);
 		~Renderer();
 
-		void	set_resolution(unsigned int const, unsigned int const);
-		void	draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
-		void	render(Graphicengine const *);
+		void			set_resolution(unsigned int const, unsigned int const);
+		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+		unsigned int	cut_line(char const *, vec<float, 2> const &, float const);
 
-		void	_set_buffer(Graphicengine const *);
+		void			render(Graphicengine const *);
+
+		void			_set_buffer(Graphicengine const *);
 };
 
 #endif

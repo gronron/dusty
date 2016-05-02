@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,21 +39,6 @@ class	Gameengine;
 class	Console
 {
 	public:
-	
-		Gameengine	*engine;
-
-		
-		Console(Gameengine *);
-		virtual ~Console();
-
-		virtual void	tick(float const);
-
-		virtual void	put_text(char const *);
-};
-
-class	Gameconsole : public Console
-{
-	public:
 
 		enum	Cursormove { UP, DOWN, LEFT, RIGHT };
 		
@@ -61,26 +46,32 @@ class	Gameconsole : public Console
 		{
 			char			text[MAXCHARACTER];
 			unsigned int	size;
+			unsigned int	line_count;
+			unsigned short int	startstop[8];
 		};
+		
+		Gameengine	*engine;
 
 
+		unsigned int	_textsize;
 		unsigned int	_cursor;
 		bool			_blink;
 		float			_blinktimer;
 		float			_lastmsgtimer;
 		int				_iterator;
+		Line			_history[MAXHISTORY];
 		char			_text[MAXCHARACTER];
-		Line			_lines[MAXHISTORY];
 
 
-		Gameconsole(Gameengine *);
-		~Gameconsole();
+		Console(Gameengine *);
+		~Console();
 		
 		void	tick(float const);
 		void	draw();
 		
 		void	put_text(char const *);
-		void	update_text(char const *, unsigned int const);
+		void	put_char(char const);
+		void	move_cursor(char const);
 };
 
 #endif

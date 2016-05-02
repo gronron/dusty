@@ -175,3 +175,75 @@ void	Renderer::draw_text(char const *text, vec<float, 2> const &position, vec<fl
 		}
 	}
 }
+
+void	Renderer::draw_text(unsigned int const size, char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
+{
+	vec<float, 2>	a = position;
+	vec<float, 2>	b;
+	
+	a[1] += 64.0f * scale[1];
+
+	glBindTexture(GL_TEXTURE_2D, _glyphstexture);
+	glColor4fv(color.ar);
+
+	for (unsigned int i = 0; i < size; ++i)
+	{
+		unsigned char const	c = text[i];
+
+		b = a;
+		b[1] -= _glyphs[c].center[1] * scale[1];
+		a[0] += _glyphs[c].step[0] * scale[0];
+		
+		vec<float, 2> const	tc[4] =
+		{
+			{ { _glyphs[c].topleft[0], _glyphs[c].topleft[1] } },
+			{ { _glyphs[c].bottomright[0], _glyphs[c].topleft[1] } },
+			{ { _glyphs[c].bottomright[0], _glyphs[c].bottomright[1] } },
+			{ { _glyphs[c].topleft[0], _glyphs[c].bottomright[1] } },
+		};
+
+		vec<float, 2>	v[4] =
+		{
+			{{0.0f, 0.0f}},
+			{{1.0f, 0.0f}},
+			{{1.0f, 1.0f}},
+			{{0.0f, 1.0f}},
+		};
+		vec<float, 2> const	s = _glyphs[c].size * scale;
+
+		for (unsigned int i = 0; i < 4; ++i)
+			v[i] = v[i] * s + b;
+
+		if (v[2][0] > 0.0f && v[2][1] > 0.0f && v[0][0] < width && v[0][1] < height)
+		{
+			glBegin(GL_QUADS);
+			for (unsigned int i = 0; i < 4; ++i)
+			{
+				glTexCoord2fv(tc[i].ar);
+				glVertex2fv(v[i].ar);
+			}
+			glEnd();
+		}
+	}
+}
+
+unsigned int		Renderer::cut_line(char const *text, vec<float, 2> const &scale, float const width)
+{
+	float			a = 0.0f;
+	unsigned int	b = 0;
+
+	for (unsigned int i = 0; text[i]; ++i)
+	{
+		unsigned char const	c = text[i];
+
+		if (c == '\n')
+			return (i);
+		if (c == '\t' || c == ' ')
+			b = i;
+
+		if ((a + _glyphs[c].size[0] * scale[0]) > width)
+			return (b);
+
+		a += _glyphs[c].step[0] * scale[0];
+	}
+}

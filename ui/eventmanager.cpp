@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graphicengine.hpp"
 #include "eventmanager.hpp"
 
-Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(false)
+Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(true)
 {
 
 }
@@ -54,6 +54,7 @@ void			Eventmanager::event()
 {
 	SDL_Event	event;
 
+	SDL_StartTextInput();
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
@@ -67,6 +68,7 @@ void			Eventmanager::event()
 			case SDL_APP_DIDENTERBACKGROUND:
 			case SDL_APP_WILLENTERFOREGROUND:
 			case SDL_APP_DIDENTERFOREGROUND:
+				break;
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
 					engine->graphic->set_resolution(event.window.data1, event.window.data2);
@@ -84,7 +86,11 @@ void			Eventmanager::event()
 				_key(event, 0.0f);
 				break;
 			case SDL_TEXTEDITING:
+				break;
 			case SDL_TEXTINPUT:
+				if (typing)
+					engine->console->put_char(*event.text.text);
+				break;
 			case SDL_MOUSEMOTION:
 				if (_mousemove.ctrl)
 				{
@@ -117,8 +123,10 @@ void			Eventmanager::event()
 			case SDL_JOYBUTTONUP:
 			case SDL_JOYDEVICEADDED:
 			case SDL_JOYDEVICEREMOVED:
+				break;
 			case SDL_CONTROLLERAXISMOTION:
 				_gamepadmove(event);
+				break;
 			case SDL_CONTROLLERBUTTONDOWN:
 				_gamepadbutton(event, 1.0f);
 				break;
@@ -135,6 +143,7 @@ void			Eventmanager::event()
 			case SDL_DOLLARRECORD:
 			case SDL_MULTIGESTURE:
 			case SDL_CLIPBOARDUPDATE:
+				break;
 			case SDL_DROPFILE:
 //				((World*)engine->find_actor(0))->load(event.drop.file);
 				SDL_free(event.drop.file);
@@ -192,24 +201,36 @@ void		Eventmanager::_key(SDL_Event &event, float d)
 
 	if (typing)
 	{
-		/*if (d)
+		if (d)
 		{
-			switch (event.key.code)
+			switch (event.key.keysym.scancode)
 			{
-				case sf::Keyboard::Left:
-					am->cl->movecursor(Console::LEFT);
+				case SDL_SCANCODE_RETURN:
+					engine->console->put_char('\n');
 					break;
-				case sf::Keyboard::Right:
-					am->cl->movecursor(Console::RIGHT);
+				case SDL_SCANCODE_BACKSPACE:
+					engine->console->put_char('\b');
 					break;
-				case sf::Keyboard::Up:
-					am->cl->movecursor(Console::UP);
+				case SDL_SCANCODE_TAB:
+					engine->console->put_char('\t');
 					break;
-				case sf::Keyboard::Down:
-					am->cl->movecursor(Console::DOWN);
+				case SDL_SCANCODE_DELETE:
+					engine->console->put_char(0x7f);
+					break;
+				case SDL_SCANCODE_RIGHT:
+					engine->console->move_cursor(Console::RIGHT);
+					break;
+				case SDL_SCANCODE_LEFT:
+					engine->console->move_cursor(Console::LEFT);
+					break;
+				case SDL_SCANCODE_DOWN:
+					engine->console->move_cursor(Console::DOWN);
+					break;
+				case SDL_SCANCODE_UP:
+					engine->console->move_cursor(Console::UP);
 					break;
 			}
-		}*/
+		}
 	}
 	else
 	{
