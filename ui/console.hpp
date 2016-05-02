@@ -42,16 +42,17 @@ class	Console
 
 		enum	Cursormove { UP, DOWN, LEFT, RIGHT };
 		
-		struct	Line
+		struct	Text
 		{
 			char			text[MAXCHARACTER];
 			unsigned int	size;
-			unsigned int	line_count;
-			unsigned short int	startstop[8];
+			unsigned int	linecount;
+			unsigned short int	start[8];
+			unsigned short int	stop[8];
 		};
-		
-		Gameengine	*engine;
 
+
+		Gameengine	*engine;
 
 		unsigned int	_textsize;
 		unsigned int	_cursor;
@@ -59,7 +60,7 @@ class	Console
 		float			_blinktimer;
 		float			_lastmsgtimer;
 		int				_iterator;
-		Line			_history[MAXHISTORY];
+		Text			_history[MAXHISTORY];
 		char			_text[MAXCHARACTER];
 
 
@@ -72,6 +73,8 @@ class	Console
 		void	put_text(char const *);
 		void	put_char(char const);
 		void	move_cursor(char const);
+		
+		void	_cut_text(Text &);
 };
 
 #endif

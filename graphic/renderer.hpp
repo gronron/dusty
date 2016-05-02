@@ -84,7 +84,7 @@ class	Renderer
 		void			set_resolution(unsigned int const, unsigned int const);
 		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
 		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
-		unsigned int	cut_line(char const *, vec<float, 2> const &, float const);
+		unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
 
 		void			render(Graphicengine const *);
 

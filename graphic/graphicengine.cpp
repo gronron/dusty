@@ -149,11 +149,6 @@ void	Graphicengine::delete_light(Light *light)
 	*_lights_links[index] = _lights + index;
 }
 
-void	Graphicengine::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
-{
-	_renderer.draw_text(text, position, scale, color);
-}
-
 void				Graphicengine::_load_materials(char const *filename)
 {
 	Df_node const	*nd = Configmanager::get_instance().get(filename);

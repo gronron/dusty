@@ -107,9 +107,26 @@ class	Graphicengine
 		void	new_light(Light **);
 		void	delete_light(Light *);
 		
-		void	draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+		unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
 
 		void	_load_materials(char const *filename);
 };
+
+inline void	Graphicengine::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
+{
+	_renderer.draw_text(text, position, scale, color);
+}
+
+inline void	Graphicengine::draw_text(unsigned int const size, char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
+{
+	_renderer.draw_text(size, text, position, scale, color);
+}
+
+inline unsigned int	Graphicengine::cut_line(char const *text, vec<float, 2> const &scale, float const width) const
+{
+	return (_renderer.cut_line(text, scale, width));
+}
 
 #endif

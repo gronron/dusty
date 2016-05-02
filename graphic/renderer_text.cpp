@@ -227,12 +227,13 @@ void	Renderer::draw_text(unsigned int const size, char const *text, vec<float, 2
 	}
 }
 
-unsigned int		Renderer::cut_line(char const *text, vec<float, 2> const &scale, float const width)
+unsigned int		Renderer::cut_line(char const *text, vec<float, 2> const &scale, float const width) const
 {
+	unsigned int	i;
 	float			a = 0.0f;
 	unsigned int	b = 0;
 
-	for (unsigned int i = 0; text[i]; ++i)
+	for (i = 0; text[i]; ++i)
 	{
 		unsigned char const	c = text[i];
 
@@ -246,4 +247,5 @@ unsigned int		Renderer::cut_line(char const *text, vec<float, 2> const &scale, f
 
 		a += _glyphs[c].step[0] * scale[0];
 	}
+	return (i);
 }

@@ -34,8 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graphicengine.hpp"
 #include "console.hpp"
 
-#include <iostream>
-
 Console::Console(Gameengine *e) : engine(e), _textsize(0), _cursor(0), _blink(false), _blinktimer(0.0f), _lastmsgtimer(0.0f)
 {
 	for (unsigned int i = 0; i < MAXHISTORY; ++i)
@@ -43,8 +41,6 @@ Console::Console(Gameengine *e) : engine(e), _textsize(0), _cursor(0), _blink(fa
 		_history[i].text[0] = '\0';
 		_history[i].size = 0;
 	}
-	_textsize = 4;
-	strcpy(_text, "hola");
 }
 
 Console::~Console()
@@ -59,24 +55,16 @@ void	Console::tick(float const delta)
 		_blinktimer -= 0.5f;
 		_blink = !_blink;
 	}
-	if (_lastmsgtimer >= 0.0f)
+	if (_lastmsgtimer > 0.0f)
 		_lastmsgtimer -= delta;
 }
 
 void					Console::draw()
 {
-	vec<float, 2>		position = { 8.0f, 8.0f };
-	vec<float, 2> const	scale = { 0.4f, 0.4f };
-	vec<float, 4> const	color = { 0.4f, 0.7f, 0.4f, 1.0f };
+	vec<float, 2>		position = { 8.0f, 400.0f };
+	vec<float, 2> const	scale = { 0.25f, 0.25f };
+	vec<float, 4> const	color = { 0.4f, 0.65f, 0.4f, 1.0f };
 
-	/*if (_lastmsgtimer >= 0.0f)
-	{
-		for (unsigned int i = (_iterator - 8) % MAXHISTORY; i != _iterator; i = (i + 1) % MAXHISTORY)
-		{
-			engine->graphic->draw_text(_history[i].text, position, scale, color);
-			position[1] -= 32.0f;
-		}
-	}*/
 	if (_textsize)
 	{
 		char const	c = _text[_cursor];
@@ -86,12 +74,33 @@ void					Console::draw()
 		engine->graphic->draw_text(_text, position, scale, color);
 		_text[_cursor] = c;
 	}
+	position[1] -= 32.0f;
+	if (_lastmsgtimer > 0.0f)
+	{
+		for (int j = (int)_iterator - 1; position[1] > 0.0f; --j)
+		{
+			if (j < 0)
+				j += MAXHISTORY;
+			if (!_history[j].size)
+				break;
+			for (unsigned int i = 0; i < _history[j].linecount; ++i)
+			{
+				engine->graphic->draw_text(_history[j].stop[i], _history[j].text + _history[j].start[i], position, scale, color);
+				position[1] -= 32.0f;
+			}
+		}
+	}
 }
 
 void	Console::put_text(char const *str)
 {
 	_lastmsgtimer = 5.0f;
-	strcpy(_history[_iterator].text, str);
+	_history[_iterator].size = strlen(str);
+	if (_history[_iterator].size > MAXCHARACTER)
+		_history[_iterator].size = MAXCHARACTER;
+	strncpy(_history[_iterator].text, str, _history[_iterator].size);
+	_history[_iterator].text[_history[_iterator].size] = '\0';
+	_cut_text(_history[_iterator]);
 	_iterator = (_iterator + 1 ) % MAXHISTORY;
 }
 
@@ -155,5 +164,18 @@ void	Console::move_cursor(char const move)
 			if (_cursor < _textsize)
 				++_cursor;
 			break;
+	}
+}
+
+void	Console::_cut_text(Text &text)
+{
+	vec<float, 2> const	scale = { 0.4f, 0.4f };
+	
+	text.linecount = 0;
+	for (unsigned int offset = 0; offset < text.size && text.linecount < 8; ++text.linecount)
+	{
+		text.start[text.linecount] = offset;
+		text.stop[text.linecount] = engine->graphic->cut_line(text.text + offset, scale, 1024);
+		offset += text.stop[text.linecount] + 1;
 	}
 }
