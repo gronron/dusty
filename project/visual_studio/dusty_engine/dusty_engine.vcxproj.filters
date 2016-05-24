@@ -371,5 +371,8 @@
     <ClInclude Include="..\..\..\graphic\haabbtree.hpp">
       <Filter>Header Files\graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\physic\narrowphase.hpp">
+      <Filter>Header Files\physic</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -133,7 +133,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game\actors;$(SolutionDir)..\..\game\animations;$(AMDAPPSDKROOT)\include;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -251,6 +251,7 @@
     <ClInclude Include="..\..\..\physic\aabb.hpp" />
     <ClInclude Include="..\..\..\physic\aabbtree.hpp" />
     <ClInclude Include="..\..\..\physic\body.hpp" />
+    <ClInclude Include="..\..\..\physic\narrowphase.hpp" />
     <ClInclude Include="..\..\..\physic\physicengine.hpp" />
     <ClInclude Include="..\..\..\physic\shape.hpp" />
     <ClInclude Include="..\..\..\ui\console.hpp" />

@@ -107,8 +107,11 @@ int				Aabbtree::add_saabb(Aabb const &aabb, int const data)
 
 void	Aabbtree::remove_aabb(int const index)
 {
-	_remove_leaf(index);
-	_free_node(index);
+	if (!_nodes[index].height)
+	{
+		_remove_leaf(index);
+		_free_node(index);
+	}
 }
 
 void	Aabbtree::remove_aabbs(unsigned int const data)

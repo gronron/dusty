@@ -38,15 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <io.h>
 
-char		*read_file(char const *filename)
+char		*read_file(char const *filename, unsigned int *rdsize)
 {
 	int		fd;
 	int		size;
-	int		rdsize;
 	char	*buffer;
 
 	buffer = 0;
-	_sopen_s(&fd, filename, _O_RDONLY, _SH_DENYNO, _S_IREAD);
+	_sopen_s(&fd, filename, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD);
 	if (fd >= 0)
 	{
 		size = _lseek(fd, 0, SEEK_END);
@@ -54,9 +53,13 @@ char		*read_file(char const *filename)
 		if (size >= 0)
 		{
 			buffer = new char[size + 1];
-			rdsize = _read(fd, buffer, size);
-			if (rdsize >= 0)
-				buffer[rdsize] = '\0';
+			size = _read(fd, buffer, size);
+			if (size >= 0)
+			{
+				buffer[size] = '\0';
+				if (rdsize)
+					*rdsize = size;
+			}
 			else
 			{
 				delete [] buffer;
@@ -76,11 +79,10 @@ char		*read_file(char const *filename)
 	
 #include <unistd.h>
 
-char		*read_file(char const *filename)
+char		*read_file(char const *filename, unsigned int *rdsize)
 {
 	int		fd;
 	int		size;
-	int		rdsize;
 	char	*buffer;
 
 	buffer = 0;
@@ -92,9 +94,13 @@ char		*read_file(char const *filename)
 		if (size >= 0)
 		{
 			buffer = new char[size + 1];
-			rdsize = read(fd, buffer, size);
-			if (rdsize >= 0)
-				buffer[rdsize] = '\0';
+			size = read(fd, buffer, size);
+			if (size >= 0)
+			{
+				buffer[size] = '\0';
+				if (rdsize)
+					*rdsize = size;
+			}
 			else
 			{
 				delete [] buffer;

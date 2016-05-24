@@ -249,7 +249,11 @@ void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)
 		&& (_bodies[_currentquery].collider->should_collide(_bodies[bodyindex].collider) || _bodies[bodyindex].collider->should_collide(_bodies[_currentquery].collider)))
 	{
 		if (_bodies[bodyindex].index == -1)
+		{
 			_bodies[bodyindex].position = _statictree._nodes[aabbindex].aabb.bottom;
+			if (_bodies[bodyindex].shape->type == Shape::AXIS_ALIGNED_BOX)
+				((Axisalignedboxshape *)_bodies[bodyindex].shape)->size = _statictree._nodes[aabbindex].aabb.top - _statictree._nodes[aabbindex].aabb.bottom;
+		}
 
 		float			time;
 		vec<float, 4>	normal;

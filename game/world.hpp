@@ -43,6 +43,7 @@ class	World : public Entity
 
 		struct	Chunk
 		{
+			vec<int, 4>		position;
 			unsigned char	blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 			int				graphicids[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 		};
@@ -70,15 +71,20 @@ class	World : public Entity
 		///////////////////////////////
 		
 		bool	load(char const *filename);
+		bool	load_dstw(char const *filename);
+		bool	load_vox(char const *filename);
 		bool	save(char const *filename);
 		void	fill(vec<int, 4> const &start, vec<int, 4> const &end, char const value);
+		
 		bool	create_block(Ray const &ray, char value);
 		bool	destroy_block(Ray const &ray);
 		
-		void	_cull_world();
-		void	_cull_chunk(Chunk &chunk, vec<float, 4> const &position);
-		void	_init();
-		void	_clear();
+		void	_reduce_chunk(Chunk &chunk, vec<float, 4> const &position);
+		void	_clear_chunk(Chunk &chunk, vec<float, 4> const &position);
+
+		void	_reduce_world();
+		void	_init_world();
+		void	_clear_world();
 };
 
 #endif

@@ -75,6 +75,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 		std::cerr << "error! SDL_Init()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
 	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
 	_glcontext = SDL_GL_CreateContext(_window);
 	SDL_GL_SetSwapInterval(0);
@@ -91,10 +92,13 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
+	
 	glViewport(0, 0, width, height);
-	glOrtho(0, width, height, 0, -1000, 1000);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, width, height, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	glGenTextures(1, &_texture);
 	glBindTexture(GL_TEXTURE_2D, _texture);
@@ -135,7 +139,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	_queue = clCreateCommandQueue(_context, devices[0], 0, &error);
 	check_error(error, "clCreateCommandQueue()");
 
-	char const	*source = read_file("raytracer.cl");
+	char const	*source = read_file("raytracer.cl", 0);
 
 	if (!source)
 		exit(EXIT_FAILURE);
@@ -197,8 +201,12 @@ void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
 
 	width = w;
 	height = h;
-	glViewport(0, 0, width, height);
-	glOrtho(0, width, height, 0, -1, 1);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glViewport(0, 0, w, h);
+	glOrtho(0, w, h, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	glBindTexture(GL_TEXTURE_2D, _texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
@@ -259,7 +267,7 @@ void	Renderer::render(Graphicengine const *ge)
 	check_error(clSetKernelArg(_kernel, 6, sizeof(cl_mem), &_image_mem), "clSetKernelArg(image)");
 
 	size_t const	origin[3] = { 0, 0, 0 };
-	size_t const	image_size[3] = { ge->camera.resolution[0], ge->camera.resolution[1], 1 };
+	size_t const	image_size[3] = { width, height, 1 };
 
 	glFinish();
 	check_error(clEnqueueAcquireGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueAcquireGLObjects()");
@@ -276,8 +284,9 @@ void	Renderer::render(Graphicengine const *ge)
 		glTexCoord2f(1.0f, 1.0f);	glVertex3f((float)width, (float)height, 0.0f);
 		glTexCoord2f(0.0f, 1.0f);	glVertex3f(0.0, (float)height, 0.0f);
 	glEnd();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glFinish();
 	SDL_GL_SwapWindow(_window);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 }

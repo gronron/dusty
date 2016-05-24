@@ -33,8 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "world.hpp"
 #include <iostream>
 
+#include "file/file.hpp"
 #include "new.hpp"
 #include "aabb.hpp"
+
+unsigned int const	CHUNK_SIZE_1D = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
 FACTORYREG(World);
 
@@ -64,9 +67,8 @@ struct		Result : public Raycastcallback
 
 World::World(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o)
 {
-	
 	size = 2;
-	_init();
+	_init_world();
 
 	shape.size = 1.0f;
 	engine->physic->new_body(&body, &shape, this);
@@ -90,7 +92,7 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 		light->color = { 1.0f, 1.0f, 0.6f };
 		light->power = 4000.0f;
 
-		_cull_world();
+		_reduce_world();
 	}
 }
 
@@ -109,30 +111,121 @@ void	World::tick(float const delta)
 	light->position[2] = (float)cos(time) * 4000.0f;
 }
 
-bool				World::load(char const *filename)
+bool					World::load(char const *filename)
+{
+	unsigned int const	length = strlen(filename);
+	
+	if (filename[length - 1] == 'w')
+		return (load_dstw(filename));
+	else
+		return (load_vox(filename));
+}
+
+bool				World::load_dstw(char const *filename)
 {
 	std::ifstream	is(filename);
 
 	if (is.good())
 	{
-		_clear();
+		_clear_world();
 
 		is.read((char *)&size, sizeof(vec<unsigned int, 4>));
 		if (chunks)
 			delete_space(chunks);
-		_init();
+		_init_world();
 		unsigned int const	buffer_size = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
 		for (unsigned int x = 0; x < size[0]; ++x)
 			for (unsigned int y = 0; y < size[1]; ++y)
 				for (unsigned int z = 0; z < size[2]; ++z)
 					is.read((char *)chunks[x][y][z].blocks[0][0], buffer_size);
-		_cull_world();
+		_reduce_world();
 		return (true);
 	}
 	else
 	{
-		std::cerr << "fail to load world" << std::endl;
+		std::cerr << "error! World::load() fails to load: " << filename << std::endl;
+		return (false);
+	}
+}
+
+bool				World::load_vox(char const *filename)
+{
+	unsigned int	fsize;
+	char			*buffer = read_file(filename, &fsize);
+	unsigned int	it = 20;
+
+	if (buffer)
+	{
+		_clear_world();
+		if (chunks)
+			delete_space(chunks);
+		
+		if (fsize < 36 || buffer[0] != 'V' || buffer[1] != 'O' || buffer[2] != 'X' || buffer[3] != ' ' || buffer[8] != 'M' || buffer[9] != 'A' || buffer[10] != 'I' || buffer[11] != 'N')
+		{
+			std::cerr << "error! load_vox() 165 fails to load: " << filename << std::endl;
+			delete [] buffer;
+			return (false);
+		}
+		
+		it += *(unsigned int *)(buffer + 12);
+
+		if (buffer[it] != 'S' || buffer[it + 1] != 'I' || buffer[it + 2] != 'Z' || buffer[it + 3] != 'E')
+		{
+			std::cerr << "error! load_vox() 175 fails to load: " << filename << std::endl;
+			delete [] buffer;
+			return (false);
+		}
+		
+		it += 12;
+		size = *(vec<unsigned int, 3> *)(buffer + it) / (unsigned int)CHUNK_SIZE + 1U;
+		it += 12;
+
+		_init_world();
+
+		if (buffer[it] != 'X' || buffer[it + 1] != 'Y' || buffer[it + 2] != 'Z' || buffer[it + 3] != 'I')
+		{
+			std::cerr << "error! load_vox() 188 fails to load: " << filename << std::endl;
+			delete [] buffer;
+			return (false);
+		}
+		it += 12;
+
+		unsigned int const	voxelcount = *(unsigned int *)(buffer + it);
+		std::cout << voxelcount << std::endl;
+		
+		for (unsigned int i = 0; (it += 4) < fsize && i < voxelcount; ++i)
+		{
+			vec<unsigned char, 4> const	data = *(vec<unsigned char, 4> *)(buffer + it);
+			vec<unsigned char, 4> const	wl = data / (unsigned char)CHUNK_SIZE;
+			vec<unsigned char, 4> const	cl = data % (unsigned char)CHUNK_SIZE;
+			chunks[wl[0]][wl[1]][wl[2]].blocks[cl[0]][cl[1]][cl[2]] = data[3];
+		}
+
+		_reduce_world();
+		
+		/*if ((fsize - it) >= 1036 && buffer[it] == 'R' && buffer[it + 1] == 'G' && buffer[it + 2] == 'B' && buffer[it + 3] == 'A')
+		{
+			it += 12;
+			for (unsigned int i = 1; i < 255; ++i)
+			{
+				engine->graphic->_materials[i].color = (vec<float, 3>)*(vec<unsigned char, 3> *)(buffer + it) / 255.0f;
+				engine->graphic->_materials[i].transparency = 0.0f;
+				engine->graphic->_materials[i].refraction = 0.0f;
+				engine->graphic->_materials[i].reflection = 0.0f;
+				engine->graphic->_materials[i].shining = 0.0f;
+				it += 4;
+			}
+			engine->graphic->_materials_size = 256;
+		}*/
+
+		delete [] buffer;
+		
+		return (true);
+	}
+	else
+	{
+		std::cerr << "error! load_vox() 225 fails to load: " << filename << std::endl;
 		return (false);
 	}
 }
@@ -186,7 +279,7 @@ bool	World::create_block(Ray const &ray, char const value)
 {
 	Result	result(body);
 
-	engine->physic->raycast(ray, &result, false, true);
+	engine->physic->raycast_through(ray, &result, false, true);
 	if (result.aabbindex != -1)
 	{
 		vec<float, 4>	normal;
@@ -196,6 +289,7 @@ bool	World::create_block(Ray const &ray, char const value)
 		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
 		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
+		std::cout << position[0] << "_" << position[1] << "_" << position[2] << std::endl;
 		std::cout << wp[0] << " " << wp[1] << " " << wp[2] << std::endl;
 		std::cout << cp[0] << " " << cp[1] << " " << cp[2] << std::endl;
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && !chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
@@ -203,10 +297,14 @@ bool	World::create_block(Ray const &ray, char const value)
 			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = value;
 
 			Aabb	aabb;
+
 			aabb.bottom = position;
 			aabb.top = aabb.bottom + 1.0f;
 			engine->physic->add_aabb(body, aabb);
-			chunks[wp[0]][wp[1]][wp[2]].graphicids[cp[0]][cp[1]][cp[2]] = engine->graphic->aabbtree.add_saabb(aabb, value);
+
+			vec<float, 4> const	fp = (vec<float, 4>)(wp) * CHUNK_SIZE;
+			_clear_chunk(chunks[wp[0]][wp[1]][wp[2]], fp);
+			_reduce_chunk(chunks[wp[0]][wp[1]][wp[2]], fp);
 			return (true);
 		}
 	}
@@ -217,49 +315,87 @@ bool	World::destroy_block(Ray const &ray)
 {
 	Result	result(body);
 
-	engine->physic->raycast(ray, &result, false, true);
+	engine->physic->raycast_through(ray, &result, false, true);
+	std::cout << "destroy " << result.aabbindex << std::endl;
 	if (result.aabbindex != -1)
 	{
 		vec<float, 4> const	position = engine->physic->_statictree._nodes[result.aabbindex].aabb.bottom;
 		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
 		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
-		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
+		std::cout << position[0] << "_" << position[1] << "_" << position[2] << std::endl;
+		std::cout << wp[0] << " " << wp[1] << " " << wp[2] << std::endl;
+		std::cout << cp[0] << " " << cp[1] << " " << cp[2] << std::endl;
+		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE)
 		{
-			engine->physic->_statictree.remove_aabb(result.aabbindex);
-			engine->graphic->aabbtree.remove_aabb(chunks[wp[0]][wp[1]][wp[2]].graphicids[cp[0]][cp[1]][cp[2]]);
-			
 			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = 0;
-			chunks[wp[0]][wp[1]][wp[2]].graphicids[cp[0]][cp[1]][cp[2]] = -1;
+			
+			std::cout << "##destroy " << result.aabbindex << std::endl;
+
+			engine->physic->_statictree.remove_aabb(result.aabbindex);
+
+			vec<float, 4> const	fp = (vec<float, 4>)(wp) * CHUNK_SIZE;
+			_clear_chunk(chunks[wp[0]][wp[1]][wp[2]], fp);
+			_reduce_chunk(chunks[wp[0]][wp[1]][wp[2]], fp);
 			return (true);
 		}
+		
 	}
 	return (false);
 }
 
-void	World::_cull_world()
+void					_search_ppr(World::Chunk &chunk, vec<unsigned int, 4> const &begin, vec<unsigned int, 4> &end)
 {
-	engine->physic->remove_aabbs(body);
-	for (unsigned int x = 0; x < size[0]; ++x)
-		for (unsigned int y = 0; y < size[1]; ++y)
-			for (unsigned int z = 0; z < size[2]; ++z)
-				_cull_chunk(chunks[x][y][z], { (float)x * CHUNK_SIZE, (float)y * CHUNK_SIZE, (float)z * CHUNK_SIZE, 0.0f });
+	unsigned char const	blocks = chunk.blocks[begin[0]][begin[1]][begin[2]];
+
+	for (end[2] = begin[2] + 1; end[2] < CHUNK_SIZE; ++end[2])
+		if (chunk.blocks[begin[0]][begin[1]][end[2]] != blocks || chunk.graphicids[begin[0]][begin[1]][end[2]] >= 0)
+			break;
+
+	end[1] = CHUNK_SIZE;
+	for (unsigned int i = begin[1] + 1; i < end[1]; ++i)
+		for (unsigned int j = begin[2]; j < end[2]; ++j)
+			if (chunk.blocks[begin[0]][i][j] != blocks || chunk.graphicids[begin[0]][i][j] >= 0)
+			{
+				end[1] = i;
+				break;
+			}
+
+	for (end[0] = begin[0] + 1; end[0] < CHUNK_SIZE; ++end[0])
+		for (unsigned int i = begin[1]; i < end[1]; ++i)
+			for (unsigned int j = begin[2]; j < end[2]; ++j)
+				if (chunk.blocks[end[0]][i][j] != blocks || chunk.graphicids[end[0]][i][j] >= 0)
+					return;
 }
 
-
-
-void	World::_cull_chunk(Chunk &chunk, vec<float, 4> const &position)
+void	World::_reduce_chunk(Chunk &chunk, vec<float, 4> const &position)
 {
 	for (unsigned int x = 0; x < CHUNK_SIZE; ++x)
-	{
 		for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
-		{
 			for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
 			{
-				if (chunk.blocks[x][y][z])/* &&
-					(!(x > 0 && chunk.blocks[x - 1][y][z]) || !(x < CHUNK_SIZE && chunk.blocks[x + 1][y][z]) ||
-					!(y > 0 && chunk.blocks[x][y - 1][z]) || !(y < CHUNK_SIZE && chunk.blocks[x][y + 1][z]) ||
-					!(z > 0 && chunk.blocks[x][y][z - 1]) || !(z < CHUNK_SIZE && chunk.blocks[x][y][z + 1])))*/
+				if (chunk.graphicids[x][y][z] < 0 && chunk.blocks[x][y][z])
+				{
+					vec<unsigned int, 4> begin = { x, y, z, 0 };
+					vec<unsigned int, 4> end;
+
+					_search_ppr(chunk, begin, end);
+
+					Aabb	aabb;
+
+					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
+					aabb.bottom += position;
+					aabb.top = position + (vec<float, 4>)end;
+					engine->physic->add_aabb(body, aabb); // do something for the physic plz
+
+					int const	graphicids = engine->graphic->aabbtree.add_saabb(aabb, chunk.blocks[x][y][z]);
+
+					for (unsigned int i = x; i < end[0]; ++i)
+						for (unsigned int j = y; j < end[1]; ++j)
+							for (unsigned int k = z; k < end[2]; ++k)
+								chunk.graphicids[i][j][k] = graphicids;
+				}
+				if (chunk.blocks[x][y][z])
 				{
 					Aabb	aabb;
 
@@ -267,35 +403,54 @@ void	World::_cull_chunk(Chunk &chunk, vec<float, 4> const &position)
 					aabb.bottom += position;
 					aabb.top = aabb.bottom + 1.0f;
 					engine->physic->add_aabb(body, aabb);
-					chunk.graphicids[x][y][z] = engine->graphic->aabbtree.add_saabb(aabb, chunk.blocks[x][y][z]);
 				}
 			}
-		}
-	}
 }
 
-void	World::_init()
+void	World::_reduce_world()
 {
-	chunks = new_space<Chunk>(size[0], size[1], size[2]);
-	unsigned int const	buffer_size = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 	for (unsigned int x = 0; x < size[0]; ++x)
 		for (unsigned int y = 0; y < size[1]; ++y)
 			for (unsigned int z = 0; z < size[2]; ++z)
-				for (unsigned int i = 0; i < buffer_size; ++i)
+				_reduce_chunk(chunks[x][y][z], { (float)x * CHUNK_SIZE, (float)y * CHUNK_SIZE, (float)z * CHUNK_SIZE, 0.0f });
+}
+
+void	World::_init_world()
+{
+	chunks = new_space<Chunk>(size[0], size[1], size[2]);
+	for (unsigned int x = 0; x < size[0]; ++x)
+		for (unsigned int y = 0; y < size[1]; ++y)
+			for (unsigned int z = 0; z < size[2]; ++z)
+				for (unsigned int i = 0; i < CHUNK_SIZE_1D; ++i)
 				{
 					chunks[x][y][z].blocks[0][0][i] = 0;
 					chunks[x][y][z].graphicids[0][0][i] = -1;
 				}
 }
 
-void	World::_clear()
+void	World::_clear_chunk(Chunk &chunk, vec<float, 4> const &position)
+{
+	/*Aabb	aabb;
+
+	aabb.bottom = position;
+	aabb.top = position + (float)CHUNK_SIZE;
+	//engine->physic->remove_aabbs(body, aabb);*/
+
+	for (unsigned int i = 0; i < CHUNK_SIZE_1D; ++i)
+		if (chunk.graphicids[0][0][i] != -1)
+		{
+			engine->graphic->aabbtree.remove_aabb(chunk.graphicids[0][0][i]);
+			chunk.graphicids[0][0][i] = -1;
+		}
+}
+
+void	World::_clear_world()
 {
 	engine->physic->remove_aabbs(body);
-	unsigned int const	buffer_size = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 	for (unsigned int x = 0; x < size[0]; ++x)
 		for (unsigned int y = 0; y < size[1]; ++y)
 			for (unsigned int z = 0; z < size[2]; ++z)
-				for (unsigned int i = 0; i < buffer_size; ++i)
+				for (unsigned int i = 0; i < CHUNK_SIZE_1D; ++i)
 					if (chunks[x][y][z].graphicids[0][0][i] != -1)
 					{
 						engine->graphic->aabbtree.remove_aabb(chunks[x][y][z].graphicids[0][0][i]);

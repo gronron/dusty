@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graphicengine.hpp"
 #include "eventmanager.hpp"
 
-Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(true)
+Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(false)
 {
 
 }

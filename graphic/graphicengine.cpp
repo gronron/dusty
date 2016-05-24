@@ -155,6 +155,6 @@ void				Graphicengine::_load_materials(char const *filename)
 	
 	_materials_count = nd->data_size / sizeof(Material);
 	_materials_size = nd->data_size / sizeof(Material);
-	_materials = new Material[_materials_size];
+	_materials = new Material[256];
 	memcpy(_materials, nd->data_storage, nd->data_size);
 }
