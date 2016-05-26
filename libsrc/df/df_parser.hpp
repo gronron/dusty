@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "df_node.hpp"
 
-Df_node	*df_parse(std::istream &is);
-Df_node	*df_parse(char const *filename);
+Df_node	*df_parse(char const *data);
+Df_node	*df_parse_file(char const *filename);
 
 #endif

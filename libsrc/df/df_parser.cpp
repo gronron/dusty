@@ -29,9 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include <list>
-#include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include "../file/file.hpp"
 #include "df_parser.hpp"
 
 struct				Reference
@@ -42,7 +42,8 @@ struct				Reference
 
 struct	Parser_state
 {
-	std::istream			*is;
+	char const				*s;	//string
+	unsigned int			i;	//iterator
 	std::list<Df_node *>	ndlist;
 	std::list<Reference>	reflist;
 	unsigned int			size;
@@ -192,137 +193,90 @@ static void	_set_ptr(Df_node *node, void *data)
 
 ///////////////////////////////////////
 
-static bool	_skip_space(std::istream &is)
+static void	_skip_space(Parser_state &ps)
 {
-	char	c;
-
-	do
-		c = is.get();
-	while ((c == ' ' || c == '\t' || c == '\n' || c == '\r') && !is.fail());
-	is.unget();
-	return (is.good());
-}
-
-static bool	_read_nbr(std::istream &is, std::string &str)
-{
-	char	c;
-
-	c = is.get();
-	if (c >= '0' && c <= '9' && !is.fail())
-	{
-		str += c;
-		c = is.get();
-		while (c >= '0' && c <= '9' && !is.fail())
-		{
-			str += c;
-			c = is.get();
-		}
-		is.unget();
-		return (true);
-	}
-	is.unget();
-	return (false);
+	while (ps.s[ps.i] == ' ' || ps.s[ps.i] == '\t' || ps.s[ps.i] == '\n' || ps.s[ps.i] == '\r')
+		++ps.i;
 }
 
 static bool		_read_symbol(Parser_state &ps)
 {
-	char		c;
 	std::string	str;
 
-	if (!_skip_space(*ps.is))
-		return (false);
-	c = ps.is->get();
-	if (((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_') && !ps.is->fail())
+	_skip_space(ps);
+	if ((ps.s[ps.i] >= 'A' && ps.s[ps.i] <= 'Z') || (ps.s[ps.i] >= 'a' && ps.s[ps.i] <= 'z') || ps.s[ps.i] == '_')
 	{
-		str += c;
-		c = ps.is->get();
-		while (((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_' || (c >= '0' && c <= '9')) && !ps.is->fail())
-		{
-			str += c;
-			c = ps.is->get();
-		}
-		ps.is->unget();
+		str += ps.s[ps.i++];
+		while ((ps.s[ps.i] >= 'A' && ps.s[ps.i] <= 'Z') || (ps.s[ps.i] >= 'a' && ps.s[ps.i] <= 'z') || ps.s[ps.i] == '_' || (ps.s[ps.i] >= '0' && ps.s[ps.i] <= '9'))
+			str += ps.s[ps.i++];
+
 		_add_name(ps.ndlist, str);
 		return (true);
 	}
 	else
-	{
-		ps.is->unget();
 		return (false);
-	}
 }
 
 static bool		_read_reference(Parser_state &ps)
 {
-	char		c;
 	std::string	str;
 	
-	if (!_skip_space(*ps.is))
-		return (false);
-	c = ps.is->get();
-	if (c == '@' && !ps.is->fail())
+	_skip_space(ps);
+	if (ps.s[ps.i] == '@')
 	{
-		c = ps.is->get();
-		if (((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_') && !ps.is->fail())
+		++ps.i;
+		if ((ps.s[ps.i] >= 'A' && ps.s[ps.i] <= 'Z') || (ps.s[ps.i] >= 'a' && ps.s[ps.i] <= 'z') || ps.s[ps.i] == '_')
 		{
-			str += c;
-			c = ps.is->get();
-			while (((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_' || (c >= '0' && c <= '9')) && !ps.is->fail())
-			{
-				str += c;
-				c = ps.is->get();
-			}
-			ps.is->unget();
+			str += ps.s[ps.i++];
+			while ((ps.s[ps.i] >= 'A' && ps.s[ps.i] <= 'Z') || (ps.s[ps.i] >= 'a' && ps.s[ps.i] <= 'z') || ps.s[ps.i] == '_' || (ps.s[ps.i] >= '0' && ps.s[ps.i] <= '9'))
+				str += ps.s[ps.i++];
+
 			_add_reference(ps, str);
 			return (true);
 		}
 		else
 		{
-			char	line[256];
-
-			ps.is->getline(line, 256);
-			std::cerr << "error! _read_reference() fails on line :\n\t" << line << std::endl;
 			ps.error = true;
 			return (false);
 		}
 	}
 	else
-	{
-		ps.is->unget();
 		return (false);
-	}
+}
+
+static bool	_read_nbr(Parser_state &ps, std::string &str)
+{
+	if (ps.s[ps.i] < '0' || ps.s[ps.i] > '9')
+		return (false);
+
+	while (ps.s[ps.i] >= '0' && ps.s[ps.i] <= '9')
+		str += ps.s[ps.i++];
+	return (true);
 }
 
 static bool		_read_number(Parser_state &ps)
 {
-	char		c;
 	std::string	str;
 
-	if (!_skip_space(*ps.is))
-		return (false);
-	c = ps.is->get();
-	if ((c == '+' || c == '-') && !ps.is->fail())
-		str += c;
-	else
-		ps.is->unget();
-	if (_read_nbr(*ps.is, str))
+	_skip_space(ps);
+	if (ps.s[ps.i] == '+' || ps.s[ps.i] == '-')
+		str += ps.s[ps.i++];
+	if (_read_nbr(ps, str))
 	{
-		c = ps.is->get();
-		if (c == '.' && !ps.is->fail())
+		if (ps.s[ps.i] == '.')
 		{
-			str += c;
-			if (_read_nbr(*ps.is, str))
+			str += ps.s[ps.i++];
+			if (_read_nbr(ps, str))
 			{
-				c = ps.is->get();
-				if ((c == 'F' || c == 'f') && !ps.is->fail())
+				if (ps.s[ps.i] == 'F' || ps.s[ps.i] == 'f')
 				{
+					++ps.i;
 					float	f = (float)atof(str.c_str());
 					_add_data(ps, Df_node::FLOAT, sizeof(float), &f);
 					return (true);
 				}
 				else
 				{
-					ps.is->unget();
 					double	d = atof(str.c_str());
 					_add_data(ps, Df_node::DOUBLE, sizeof(double), &d);
 					return (true);
@@ -331,16 +285,16 @@ static bool		_read_number(Parser_state &ps)
 		}
 		else
 		{
-			ps.is->unget();
 			int	i = atoi(str.c_str());
 			_add_data(ps, Df_node::INT, sizeof(int), &i);
 			return (true);
 		}
 	}
-	return (false);
+	else
+		return (false);
 }
 
-static char				_to_c_char(char c)
+static char				_to_c_char(char const c)
 {
 	static char const	*c_char = "a\ab\bt\tn\nv\vf\fr\r0\0";
 
@@ -352,68 +306,60 @@ static char				_to_c_char(char c)
 	return (c);
 }
 
-static bool	_read_string(Parser_state &ps)
+static bool		_read_string(Parser_state &ps)
 {
-	if (!_skip_space(*ps.is))
-		return (false);
-	if (ps.is->get() == '"' && !ps.is->fail())
+	std::string	str;
+	
+	_skip_space(ps);
+	if (ps.s[ps.i] == '"')
 	{
-		std::string	str;
-		char		c;
-
-		c = ps.is->get();
-		while (c != '"' && !ps.is->fail())
+		++ps.i;
+		while (ps.s[ps.i] != '"' && ps.s[ps.i])
 		{
-			if (c == '\\')
+			if (ps.s[ps.i] == '\\')
 			{
-				c = ps.is->get();
-				if (ps.is->fail())
+				if (!ps.s[++ps.i])
+				{
+					ps.error = true;
 					return (false);
-				str += _to_c_char(c);
+				}
+				str += _to_c_char(ps.s[ps.i++]);
 			}
 			else
-				str += c;
-			c = ps.is->get();
+				str += ps.s[ps.i++];
 		}
-		
+
 		char	*ptr = strdup(str.c_str());
 		_add_data(ps, Df_node::STRING, sizeof(char *), &ptr);
 		return (true);
 	}
-	ps.is->unget();
 	return (false);
 }
 
 static bool	_read_open_bracket(Parser_state &ps)
 {
-	if (!_skip_space(*ps.is))
-		return (false);
-	if (ps.is->get() == '{' && !ps.is->fail())
+	_skip_space(ps);
+	if (ps.s[ps.i] == '{')
 	{
+		++ps.i;
 		_begin_block(ps.ndlist);
 		return (true);
 	}
 	else
-	{
-		ps.is->unget();
 		return (false);
-	}
 }
 
 static bool	_read_close_bracket(Parser_state &ps)
 {
-	if (!_skip_space(*ps.is))
-		return (false);
-	if (ps.is->get() == '}' && !ps.is->fail())
+	_skip_space(ps);
+	if (ps.s[ps.i] == '}')
 	{
+		++ps.i;
 		_end_block(ps.ndlist);
 		return (true);
 	}
 	else
-	{
-		ps.is->unget();
 		return (false);
-	}
 }
 
 ///////////////////////////////////////
@@ -469,10 +415,6 @@ static bool	_read_expr(Parser_state &ps)
 		return (true);
 	else
 	{
-		char	line[256];
-
-		ps.is->getline(line, 256);
-		std::cerr << "error! _read_def() fails on line :\n\t" << line << std::endl;
 		ps.error = true;
 		return (false);
 	}
@@ -488,20 +430,21 @@ static bool	_read_def(Parser_state &ps)
 
 ///////////////////////////////////////
 
-Df_node				*df_parse(std::istream &is)
+Df_node				*df_parse(const char *data)
 {
 	Df_node			*node;
 	Parser_state	ps;
 
 	node = 0;
-	ps.is = &is;
+	ps.s = data;
+	ps.i = 0;
 	ps.size = 0;
 	ps.data = 0;
 	ps.error = false;
 	while (_read_def(ps));
 	if (ps.error)
 	{
-		std::cerr << "error! df_parse() fails to parse std::istream" << std::endl;
+		std::cerr << "error! df_parse() fails to parse: synthax error" << std::endl;
 		free(ps.data);
 	}
 	else
@@ -524,15 +467,15 @@ Df_node				*df_parse(std::istream &is)
 	return (node);
 }
 
-Df_node				*df_parse(char const *filename)
+Df_node				*df_parse_file(char const *filename)
 {
-	std::ifstream	isf(filename);
+	char const	*str = read_file(filename, 0);
 
-	if (isf.is_open())
-		return (df_parse(isf));
+	if (str)
+		return (df_parse(str));
 	else
 	{
-		std::cerr << "error! df_parse() can't open file: " << filename << std::endl;
+		std::cerr << "error! df_parse_file() can't open file: " << filename << std::endl;
 		return (0);
 	}
 }

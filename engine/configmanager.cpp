@@ -60,11 +60,11 @@ Df_node											*Configmanager::get(std::string const &name)
 	{
 		std::string	temp = configdir + name;
 
-		Df_node	*node = df_parse(temp.c_str());
+		Df_node	*node = df_parse_file(temp.c_str());
 
 		if (node)
 		{
-			//node->print();
+			node->print();
 			_nodemap[name] = node;
 		}
 		else
