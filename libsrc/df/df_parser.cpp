@@ -266,21 +266,20 @@ static bool		_read_number(Parser_state &ps)
 		if (ps.s[ps.i] == '.')
 		{
 			str += ps.s[ps.i++];
-			if (_read_nbr(ps, str))
+			_read_nbr(ps, str);
+
+			if (ps.s[ps.i] == 'F' || ps.s[ps.i] == 'f')
 			{
-				if (ps.s[ps.i] == 'F' || ps.s[ps.i] == 'f')
-				{
-					++ps.i;
-					float	f = (float)atof(str.c_str());
-					_add_data(ps, Df_node::FLOAT, sizeof(float), &f);
-					return (true);
-				}
-				else
-				{
-					double	d = atof(str.c_str());
-					_add_data(ps, Df_node::DOUBLE, sizeof(double), &d);
-					return (true);
-				}
+				++ps.i;
+				float	f = (float)atof(str.c_str());
+				_add_data(ps, Df_node::FLOAT, sizeof(float), &f);
+				return (true);
+			}
+			else
+			{
+				double	d = atof(str.c_str());
+				_add_data(ps, Df_node::DOUBLE, sizeof(double), &d);
+				return (true);
 			}
 		}
 		else

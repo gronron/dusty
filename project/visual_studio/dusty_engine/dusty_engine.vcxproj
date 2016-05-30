@@ -171,7 +171,7 @@
     <ClCompile Include="..\..\..\libsrc\endian\endian.cpp" />
     <ClCompile Include="..\..\..\libsrc\endian\packet.cpp" />
     <ClCompile Include="..\..\..\libsrc\file\file.cpp" />
-    <ClCompile Include="..\..\..\libsrc\hash\crc32.cpp" />
+    <ClCompile Include="..\..\..\libsrc\hash\crc.cpp" />
     <ClCompile Include="..\..\..\libsrc\random\mt19937.cpp" />
     <ClCompile Include="..\..\..\libsrc\random\prbg.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\selector.cpp" />
@@ -225,7 +225,7 @@
     <ClInclude Include="..\..\..\libsrc\endian\endian.hpp" />
     <ClInclude Include="..\..\..\libsrc\endian\packet.hpp" />
     <ClInclude Include="..\..\..\libsrc\file\file.hpp" />
-    <ClInclude Include="..\..\..\libsrc\hash\crc32.hpp" />
+    <ClInclude Include="..\..\..\libsrc\hash\crc.hpp" />
     <ClInclude Include="..\..\..\libsrc\math\vec.hpp" />
     <ClInclude Include="..\..\..\libsrc\math\vec_util.hpp" />
     <ClInclude Include="..\..\..\libsrc\new.hpp" />

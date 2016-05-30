@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef EFFECTFACTORY_H_
 #define EFFECTFACTORY_H_
 
-#include "hash/crc32.hpp"
+#include "hash/crc.hpp"
 
-#define EFFECTFACTORYREG(name) Effectfactoryregister<name> const	registered_effect_##name(HASH(#name))
+#define EFFECTFACTORYREG(name) Effectfactoryregister<name> const	registered_effect_##name(CRC32(#name))
 
 class	Df_node;
 class	Particleeffect;
