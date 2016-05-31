@@ -68,7 +68,7 @@ void	Effectfactory::register_class(unsigned int const hash, CF cf)
 Particleeffect		*Effectfactory::create(unsigned int const hash, Particlesystem *p, float const t, Df_node const *d) const
 {
 	int				imin = 0;
-	int				imax = _prscount;
+	int				imax = _prscount - 1;
 
 	while (imin <= imax)
 	{

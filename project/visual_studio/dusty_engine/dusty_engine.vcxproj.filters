@@ -204,6 +204,9 @@
     <ClCompile Include="..\..\..\libsrc\hash\crc.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\ui\interpreter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\configmanager.hpp">
@@ -373,6 +376,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\hash\crc.hpp">
       <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ui\interpreter.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

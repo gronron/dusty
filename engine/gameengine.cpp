@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graphicengine.hpp"
 #include "eventmanager.hpp"
 #include "callbackmanager.hpp"
+#include "interpreter.hpp"
 #include "gameengine.hpp"
 
 #include <iostream>
@@ -54,6 +55,8 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrl
 	
 	callback = new Callbackmanager();
 	physic = new Physicengine();
+	interpreter = new Interpreter(this);
+	interpreter->exec("help");
 
 	if (!opt.local)
 	{
@@ -61,14 +64,13 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrl
 		network->connect(opt.ip, opt.port);
 	}
 
-	
 	Df_node	*nd = Configmanager::get_instance().get("game.df");
 
 	if (opt.graphic)
 	{
 		console = new Console(this);
-		graphic = new Graphicengine();
 		event = new Eventmanager(this);
+		graphic = new Graphicengine();
 	}
 
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];

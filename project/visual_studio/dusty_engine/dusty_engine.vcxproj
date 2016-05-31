@@ -198,6 +198,7 @@
     <ClCompile Include="..\..\..\physic\shape.cpp" />
     <ClCompile Include="..\..\..\ui\console.cpp" />
     <ClCompile Include="..\..\..\ui\eventmanager.cpp" />
+    <ClCompile Include="..\..\..\ui\interpreter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\callbackmanager.hpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="..\..\..\physic\shape.hpp" />
     <ClInclude Include="..\..\..\ui\console.hpp" />
     <ClInclude Include="..\..\..\ui\eventmanager.hpp" />
+    <ClInclude Include="..\..\..\ui\interpreter.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

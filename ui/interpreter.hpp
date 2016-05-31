@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,70 +28,73 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef GAMEENGINE_H_
-#define GAMEENGINE_H_
+#ifndef INTERPRETER_H_
+#define INTERPRETER_H_
 
-#include <string>
+/*
+ = all
+& = team
+@ = private
+/ = cmd
+*/
 
-class	Entity;
-class	Replication;
-class	Controller;
-class	Callbackmanager;
-class	Physicengine;
-class	Interpreter;
-class	Networkengine;
-class	Console;
-class	Eventmanager;
-class	Graphicengine;
+#define	MAXWORDSIZE		64
+#define MAXSTRINGSIZE	512
 
-class	Gameengine
+class	Gameengine;
+
+class	Interpreter
 {
 	public:
 
-		struct			Option
+		enum	Argumenttype { NONE, INTEGER, DOUBLE, STRING };
+
+		struct	Argumenttypelist
 		{
-			bool		master;
-			bool		local;
-			bool		graphic;
-			bool		audio;
-			std::string	ip;
-			std::string	port;
-			std::string	level;
+			char	argtypes[16];
+		};
+		
+		struct	Argument
+		{
+			char		type;
+			union
+			{
+				int		nbr;
+				double	dbl;
+				char	str[MAXSTRINGSIZE];
+			};
+		};
+
+		struct	Command
+		{
+			char const		*name;
+			char const		*description;
+			void			(*function)(Gameengine *, Argument *);
+			unsigned int	argcount;
+			char			argtypes[16];
 		};
 
 
-		bool			master;
-		int				rootid;
-		int				ctrlid;
+		Gameengine		*engine;
+
+		unsigned int	_cmdcount;
+		unsigned int	_cmdsize;
+		Command			*_commands;
 		
-		unsigned int	_entsize;
-		Entity			**_entities;
 
-		Callbackmanager	*callback;
-		Physicengine	*physic;
-		Interpreter		*interpreter;
-		Networkengine	*network;
-
-		Console			*console;
-		Eventmanager	*event;
-		Graphicengine	*graphic;
-		//Uimanager		*um;
-
-		std::string		controllerclass;
-
-
-		Gameengine(Option const &);
-		~Gameengine();
-
-		Entity	*create(std::string const &, Entity const *, bool const need_replication);
-		Entity	*create(Replication *);
-		Entity	*find_entity(int const);
-		void	notify_owner(Entity *, bool const);
-		void	notify_owned(Entity *, bool const);
-		void	destroy(int const);
-		void	control(int const);
-
-		void	tick(float const);
+		Interpreter(Gameengine *);
+		~Interpreter();
+		
+		void	exec(char const *);
+		
+		//void	register_variable();
+		void	register_function(char const *name, char const *description, void (*function)(Gameengine *, Argument *), Argumenttypelist const &);
+		
+		int		_find_commandindex(char const *, unsigned int const, Argument const *);
+		bool	_read_symbol(char const *, unsigned int &i, char *);
+		bool	_read_nbr(char const *, unsigned int &, char *, unsigned int &);
+		bool	_read_number(char const *, unsigned int &, unsigned int &, Argument *);
+		bool	_read_string(char const *, unsigned int &, unsigned int &, Argument *);
 };
 
 #endif
