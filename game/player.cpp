@@ -86,7 +86,7 @@ void	Player::tick(float const delta)
 			for (float i = 0.0f; i < a; ++i)
 			{
 				vec<float, 2>	a;
-				Projectile		*p = (Projectile *)engine->create("Projectile", this, true);
+				Projectile		*p = (Projectile *)engine->create(CRC32("Projectile"), this, true);
 
 				p->ownerid = id;
 				//p->damage = dmg;
@@ -138,7 +138,7 @@ bool	Player::fire()
 	{
 		if (engine->master)
 		{
-			Projectile *p = (Projectile *)engine->create("Projectile", this, true);
+			Projectile *p = (Projectile *)engine->create(CRC32("Projectile"), this, true);
 			p->ownerid = id;
 			p->damage = damage;
 			p->body->position = body->position + dir * 1.0f;

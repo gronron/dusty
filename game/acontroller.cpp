@@ -28,7 +28,7 @@ void	AController::postinstanciation()
 {
 	Controller::postinstanciation();
 	if (engine->master)
-		controlled = (Player *)engine->create("Player", this, true);
+		controlled = (Player *)engine->create(CRC32("Player"), this, true);
 	if (!engine->master)
 		engine->notify_owned(this, true);
 }

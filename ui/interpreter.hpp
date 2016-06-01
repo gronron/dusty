@@ -31,13 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INTERPRETER_H_
 #define INTERPRETER_H_
 
-/*
- = all
-& = team
-@ = private
-/ = cmd
-*/
-
 #define	MAXWORDSIZE		64
 #define MAXSTRINGSIZE	512
 
@@ -89,12 +82,13 @@ class	Interpreter
 		
 		//void	register_variable();
 		void	register_function(char const *name, char const *description, void (*function)(Gameengine *, Argument *), Argumenttypelist const &);
-		
+
 		int		_find_commandindex(char const *, unsigned int const, Argument const *);
 		bool	_read_symbol(char const *, unsigned int &i, char *);
 		bool	_read_nbr(char const *, unsigned int &, char *, unsigned int &);
 		bool	_read_number(char const *, unsigned int &, unsigned int &, Argument *);
 		bool	_read_string(char const *, unsigned int &, unsigned int &, Argument *);
+		void	_register_all();
 };
 
 #endif

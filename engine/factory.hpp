@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FACTORY_H_
 #define FACTORY_H_
 
-#include <map>
-#include <string>
+#include "hash/crc.hpp"
 
-#define FACTORYREG(name) Factoryregister<name> const	reg_##name(#name)
+#define FACTORYREG(name) Factoryregister<name> const	reg_##name(CRC32(#name))
 
 class	Entity;
 class	Gameengine;
@@ -48,24 +47,26 @@ class	Factory
 
 		struct	Class
 		{
-			short int	type;
-			CF			cf;
+			unsigned int	hash;
+			CF				cf;
 		};
 
 
 		static Factory	&get_instance();
 
 
-		std::map<std::string, Class>	_classmap;
+		unsigned int	_classcount;
+		unsigned int	_classsize;
+		Class			*_classes;
 
 
-		void		register_class(std::string const &, CF);
-		void		generate_type();
-
-		short int	get_type(std::string const &) const;
+		Factory();
+		~Factory();
+		
+		void		register_class(unsigned int const, CF);
 
 		Entity		*create(Gameengine *, Replication *) const;
-		Entity		*create(Gameengine *, Replication *, int const, std::string const&, Entity const *) const;
+		Entity		*create(Gameengine *, Replication *, int const, unsigned int const, Entity const *) const;
 };
 
 template<class T>
@@ -77,9 +78,9 @@ Entity	*create(Gameengine *am, Replication *r, int const i, short int const t, E
 template<class T>
 struct	Factoryregister
 {
-	Factoryregister(std::string const &name)
+	Factoryregister(unsigned int const hash)
 	{
-		Factory::get_instance().register_class(name, &create<T>);
+		Factory::get_instance().register_class(hash, &create<T>);
 	}
 };
 

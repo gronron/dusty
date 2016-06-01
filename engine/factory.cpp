@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <stdlib.h>
+#include "new.hpp"
 #include "replication.hpp"
 #include "factory.hpp"
 
@@ -40,62 +41,67 @@ Factory				&Factory::get_instance()
 	return (instance);
 }
 
-void		Factory::register_class(std::string const &name, CF cf)
+Factory::Factory() : _classcount(0), _classsize(64), _classes(0)
 {
-	Class	a;
-
-	a.type = -1;
-	a.cf = cf;
-	_classmap[name] = a;
+	_classes = new Class[_classsize];
 }
 
-void										Factory::generate_type()
+Factory::~Factory()
 {
-	std::map<std::string, Class>::iterator	i;
-	short int								type = 0;
-
-	for (i = _classmap.begin(); i != _classmap.end(); ++i)
-		i->second.type = ++type;
+	delete [] _classes;
 }
 
-short int									Factory::get_type(std::string const &name) const
+void		Factory::register_class(unsigned int const hash, CF cf)
 {
-	std::map<std::string, Class>::const_iterator	i;
-
-	if ((i = _classmap.find(name)) != _classmap.end())
-		return (i->second.type);
-	else
-    {
-		std::cerr << "Error! Factory::get_type() fails to find class: " << name << std::endl;
-		exit(EXIT_FAILURE);
-		return (-1);
-	}
-}
-
-Entity										*Factory::create(Gameengine *g, Replication *r) const
-{
-	std::map<std::string, Class>::const_iterator	i;
-
-	for (i = _classmap.begin(); i != _classmap.end(); ++i)
+	if (_classcount >= _classsize)
 	{
-		if (i->second.type == r->type)
-			return (i->second.cf(g, r, r->id, r->type, 0));
+		_classsize <<= 1;
+		_classes = resize(_classes, _classcount, _classsize);
 	}
-	std::cerr << "Error! Factory::create() fails to find id: " << r->type << std::endl;
-	exit(EXIT_FAILURE);
-	return (0);
+
+	unsigned int	i;
+	for (i = _classcount++; i && _classes[i - 1].hash > hash; --i)
+	{
+		if (_classes[i - 1].hash == hash)
+		{
+			std::cerr << "error! Factory::register_class(): hash collision" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		_classes[i] = _classes[i - 1];
+	}
+	_classes[i].hash = hash;
+	_classes[i].cf = cf;
 }
 
-Entity												*Factory::create(Gameengine *g, Replication *r, int const id, std::string const &name, Entity const *owner) const
+Entity	*Factory::create(Gameengine *g, Replication *r) const
 {
-	std::map<std::string, Class>::const_iterator	i;
-
-	if ((i = _classmap.find(name)) != _classmap.end())
-		return (i->second.cf(g, r, id, i->second.type, owner));
+	if (r->type >= 0 && r->type < (int)_classcount)
+		return (_classes[r->type].cf(g, r, r->id, r->type, 0));
 	else
-    {
-		std::cerr << "Error! Factory::create() fails to find class: " << name << std::endl;
+	{
+		std::cerr << "Error! Factory::create() the following id doesn't exist: " << r->type << std::endl;
 		exit(EXIT_FAILURE);
 		return (0);
 	}
+}
+
+Entity	*Factory::create(Gameengine *g, Replication *r, int const id, unsigned int const hash, Entity const *owner) const
+{
+	int	imin = 0;
+	int	imax = _classcount - 1;
+
+	while (imin <= imax)
+	{
+		int const	imid = (imin + imax) >> 1;
+
+		if (hash < _classes[imid].hash)
+			imax = imid - 1;
+		else if (hash > _classes[imid].hash)
+			imin = imid + 1;
+		else
+			return (_classes[imid].cf(g, r, id, imid, owner));
+	}
+	std::cerr << "Error! Factory::create() the following hash doesn't exist : " << hash << std::endl;
+	exit(EXIT_FAILURE);
+	return (0);
 }

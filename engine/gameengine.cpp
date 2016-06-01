@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-216, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -47,8 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrlid(-1), _entsize(1024), _entities(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
 {
-	Factory::get_instance().generate_type();
-
 	_entities = new Entity*[_entsize];
 	for (unsigned int i = 0; i < _entsize; ++i)
 		_entities[i] = 0;
@@ -56,7 +54,6 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrl
 	callback = new Callbackmanager();
 	physic = new Physicengine();
 	interpreter = new Interpreter(this);
-	interpreter->exec("help");
 
 	if (!opt.local)
 	{
@@ -76,10 +73,10 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrl
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
 	if (master)
-		create("World", 0, true);
+		create(CRC32("World"), 0, true);
 	if (!network)
 	{
-		Controller *ctrl = (Controller *)create(controllerclass, 0, true);
+		Controller *ctrl = (Controller *)create(crc32(controllerclass.c_str()), 0, true);
 		ctrlid = ctrl->id;
 	}
 }
@@ -106,7 +103,7 @@ Gameengine::~Gameengine()
 	delete console;
 }
 
-Entity		*Gameengine::create(std::string const &name, Entity const *owner, bool const need_replication)
+Entity		*Gameengine::create(unsigned int const hash, Entity const *owner, bool const need_replication)
 {
 	int		id = -1;
 
@@ -126,7 +123,7 @@ Entity		*Gameengine::create(std::string const &name, Entity const *owner, bool c
 		for (unsigned int i = _entsize >> 1; i < _entsize; ++i)
 			_entities[i] = 0;
 	}
-	_entities[id] = Factory::get_instance().create(this, (need_replication && network ? network->new_replication(id) : 0), id, name, owner);
+	_entities[id] = Factory::get_instance().create(this, (need_replication && network ? network->new_replication(id) : 0), id, hash, owner);
 	return (_entities[id]);
 }
 

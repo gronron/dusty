@@ -28,70 +28,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef GAMEENGINE_H_
-#define GAMEENGINE_H_
+#include "common.hpp"
+#include "interpreter.hpp"
 
-#include <string>
-
-class	Entity;
-class	Replication;
-class	Controller;
-class	Callbackmanager;
-class	Physicengine;
-class	Interpreter;
-class	Networkengine;
-class	Console;
-class	Eventmanager;
-class	Graphicengine;
-
-class	Gameengine
+void	Interpreter::_register_all()
 {
-	public:
-
-		struct			Option
-		{
-			bool		master;
-			bool		local;
-			bool		graphic;
-			bool		audio;
-			std::string	ip;
-			std::string	port;
-			std::string	level;
-		};
-
-
-		bool			master;
-		int				rootid;
-		int				ctrlid;
-		
-		unsigned int	_entsize;
-		Entity			**_entities;
-
-		Callbackmanager	*callback;
-		Physicengine	*physic;
-		Interpreter		*interpreter;
-		Networkengine	*network;
-
-		Console			*console;
-		Eventmanager	*event;
-		Graphicengine	*graphic;
-		//Uimanager		*um;
-
-		std::string		controllerclass;
-
-
-		Gameengine(Option const &);
-		~Gameengine();
-
-		Entity	*create(unsigned int const hash, Entity const *, bool const need_replication);
-		Entity	*create(Replication *);
-		Entity	*find_entity(int const);
-		void	notify_owner(Entity *, bool const);
-		void	notify_owned(Entity *, bool const);
-		void	destroy(int const);
-		void	control(int const);
-
-		void	tick(float const);
-};
-
-#endif
+	
+}

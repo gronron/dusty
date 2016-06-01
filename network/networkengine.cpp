@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include "new.hpp"
+#include "hash/crc.hpp"
 #include "time/time.hpp"
 #include "client.hpp"
 #include "server.hpp"
@@ -124,7 +125,7 @@ void								Networkengine::tick(float const delta)
 		}
 		else if (msg->type == Messagequeue::CONNECTION)
 		{
- 			id = engine->create(engine->controllerclass, 0, true)->id;
+ 			id = engine->create(crc32(engine->controllerclass.c_str()), 0, true)->id;
 			_playerids[msg->cltid] = id;
 			mq.push_out_cnt(msg->cltid, id);
 		}

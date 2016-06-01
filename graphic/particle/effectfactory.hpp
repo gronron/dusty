@@ -55,8 +55,8 @@ class	Effectfactory
 		static Effectfactory	&get_instance();
 
 
-		unsigned int	_prscount;
-		unsigned int	_prssize;
+		unsigned int	_prcount;
+		unsigned int	_prsize;
 		Pair			*_pairs;
 
 

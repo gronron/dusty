@@ -199,6 +199,7 @@
     <ClCompile Include="..\..\..\ui\console.cpp" />
     <ClCompile Include="..\..\..\ui\eventmanager.cpp" />
     <ClCompile Include="..\..\..\ui\interpreter.cpp" />
+    <ClCompile Include="..\..\..\ui\interpreter_register.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\engine\callbackmanager.hpp" />
