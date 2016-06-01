@@ -10,3 +10,4 @@ features:<br/>
 - raytracer using BVH and OpenCL<br/>
 
 [Renderer preview](https://www.youtube.com/watch?v=UGmM1AlRqjM)
+[Rendering large structure](https://www.youtube.com/watch?v=Z8SukrJTKDM)
