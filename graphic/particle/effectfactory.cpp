@@ -40,9 +40,9 @@ Effectfactory		&Effectfactory::get_instance()
 	return (instance);
 }
 
-Effectfactory::Effectfactory() : _prscount(0), _prssize(64), _pairs(0)
+Effectfactory::Effectfactory() : _prcount(0), _prsize(64), _pairs(0)
 {
-	_pairs = new Pair[_prssize];
+	_pairs = new Pair[_prsize];
 }
 
 Effectfactory::~Effectfactory()
@@ -52,15 +52,22 @@ Effectfactory::~Effectfactory()
 
 void	Effectfactory::register_class(unsigned int const hash, CF cf)
 {
-	if (_prscount >= _prssize)
+	if (_prcount >= _prsize)
 	{
-		_prssize <<= 1;
-		_pairs = resize(_pairs, _prscount, _prssize);
+		_prsize <<= 1;
+		_pairs = resize(_pairs, _prcount, _prsize);
 	}
 
 	unsigned int	i;
-	for (i = _prscount++; i && _pairs[i - 1].hash > hash; --i)
+	for (i = _prcount++; i && _pairs[i - 1].hash > hash; --i)
+	{
+		if (_pairs[i - 1].hash == hash)
+		{
+			std::cerr << "error! Effectfactory::register_class(): hash collision" << std::endl;
+			exit(EXIT_FAILURE);
+		}
 		_pairs[i] = _pairs[i - 1];
+	}
 	_pairs[i].hash = hash;
 	_pairs[i].cf = cf;
 }
@@ -68,7 +75,7 @@ void	Effectfactory::register_class(unsigned int const hash, CF cf)
 Particleeffect		*Effectfactory::create(unsigned int const hash, Particlesystem *p, float const t, Df_node const *d) const
 {
 	int				imin = 0;
-	int				imax = _prscount - 1;
+	int				imax = _prcount - 1;
 
 	while (imin <= imax)
 	{

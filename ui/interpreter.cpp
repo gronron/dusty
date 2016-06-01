@@ -36,8 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Interpreter::Interpreter(Gameengine *e) : engine(e), _cmdcount(0), _cmdsize(256), _commands(0)
 {
 	_commands = new Command[_cmdsize];
-
-	register_function("help", "call for help", [](Gameengine *, Argument *){ std::cout << "hep me plz" << std::endl; }, { });
+	_register_all();
 }
 
 Interpreter::~Interpreter()
