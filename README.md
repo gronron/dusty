@@ -9,5 +9,5 @@ features:<br/>
 - continuous physic with use of dynamic AABB tree<br/>
 - raytracer using BVH and OpenCL<br/>
 
-[Renderer preview](https://www.youtube.com/watch?v=UGmM1AlRqjM)
+[Renderer preview](https://www.youtube.com/watch?v=UGmM1AlRqjM)<br/>
 [Rendering large structure](https://www.youtube.com/watch?v=Z8SukrJTKDM)
