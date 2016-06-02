@@ -48,9 +48,7 @@ class	AController : public Controller
 		void	left(int const, float const *);
 		void	right(int const, float const *);
 		void	aimloc(int const, float const *);
-		
-		void	load(int const, float const *);
-		void	save(int const, float const *);
+
 		void	create_block(int const, float const *);
 		void	destroy_block(int const, float const *);
 		void	change_material(int const, float const *);

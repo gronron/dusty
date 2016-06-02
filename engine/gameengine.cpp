@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
-Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrlid(-1), _entsize(1024), _entities(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
+Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), rootid(-1), ctrlid(-1), _entsize(1024), _entities(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
 {
 	_entities = new Entity*[_entsize];
 	for (unsigned int i = 0; i < _entsize; ++i)
@@ -73,7 +73,7 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), ctrl
 	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
 
 	if (master)
-		create(CRC32("World"), 0, true);
+		rootid = create(CRC32("World"), 0, true)->id;
 	if (!network)
 	{
 		Controller *ctrl = (Controller *)create(crc32(controllerclass.c_str()), 0, true);

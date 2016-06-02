@@ -139,12 +139,6 @@ void	AController::bind()
 
 		engine->event->_mousewheel.ctrl = this;
 		engine->event->_mousewheel.fx = (BINDTYPE)&AController::change_material;
-
-		engine->event->_keys[SDL_SCANCODE_L].ctrl = this;
-		engine->event->_keys[SDL_SCANCODE_L].fx = (BINDTYPE)&AController::load;
-	
-		engine->event->_keys[SDL_SCANCODE_M].ctrl = this;
-		engine->event->_keys[SDL_SCANCODE_M].fx = (BINDTYPE)&AController::save;
 	}
 	else if (controllertype == FIGHTER)
 	{
@@ -238,18 +232,6 @@ void	AController::aimloc(int const size, float const *data)
 }
 
 //// MAPCREATOR ///////////////////////
-
-void	AController::load(int const size, float const *data)
-{
-	if (size == 1 && *data > 0.0f)
-		((World*)engine->find_entity(0))->load("dusty_worldp.vox");
-}
-
-void	AController::save(int const size, float const *data)
-{
-	if (size == 1 && *data > 0.0f)
-		((World*)engine->find_entity(0))->save("dusty_world.dstw");
-}
 
 void	AController::create_block(int const size, float const *data)
 {

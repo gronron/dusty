@@ -64,7 +64,7 @@ Df_node											*Configmanager::get(std::string const &name)
 
 		if (node)
 		{
-			node->print();
+			//node->print();
 			_nodemap[name] = node;
 		}
 		else
