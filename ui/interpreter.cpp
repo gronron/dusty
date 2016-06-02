@@ -53,7 +53,6 @@ void	Interpreter::register_function(char const *name, char const *description, v
 	}
 	
 	unsigned int	argcount;
-	
 	for (argcount = 0; atl.argtypes[argcount] != NONE; ++argcount);
 
 	unsigned int	i;
@@ -63,6 +62,7 @@ void	Interpreter::register_function(char const *name, char const *description, v
 	_commands[i].name = name;
 	_commands[i].description = description;
 	_commands[i].function = function;
+	_commands[i].argcount = argcount;
 	for (unsigned int j = 0; j < argcount; ++j)
 		_commands[j].argtypes[j] = atl.argtypes[j];
 }
@@ -71,7 +71,7 @@ void				Interpreter::exec(char const *str)
 {
 	unsigned int	cursor = 0;
 	char			name[MAXWORDSIZE];
-	unsigned int	argcount;
+	unsigned int	argcount = 0;
 	Argument		args[16];
 
 	if (_read_symbol(str, cursor, name))
@@ -83,7 +83,7 @@ void				Interpreter::exec(char const *str)
 			(_commands[cmdindex].function)(engine, args);
 	}
 	else
-		;//engine->put_text("there is no command starting like this");
+		std::cout << "there is no command starting like this " << str << std::endl;
 }
 
 int		Interpreter::_find_commandindex(char const *name, unsigned int const argcount, Argument const *args)
@@ -116,25 +116,23 @@ int		Interpreter::_find_commandindex(char const *name, unsigned int const argcou
 			if (argcount != _commands[idx].argcount)
 				continue;
 
-			unsigned int i = 0;
+			unsigned int i = -1;
 			do
-				if (i++ == argcount)
+				if (++i == argcount)
 					return (idx);
 			while (i < argcount && args[i].type == _commands[idx].argtypes[i]);
-
 		}
-		//engine->put_text("there is no function called matching the argument");
+		std::cout << "there is no function called \"" << name << "\" matching the argument" << std::endl;
 	}
 	else
-		;//engine->put_text("not found");
+		std::cout << "not found" << std::endl;
 	return (-1);
 }
 
-static bool	_skip_space(char const *s, unsigned int &i)
+static void	_skip_space(char const *s, unsigned int &i)
 {
 	while (s[i] == ' ' || s[i] == '\t' || s[i] == '\n' || s[i] == '\r')
 		++i;
-	return (true);
 }
 
 bool				Interpreter::_read_symbol(char const *s, unsigned int &i, char *name)
@@ -224,7 +222,7 @@ bool				Interpreter::_read_string(char const *s, unsigned int &i, unsigned int &
 	if (s[i] == '"')
 	{
 		++i;
-		while (s[i] != '"')
+		while (s[i] && s[i] != '"')
 		{
 			if (s[i] == '\\')
 			{
@@ -237,6 +235,8 @@ bool				Interpreter::_read_string(char const *s, unsigned int &i, unsigned int &
 			if (j >= MAXSTRINGSIZE)
 				;//engine->put_text("number too long");
 		}
+		if (s[i] == '"')
+			++i;
 		args[index].str[j] = '\0';
 		args[index++].type = STRING;
 		return (true);

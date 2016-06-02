@@ -80,10 +80,19 @@ void			Eventmanager::event()
 			case SDL_SYSWMEVENT:
 				break;
 			case SDL_KEYDOWN:
-				_key(event, 1.0f);
+				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+					typing = !typing;
+				else
+				{
+					if (typing)
+						_type(event);
+					else
+						_key(event, 1.0f);
+				}
 				break;
 			case SDL_KEYUP:
-				_key(event, 0.0f);
+				if (!typing)
+					_key(event, 0.0f);
 				break;
 			case SDL_TEXTEDITING:
 				break;
@@ -151,16 +160,6 @@ void			Eventmanager::event()
 			case SDL_RENDER_TARGETS_RESET:
 			default:
 				break;
-/*
-			case sf::Event::TextEntered:
-				if (typing)
-				{
-					std::cout << (int)event.text.unicode << std::endl;
-					am->cl->putchar(event.text.unicode);
-				}
-				else if (event.text.unicode == '\n' || event.text.unicode == '\r')
-					typing = true;
-				break;*/
 		}
 	}
 }
@@ -195,49 +194,44 @@ bool					Eventmanager::bind(std::string const &name, Controller *ctrl, Controlle
 	return (false);
 }
 
+void	Eventmanager::_type(SDL_Event &event)
+{
+	switch (event.key.keysym.scancode)
+	{
+		case SDL_SCANCODE_RETURN:
+			engine->console->put_char('\n');
+			break;
+		case SDL_SCANCODE_BACKSPACE:
+			engine->console->put_char('\b');
+			break;
+		case SDL_SCANCODE_TAB:
+			engine->console->put_char('\t');
+			break;
+		case SDL_SCANCODE_DELETE:
+			engine->console->put_char(0x7f);
+			break;
+		case SDL_SCANCODE_RIGHT:
+			engine->console->move_cursor(Console::RIGHT);
+			break;
+		case SDL_SCANCODE_LEFT:
+			engine->console->move_cursor(Console::LEFT);
+			break;
+		case SDL_SCANCODE_DOWN:
+			engine->console->move_cursor(Console::DOWN);
+			break;
+		case SDL_SCANCODE_UP:
+			engine->console->move_cursor(Console::UP);
+			break;
+	}
+}
+
 void		Eventmanager::_key(SDL_Event &event, float d)
 {
 	Bind	*a;
 
-	if (typing)
-	{
-		if (d)
-		{
-			switch (event.key.keysym.scancode)
-			{
-				case SDL_SCANCODE_RETURN:
-					engine->console->put_char('\n');
-					break;
-				case SDL_SCANCODE_BACKSPACE:
-					engine->console->put_char('\b');
-					break;
-				case SDL_SCANCODE_TAB:
-					engine->console->put_char('\t');
-					break;
-				case SDL_SCANCODE_DELETE:
-					engine->console->put_char(0x7f);
-					break;
-				case SDL_SCANCODE_RIGHT:
-					engine->console->move_cursor(Console::RIGHT);
-					break;
-				case SDL_SCANCODE_LEFT:
-					engine->console->move_cursor(Console::LEFT);
-					break;
-				case SDL_SCANCODE_DOWN:
-					engine->console->move_cursor(Console::DOWN);
-					break;
-				case SDL_SCANCODE_UP:
-					engine->console->move_cursor(Console::UP);
-					break;
-			}
-		}
-	}
-	else
-	{
-		a = &_keys[event.key.keysym.scancode];
-		if (a->ctrl)
-			(a->ctrl->*a->fx)(1, &d);
-	}
+	a = &_keys[event.key.keysym.scancode];
+	if (a->ctrl)
+		(a->ctrl->*a->fx)(1, &d);
 }
 
 void				Eventmanager::_mousebutton(SDL_Event &event, float d)

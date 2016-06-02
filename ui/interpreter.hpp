@@ -40,7 +40,7 @@ class	Interpreter
 {
 	public:
 
-		enum	Argumenttype { NONE, INTEGER, DOUBLE, STRING };
+		enum	Argumenttype { NONE = 0, INTEGER, DOUBLE, STRING };
 
 		struct	Argumenttypelist
 		{

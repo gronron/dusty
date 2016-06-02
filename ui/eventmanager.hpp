@@ -77,6 +77,7 @@ class	Eventmanager
 
 		void	event();
 
+		void	_type(SDL_Event &);
 		void	_key(SDL_Event &, float );
 		void	_mousebutton(SDL_Event &, float);
 		void	_gamepadbutton(SDL_Event &, float);

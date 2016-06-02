@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "networkengine.hpp"
 #include "graphicengine.hpp"
 #include "console.hpp"
+#include "interpreter.hpp"
 
 Console::Console(Gameengine *e) : engine(e), _textsize(0), _cursor(0), _blink(false), _blinktimer(0.0f), _lastmsgtimer(0.0f)
 {
@@ -65,7 +66,7 @@ void					Console::draw()
 	vec<float, 2> const	scale = { 0.25f, 0.25f };
 	vec<float, 4> const	color = { 0.4f, 0.65f, 0.4f, 1.0f };
 
-	if (_textsize)
+	if (engine->event->typing)
 	{
 		char const	c = _text[_cursor];
 
@@ -75,7 +76,7 @@ void					Console::draw()
 		_text[_cursor] = c;
 	}
 	position[1] -= 32.0f;
-	if (_lastmsgtimer > 0.0f)
+	if (_lastmsgtimer > 0.0f || engine->event->typing)
 	{
 		for (int j = (int)_iterator - 1; position[1] > 0.0f; --j)
 		{
@@ -94,7 +95,7 @@ void					Console::draw()
 
 void	Console::put_text(char const *str)
 {
-	_lastmsgtimer = 5.0f;
+	_lastmsgtimer = 8.0f;
 	_history[_iterator].size = strlen(str);
 	if (_history[_iterator].size > MAXCHARACTER)
 		_history[_iterator].size = MAXCHARACTER;
@@ -110,12 +111,17 @@ void	Console::put_char(char const c)
 	{
 		if (_textsize)
 		{
+			if (_text[0] == '/')
+				engine->interpreter->exec(_text + 1);
+
 			if (engine->master)
 				put_text(_text);
 			else
 				engine->network->send_textmsg(_text);
 			_textsize = 0;
 			_cursor = 0;
+			_text[0] = '\0';
+			_text[1] = '\0';
 		}
 	}
 	else if (c == '\b')

@@ -52,7 +52,7 @@ class	Console
 		};
 
 
-		Gameengine	*engine;
+		Gameengine		*engine;
 
 		unsigned int	_textsize;
 		unsigned int	_cursor;
