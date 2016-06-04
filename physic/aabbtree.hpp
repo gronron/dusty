@@ -109,10 +109,10 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const,
 		int	stack[32];
 		int	top = 0;
 
-		stack[top++] = _root;
+		stack[top] = _root;
 		do
 		{
-			int const	index = stack[--top];
+			int const	index = stack[top];
 
 			if (aabb.is_overlapping(_nodes[index].aabb))
 			{
@@ -125,7 +125,7 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const,
 				}
 			}
 		}
-		while (top);
+		while (--top >= 0);
 	}
 }
 
@@ -138,10 +138,10 @@ void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(in
 		int			stack[32];
 		int			top = 0;
 
-		stack[top++] = _root;
+		stack[top] = _root;
 		do
 		{
-			int const	index = stack[--top];
+			int const	index = stack[top];
 			float		near;
 			float		far;
 			
@@ -156,7 +156,7 @@ void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(in
 				}
 			}
 		}
-		while (top);
+		while (--top >= 0);
 	}
 }
 
@@ -172,10 +172,10 @@ void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const,
 		float		near = INFINITY;
 
 		stack[top] = _root;
-		near_stack[top++] = 0.0f;		
+		near_stack[top] = 0.0f;		
 		do
 		{
-			if (near_stack[--top] < near)
+			if (near_stack[top] < near)
 			{
 				int const	index = stack[top];
 
@@ -225,7 +225,7 @@ void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const,
 				}
 			}
 		}
-		while (top);
+		while (--top >= 0);
 	}
 }
 

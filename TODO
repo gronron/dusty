@@ -6,9 +6,15 @@ warning! function_name: what happned
 
 ///////////////////////////////////////
 
-console:
-	polish it 2
+start tremulous or lethargy:
+	GO GO GO GO TREmulous: armageddon 1
 
+console:
+	handle typing screen depassement with <= => shift
+	handle multi line
+	text input history
+interpreter:
+	handle buffer overflow read_number
 df:
 	-brace compacting???
 	-debug 0
@@ -16,8 +22,8 @@ df:
 physic engine:
 	-use a good sorting algo for the first phase of collision solving in the physic engine
 	-maybe rethink the collision callback to the gamelogic
-	-add the missing continuous collision in narrowphase
-	-think about continuous collision detection of rotating object
+	-add the missing continuous collision in narrowphase 0
+	-think about continuous collision detection of rotating object 0
 
 graphic engine:
 	-oriented box rendering 1

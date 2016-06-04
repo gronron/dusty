@@ -286,12 +286,9 @@ bool	World::create_block(Ray const &ray, char const value)
 		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
 
 		vec<float, 4> const	position = engine->physic->_statictree._nodes[result.aabbindex].aabb.bottom + normal;
-		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
+		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, (position + 0.5f) / (float)CHUNK_SIZE);
 		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
-		std::cout << position[0] << "_" << position[1] << "_" << position[2] << std::endl;
-		std::cout << wp[0] << " " << wp[1] << " " << wp[2] << std::endl;
-		std::cout << cp[0] << " " << cp[1] << " " << cp[2] << std::endl;
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && !chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
 		{
 			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = value;
@@ -316,22 +313,16 @@ bool	World::destroy_block(Ray const &ray)
 	Result	result(body);
 
 	engine->physic->raycast_through(ray, &result, false, true);
-	std::cout << "destroy " << result.aabbindex << std::endl;
 	if (result.aabbindex != -1)
 	{
 		vec<float, 4> const	position = engine->physic->_statictree._nodes[result.aabbindex].aabb.bottom;
-		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
+		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, (position + 0.5f) / (float)CHUNK_SIZE);
 		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
-		std::cout << position[0] << "_" << position[1] << "_" << position[2] << std::endl;
-		std::cout << wp[0] << " " << wp[1] << " " << wp[2] << std::endl;
-		std::cout << cp[0] << " " << cp[1] << " " << cp[2] << std::endl;
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE)
 		{
 			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = 0;
-			
-			std::cout << "##destroy " << result.aabbindex << std::endl;
-
+	
 			engine->physic->_statictree.remove_aabb(result.aabbindex);
 
 			vec<float, 4> const	fp = (vec<float, 4>)(wp) * CHUNK_SIZE;
@@ -339,7 +330,6 @@ bool	World::destroy_block(Ray const &ray)
 			_reduce_chunk(chunks[wp[0]][wp[1]][wp[2]], fp);
 			return (true);
 		}
-		
 	}
 	return (false);
 }
@@ -386,7 +376,6 @@ void	World::_reduce_chunk(Chunk &chunk, vec<float, 4> const &position)
 					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
 					aabb.bottom += position;
 					aabb.top = position + (vec<float, 4>)end;
-					engine->physic->add_aabb(body, aabb); // do something for the physic plz
 
 					int const	graphicids = engine->graphic->aabbtree.add_saabb(aabb, chunk.blocks[x][y][z]);
 

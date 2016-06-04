@@ -72,9 +72,6 @@ class	Eventmanager
 		Eventmanager(Gameengine *);
 		~Eventmanager();
 
-		bool	bind(std::string const &, Controller *, Controller::BINDTYPE);
-		void	toogletyping();
-
 		void	event();
 
 		void	_type(SDL_Event &);

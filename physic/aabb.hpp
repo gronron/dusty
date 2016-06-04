@@ -92,7 +92,7 @@ inline bool				intersect_invrayaabb(Ray const &ray, Aabb const &aabb, float &tne
 	tnear = max(max(tmin[0], tmin[1]), tmin[2]);
 	tfar = min(min(tmax[0], tmax[1]), tmax[2]);
 
-	return (tfar >= 0 && tnear <= tfar);
+	return (tfar >= 0.0f && tnear <= tfar);
 }
 
 inline bool				intersect_rayaabb_n(Ray const &ray, Aabb const &aabb, float &tnear, float &tfar, vec<float, 4> &normal)

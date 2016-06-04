@@ -28,14 +28,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include <cmath>
-#include <iostream>
 #include "gameengine.hpp"
 #include "console.hpp"
 #include "graphicengine.hpp"
 #include "eventmanager.hpp"
 
-Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(false)
+Eventmanager::Eventmanager(Gameengine *e) : engine(e), running(true), typing(false)
 {
 
 }
@@ -43,11 +41,6 @@ Eventmanager::Eventmanager(Gameengine *g) : engine(g), running(true), typing(fal
 Eventmanager::~Eventmanager()
 {
 
-}
-
-void	Eventmanager::toogletyping()
-{
-	typing = !typing;
 }
 
 void			Eventmanager::event()
@@ -154,7 +147,6 @@ void			Eventmanager::event()
 			case SDL_CLIPBOARDUPDATE:
 				break;
 			case SDL_DROPFILE:
-//				((World*)engine->find_actor(0))->load(event.drop.file);
 				SDL_free(event.drop.file);
 				break;
 			case SDL_RENDER_TARGETS_RESET:
@@ -162,36 +154,6 @@ void			Eventmanager::event()
 				break;
 		}
 	}
-}
-
-bool					Eventmanager::bind(std::string const &name, Controller *ctrl, Controller::BINDTYPE fx)
-{
-	unsigned long int	a;
-	std::string			prefix;
-	std::string			suffix;
-
-	a = name.find('.');
-	prefix = name.substr(0, a);
-	if (a != std::string::npos)
-		suffix = name.substr(a + 1);
-	if (prefix == "key")
-		;
-	else if (prefix == "mouse_wheel")
-		;
-	else if (prefix == "mouse_button")
-		;
-	else if (prefix == "mouse_moved")
-	{
-		_mousemove.ctrl = ctrl;
-		_mousemove.fx = fx;
-	}
-	else if (prefix == "joystick_button")
-		;
-	else if (prefix == "joystick_moved")
-		;
-	else
-		std::cerr << "Warning: Eventmanager::bind() wrong bind name: " << name << std::endl;
-	return (false);
 }
 
 void	Eventmanager::_type(SDL_Event &event)
