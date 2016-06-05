@@ -45,6 +45,7 @@ class	World : public Entity
 		{
 			vec<int, 4>		position;
 			unsigned char	blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+			int				physicids[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 			int				graphicids[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 		};
 

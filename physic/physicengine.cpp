@@ -134,10 +134,15 @@ void		Physicengine::delete_body(Body *body)
 	_bdfree = (int)(body - _bodies);
 }
 
-void	Physicengine::add_aabb(Body *body, Aabb const &aabb)
+int		Physicengine::add_aabb(Body *body, Aabb const &aabb)
+{
+	return (body->index == -1 && !body->dynamic ? _statictree.add_saabb(aabb, (unsigned int)(body - _bodies)) : -1);
+}
+
+void	Physicengine::remove_aabb(Body *body, int const index)
 {
 	if (body->index == -1 && !body->dynamic)
-		_statictree.add_saabb(aabb, (unsigned int)(body - _bodies));
+		_statictree.remove_aabb(index);
 }
 
 void	Physicengine::remove_aabbs(Body *body)

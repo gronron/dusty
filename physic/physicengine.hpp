@@ -96,7 +96,8 @@ class	Physicengine
 		void	init_body(Body *);
 		void	delete_body(Body *);
 		
-		void	add_aabb(Body *, Aabb const &);
+		int		add_aabb(Body *, Aabb const &);
+		void	remove_aabb(Body *, int const);
 		void	remove_aabbs(Body *);
 		void	remove_aabbs(Body *, Aabb const &);
 		

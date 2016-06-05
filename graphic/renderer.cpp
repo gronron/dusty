@@ -105,7 +105,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
-	_glyphstexture = _load_font("cousine-regular.ttf", _glyphs);
+	_glyphstexture = _load_font("cousine-bold.ttf", _glyphs);
 	glFinish();
 	
 	check_error(clGetPlatformIDs(0, 0, &platforms_count), "clGetPlatformIDs()");

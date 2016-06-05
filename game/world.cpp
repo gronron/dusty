@@ -28,6 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include <cfloat>
 #include <fstream>
 #include "common.hpp"
 #include "world.hpp"
@@ -284,20 +285,14 @@ bool	World::create_block(Ray const &ray, char const value)
 	{
 		vec<float, 4>	normal;
 		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
-
-		vec<float, 4> const	position = engine->physic->_statictree._nodes[result.aabbindex].aabb.bottom + normal;
-		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, (position + 0.5f) / (float)CHUNK_SIZE);
-		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
+		
+		vec<float, 4> const	position = ray.origin + ray.direction * (result.near - FLT_EPSILON) + normal * 0.5f;
+		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
+		vec<int, 3> const	cp = (vec<int, 3>)vcall(floor, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && !chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
 		{
 			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = value;
-
-			Aabb	aabb;
-
-			aabb.bottom = position;
-			aabb.top = aabb.bottom + 1.0f;
-			engine->physic->add_aabb(body, aabb);
 
 			vec<float, 4> const	fp = (vec<float, 4>)(wp) * CHUNK_SIZE;
 			_clear_chunk(chunks[wp[0]][wp[1]][wp[2]], fp);
@@ -315,15 +310,16 @@ bool	World::destroy_block(Ray const &ray)
 	engine->physic->raycast_through(ray, &result, false, true);
 	if (result.aabbindex != -1)
 	{
-		vec<float, 4> const	position = engine->physic->_statictree._nodes[result.aabbindex].aabb.bottom;
-		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, (position + 0.5f) / (float)CHUNK_SIZE);
-		vec<int, 3> const	cp = (vec<int, 3>)vcall(round, position - (vec<float, 4>)(wp * CHUNK_SIZE));
+		vec<float, 4>	normal;
+		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
+		
+		vec<float, 4> const	position = ray.origin + ray.direction * (result.near + FLT_EPSILON) - normal * 0.5f;
+		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
+		vec<int, 3> const	cp = (vec<int, 3>)vcall(floor, position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE)
 		{
 			chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]] = 0;
-	
-			engine->physic->_statictree.remove_aabb(result.aabbindex);
 
 			vec<float, 4> const	fp = (vec<float, 4>)(wp) * CHUNK_SIZE;
 			_clear_chunk(chunks[wp[0]][wp[1]][wp[2]], fp);
@@ -339,13 +335,13 @@ void					_search_ppr(World::Chunk &chunk, vec<unsigned int, 4> const &begin, vec
 	unsigned char const	blocks = chunk.blocks[begin[0]][begin[1]][begin[2]];
 
 	for (end[2] = begin[2] + 1; end[2] < CHUNK_SIZE; ++end[2])
-		if (chunk.blocks[begin[0]][begin[1]][end[2]] != blocks || chunk.graphicids[begin[0]][begin[1]][end[2]] >= 0)
+		if (chunk.blocks[begin[0]][begin[1]][end[2]] != blocks || chunk.physicids[begin[0]][begin[1]][end[2]] >= 0)
 			break;
 
 	end[1] = CHUNK_SIZE;
 	for (unsigned int i = begin[1] + 1; i < end[1]; ++i)
 		for (unsigned int j = begin[2]; j < end[2]; ++j)
-			if (chunk.blocks[begin[0]][i][j] != blocks || chunk.graphicids[begin[0]][i][j] >= 0)
+			if (chunk.blocks[begin[0]][i][j] != blocks || chunk.physicids[begin[0]][i][j] >= 0)
 			{
 				end[1] = i;
 				break;
@@ -354,7 +350,7 @@ void					_search_ppr(World::Chunk &chunk, vec<unsigned int, 4> const &begin, vec
 	for (end[0] = begin[0] + 1; end[0] < CHUNK_SIZE; ++end[0])
 		for (unsigned int i = begin[1]; i < end[1]; ++i)
 			for (unsigned int j = begin[2]; j < end[2]; ++j)
-				if (chunk.blocks[end[0]][i][j] != blocks || chunk.graphicids[end[0]][i][j] >= 0)
+				if (chunk.blocks[end[0]][i][j] != blocks || chunk.physicids[end[0]][i][j] >= 0)
 					return;
 }
 
@@ -364,7 +360,7 @@ void	World::_reduce_chunk(Chunk &chunk, vec<float, 4> const &position)
 		for (unsigned int y = 0; y < CHUNK_SIZE; ++y)
 			for (unsigned int z = 0; z < CHUNK_SIZE; ++z)
 			{
-				if (chunk.graphicids[x][y][z] < 0 && chunk.blocks[x][y][z])
+				if (chunk.physicids[x][y][z] < 0 && chunk.blocks[x][y][z])
 				{
 					vec<unsigned int, 4> begin = { x, y, z, 0 };
 					vec<unsigned int, 4> end;
@@ -377,21 +373,16 @@ void	World::_reduce_chunk(Chunk &chunk, vec<float, 4> const &position)
 					aabb.bottom += position;
 					aabb.top = position + (vec<float, 4>)end;
 
+					int const	physicids = engine->physic->add_aabb(body, aabb);
 					int const	graphicids = engine->graphic->aabbtree.add_saabb(aabb, chunk.blocks[x][y][z]);
 
 					for (unsigned int i = x; i < end[0]; ++i)
 						for (unsigned int j = y; j < end[1]; ++j)
 							for (unsigned int k = z; k < end[2]; ++k)
+							{
+								chunk.physicids[i][j][k] = physicids;
 								chunk.graphicids[i][j][k] = graphicids;
-				}
-				if (chunk.blocks[x][y][z])
-				{
-					Aabb	aabb;
-
-					aabb.bottom = { (float)x, (float)y, (float)z, 0.0f };
-					aabb.bottom += position;
-					aabb.top = aabb.bottom + 1.0f;
-					engine->physic->add_aabb(body, aabb);
+							}
 				}
 			}
 }
@@ -413,22 +404,19 @@ void	World::_init_world()
 				for (unsigned int i = 0; i < CHUNK_SIZE_1D; ++i)
 				{
 					chunks[x][y][z].blocks[0][0][i] = 0;
+					chunks[x][y][z].physicids[0][0][i] = -1;
 					chunks[x][y][z].graphicids[0][0][i] = -1;
 				}
 }
 
 void	World::_clear_chunk(Chunk &chunk, vec<float, 4> const &position)
 {
-	/*Aabb	aabb;
-
-	aabb.bottom = position;
-	aabb.top = position + (float)CHUNK_SIZE;
-	//engine->physic->remove_aabbs(body, aabb);*/
-
 	for (unsigned int i = 0; i < CHUNK_SIZE_1D; ++i)
-		if (chunk.graphicids[0][0][i] != -1)
+		if (chunk.physicids[0][0][i] != -1)
 		{
+			engine->physic->remove_aabb(body, chunk.physicids[0][0][i]);
 			engine->graphic->aabbtree.remove_aabb(chunk.graphicids[0][0][i]);
+			chunk.physicids[0][0][i] = -1;
 			chunk.graphicids[0][0][i] = -1;
 		}
 }
@@ -440,9 +428,10 @@ void	World::_clear_world()
 		for (unsigned int y = 0; y < size[1]; ++y)
 			for (unsigned int z = 0; z < size[2]; ++z)
 				for (unsigned int i = 0; i < CHUNK_SIZE_1D; ++i)
-					if (chunks[x][y][z].graphicids[0][0][i] != -1)
+					if (chunks[x][y][z].physicids[0][0][i] != -1)
 					{
 						engine->graphic->aabbtree.remove_aabb(chunks[x][y][z].graphicids[0][0][i]);
+						chunks[x][y][z].physicids[0][0][i] = -1;
 						chunks[x][y][z].graphicids[0][0][i] = -1;
 					}
 }
