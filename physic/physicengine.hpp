@@ -70,6 +70,7 @@ class	Physicengine
 		};
 
 
+		unsigned int	_bdcount;
 		unsigned int	_bdsize;
 		int				_bdfree;
 		Body			*_bodies;

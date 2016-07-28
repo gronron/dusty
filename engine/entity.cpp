@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gameengine.hpp"
 #include "entity.hpp"
 
-Entity::Entity(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : engine(g), rp(r), callbacks(-1), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), state(CREATED), ping(0.0f)
+Entity::Entity(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : engine(g), rp(r), callbacks(-1), state(CREATED), type(t), id(r ? r->id : i), ownerid(o ? o->id : 0), ping(0.0f)
 {
 
 }

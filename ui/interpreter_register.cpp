@@ -31,7 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.hpp"
 #include "interpreter.hpp"
 
+#include "world.hpp"
+#include <cstdlib>
+
 void	Interpreter::_register_all()
 {
-	
+	register_function("load", "load a map", [](Gameengine *e, Argument *a){ if (e->rootid >= 0) ((World *)e->find_entity(e->rootid))->load(a[0].str); }, { STRING });
 }

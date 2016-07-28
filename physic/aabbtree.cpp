@@ -168,6 +168,13 @@ void	Aabbtree::update_aabbdata(int const index, int const data)
 	_nodes[index].data = data;
 }
 
+void	Aabbtree::update_aabbsdata(int const olddata, int const newdata)
+{
+	for (unsigned int i = 0; i < _size; ++i)
+		if (_nodes[i].height == 0 && _nodes[i].data == olddata)
+			 _nodes[i].data = newdata;
+}
+
 int		Aabbtree::_allocate_node()
 {
 	int	index;

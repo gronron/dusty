@@ -94,8 +94,8 @@ Axisalignedboxshape::~Axisalignedboxshape()
 
 Aabb	&Axisalignedboxshape::compute_aabb(Aabb &aabb, vec<float, 4> const &position) const
 {
-	aabb.bottom = position;
-	aabb.top = position + size;
+	aabb.bottom = position - size * 0.5f;
+	aabb.top = position + size * 0.5f;
 	return (aabb);
 }
 

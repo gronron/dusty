@@ -287,8 +287,8 @@ bool	World::create_block(Ray const &ray, char const value)
 		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
 		
 		vec<float, 4> const	position = ray.origin + ray.direction * (result.near - FLT_EPSILON) + normal * 0.5f;
-		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
-		vec<int, 3> const	cp = (vec<int, 3>)vcall(floor, position - (vec<float, 4>)(wp * CHUNK_SIZE));
+		vec<int, 3> const	wp = (vec<int, 3>)vfloor(position / (float)CHUNK_SIZE);
+		vec<int, 3> const	cp = (vec<int, 3>)vfloor(position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE && !chunks[wp[0]][wp[1]][wp[2]].blocks[cp[0]][cp[1]][cp[2]])
 		{
@@ -314,8 +314,8 @@ bool	World::destroy_block(Ray const &ray)
 		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
 		
 		vec<float, 4> const	position = ray.origin + ray.direction * (result.near + FLT_EPSILON) - normal * 0.5f;
-		vec<int, 3> const	wp = (vec<int, 3>)vcall(floor, position / (float)CHUNK_SIZE);
-		vec<int, 3> const	cp = (vec<int, 3>)vcall(floor, position - (vec<float, 4>)(wp * CHUNK_SIZE));
+		vec<int, 3> const	wp = (vec<int, 3>)vfloor(position / (float)CHUNK_SIZE);
+		vec<int, 3> const	cp = (vec<int, 3>)vfloor(position - (vec<float, 4>)(wp * CHUNK_SIZE));
 
 		if (wp >= 0 && wp < (vec<int, 4>)size && cp >= 0 && cp < CHUNK_SIZE)
 		{

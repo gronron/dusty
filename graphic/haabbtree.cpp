@@ -77,13 +77,13 @@ void	Haabbtree::delete_transient_tree()
 		_transitory = false;
 
 		int	stack[32];
-		int	top = 0;
+		int	top = 1;
 
 		if (_realroot == -1)
-			stack[top++] = _root;
+			stack[top] = _root;
 		else
 		{
-			stack[top++] = _nodes[_root].right;
+			stack[top] = _nodes[_root].right;
 
 			_free_node(_root);
 			_root = _realroot;
@@ -91,7 +91,7 @@ void	Haabbtree::delete_transient_tree()
 
 		do
 		{
-			int const	index = stack[--top];
+			int const	index = stack[top];
 
 			if (_nodes[index].right != -1)
 			{
@@ -100,8 +100,7 @@ void	Haabbtree::delete_transient_tree()
 			}
 			_free_node(index);
 		}
-		while (top);
-
+		while (--top >= 0);
 	}
 }
 

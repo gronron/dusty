@@ -39,18 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "physicengine.hpp"
 
 
-Physicengine::Physicengine() : _bdsize(1024), _bdfree(0), _bodies(0), _prcount(0), _prsize(1024), _pairs(0), _currentquery(0)
+Physicengine::Physicengine() : _bdcount(0), _bdsize(1024), _bdfree(-1), _bodies(0), _prcount(0), _prsize(1024), _pairs(0), _currentquery(0)
 {
 	_bodies = new Body[_bdsize];
 	_pairs = new Pair[_prsize];
-
-	for (unsigned int i = 0; i < _bdsize - 1; ++i)
-	{
-		_bodies[i].next = i + 1;
-		_bodies[i].index = -1;
-	}
-	_bodies[_bdsize - 1].next = -1;
-	_bodies[_bdsize - 1].index = -1;
 }
 
 Physicengine::~Physicengine()
@@ -61,32 +53,21 @@ Physicengine::~Physicengine()
 
 void		Physicengine::new_body(Body **link, Shape *shape, Collider *collider)
 {
-	Body	*body;
-
-	if (_bdfree == -1)
+	if (_bdcount >= _bdsize)
 	{
-		_bdfree = _bdsize;
-		_bodies = resize(_bodies, _bdsize, _bdsize << 1);
-		unsigned int i = 0;
-		for (; i < _bdsize; ++i)
-			*_bodies[i].link = _bodies + i;
 		_bdsize <<= 1;
-		for (; i < _bdsize - 1; ++i)
-		{
-			_bodies[i].next = i + 1;
-			_bodies[i].index = -1;
-		}
-		_bodies[_bdsize - 1].next = -1;
-		_bodies[_bdsize - 1].index = -1;
+		_bodies = resize(_bodies, _bdcount, _bdsize);
+		for (unsigned int i = 0; i < _bdcount; ++i)
+			*_bodies[i].link = _bodies + i;
 	}
 
-	body = _bodies + _bdfree;
-	_bdfree = _bodies[_bdfree].next;
-	
+	Body	*body = _bodies + _bdcount++;
+
 	body->link = link;
 	*body->link = body;
 	body->shape = shape;
 	body->collider = collider;
+	body->index = -1;
 	
 	body->velocity = 0.0f;
 	body->acceleration = 0.0f;
@@ -115,7 +96,7 @@ void	Physicengine::move(Body *body, vec<float, 4> const &position)
 	//_statictree.move_aabb(index, aabb);
 }	
 */
-void		Physicengine::delete_body(Body *body)
+void	Physicengine::delete_body(Body *body)
 {
 	if (body->index != -1)
 	{
@@ -174,10 +155,10 @@ void	_query(Body const *body, Physicengine *pe)
 }
 */
 
-void		Physicengine::tick(float const delta)
+void	Physicengine::tick(float const delta)
 {
 	_delta = delta;
-	for (unsigned int i = 0; i < _bdsize; ++i)
+	for (unsigned int i = 0; i < _bdcount; ++i)
 	{
 		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 		{
@@ -195,7 +176,7 @@ void		Physicengine::tick(float const delta)
 	_avoidquery = -1;
 	_currenttime = 0.0f;
 	//Lightthreadpool::get_instance().run_tasks<Caller_fa>(_bsize, _bodies, _query, this);
-	for (unsigned int i = 0; i < _bdsize; ++i)
+	for (unsigned int i = 0; i < _bdcount; ++i)
 	{
 		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 		{
@@ -205,7 +186,7 @@ void		Physicengine::tick(float const delta)
 		}
 	}
 	_sort_pairs(1);
-	
+
 	for (unsigned int i = 0; i < _prcount; ++i)
 	{
 		int const	a = _pairs[i].a;
@@ -242,10 +223,31 @@ void		Physicengine::tick(float const delta)
 
 		_sort_pairs(currentcount);
 	}
-	
-	for (unsigned int i = 0; i < _bdsize; ++i)
+
+	for (unsigned int i = 0; i < _bdcount; ++i)
 		if (_bodies[i].index != -1 && _bodies[i].dynamic)
 			_bodies[i].position += _bodies[i].velocity * (delta - _bodies[i].time);
+
+	int next;
+	for (int i = _bdfree; i != -1; i = next)
+	{
+		next = _bodies[i].next;
+		if (i < --_bdcount)
+		{
+			_bodies[i] = _bodies[_bdcount];
+			if (_bodies[i].index != -1)
+			{
+				if (_bodies[i].dynamic)
+					_dynamictree.update_aabbdata(_bodies[i].index, i);
+				else
+					_statictree.update_aabbdata(_bodies[i].index, i);
+			}
+			else if (!_bodies[i].dynamic)
+				_statictree.update_aabbsdata(_bdcount, i);
+			*_bodies[i].link = _bodies + i;
+		}
+	}
+	_bdfree = -1;
 }
 
 void	Physicengine::_add_pair(int const aabbindex, int const bodyindex)

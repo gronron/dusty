@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VEC_SSE_H_
 
 #include "xmmintrin.h"
+#include "smmintrin.h"
 
 template<>
 struct	vec<float, 4>
@@ -284,6 +285,38 @@ inline vec<float, 4>	vsqrt(vec<float, 4> const &x)
 	vec<float, 4>	a;
 	
 	a.v = _mm_sqrt_ps(x.v);
+	return (a);
+}
+
+inline vec<float, 4>	vrsqrt(vec<float, 4> const &x)
+{
+	vec<float, 4>	a;
+	
+	a.v = _mm_rsqrt_ps(x.v);
+	return (a);
+}
+
+inline vec<float, 4>	vceil(vec<float, 4> const &x)
+{
+	vec<float, 4>	a;
+	
+	a.v = _mm_ceil_ps(x.v);
+	return (a);
+}
+
+inline vec<float, 4>	vfloor(vec<float, 4> const &x)
+{
+	vec<float, 4>	a;
+	
+	a.v = _mm_floor_ps(x.v);
+	return (a);
+}
+
+inline vec<float, 4>	vround(vec<float, 4> const &x)
+{
+	vec<float, 4>	a;
+	
+	a.v = _mm_round_ps(x.v, _MM_FROUND_TO_NEAREST_INT |_MM_FROUND_NO_EXC);
 	return (a);
 }
 

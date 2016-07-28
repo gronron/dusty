@@ -48,4 +48,12 @@ class	Haabbtree : public Aabbtree
 		void	delete_transient_tree();
 };
 
+class	Maabbtree : public Aabbtree
+{
+	public:
+
+		int		close_current_tree();
+		void	delete_tree(int const);
+};
+
 #endif
