@@ -56,15 +56,15 @@ void	Interpreter::register_function(char const *name, char const *description, v
 	for (argcount = 0; atl.argtypes[argcount] != NONE; ++argcount);
 
 	unsigned int	i;
-	for (i = _cmdcount++; i && strcmp(name, _commands[i - 1].name) > 0; --i)
+	for (i = _cmdcount++; i && strcmp(name, _commands[i - 1].name) < 0; --i)
 		_commands[i] = _commands[i - 1];
-	
+
 	_commands[i].name = name;
 	_commands[i].description = description;
 	_commands[i].function = function;
 	_commands[i].argcount = argcount;
 	for (unsigned int j = 0; j < argcount; ++j)
-		_commands[j].argtypes[j] = atl.argtypes[j];
+		_commands[i].argtypes[j] = atl.argtypes[j];
 }
 
 void				Interpreter::exec(char const *str)
@@ -96,7 +96,7 @@ int		Interpreter::_find_commandindex(char const *name, unsigned int const argcou
 	{
 		int const	imid = (imin + imax) >> 1;
 		int const	cmp = strcmp(name, _commands[imid].name);
-		
+
 		if (cmp < 0)
 			imax = imid - 1;
 		else if (cmp > 0)

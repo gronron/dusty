@@ -195,6 +195,11 @@ Renderer::~Renderer()
 	SDL_Quit();
 }
 
+void	Renderer::set_fullscreen(bool const fullscreen)
+{
+	SDL_SetWindowFullscreen(_window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+}
+
 void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
 {
 	cl_int	error;

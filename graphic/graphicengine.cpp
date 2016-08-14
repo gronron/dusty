@@ -63,6 +63,11 @@ Graphicengine::~Graphicengine()
 	delete [] _materials;
 }
 
+void	Graphicengine::set_fullscreen(bool const fullscreen)
+{
+	_renderer.set_fullscreen(fullscreen);
+}
+
 void	Graphicengine::set_resolution(unsigned int const width, unsigned int const height)
 {
 	camera.resolution[0] = width;

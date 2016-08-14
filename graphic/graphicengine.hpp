@@ -96,6 +96,7 @@ class	Graphicengine
 		Graphicengine();
 		~Graphicengine();
 
+		void	set_fullscreen(bool const);
 		void	set_resolution(unsigned int const, unsigned int const);
 		void	set_camera(vec<float, 4> const &, vec<float, 2> const &);
 

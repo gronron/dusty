@@ -81,6 +81,7 @@ class	Renderer
 		Renderer(unsigned int const, unsigned int const, bool const);
 		~Renderer();
 
+		void			set_fullscreen(bool const);
 		void			set_resolution(unsigned int const, unsigned int const);
 		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
 		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
