@@ -16,6 +16,7 @@ AController::AController(Gameengine *g, Replication *r, int i, short int t, Enti
 	aim = 0.0f;
 	move = 0.0f;
 	material = 1;
+	spherical_coord = 0.0f;
 }
 
 AController::~AController()

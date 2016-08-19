@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.hpp"
 #include "structure.hpp"
 
-Structure::Structure(Gameengine *g, Replication *r, int const i, short int const t, Actor const *o) : Actor(g, r, i, t, o), body(0), team(0), ready(false), hp(0), maxhp(0)
+Structure::Structure(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o), body(0), team(0), avancement(0.0f), buildtime(6.0f), hp(0), maxhp(0)
 {
 
 }
@@ -46,9 +46,11 @@ Structure::post_instanciation()
 	Actor::postinstanciation();
 	
 	Team	*team;
-	if ((team = dynamic_cast<Team *>find_actor(ownerid)))
+	if ((team = dynamic_cast<Team *>engine->find_entity(ownerid)))
 		teamid = team->teamid;
-	
+
+	health = maxhealth * 0.1f;
+	engine->callback->start_callback(HASH32("finished"), this, (bool (Entity::*)())&Structure::build, 0.1f, true);
 	//launch building
 }
 
@@ -57,3 +59,14 @@ Structure::destroy()
 	
 }
 
+bool	Structure::build()
+{
+	if ((avancement += 0.1f) >= buildtime)
+	{
+		avancement = buildtime;
+		ready = true;
+	}
+	health += (maxhealth - (maxhealth - buildtime * 0.1f)) / (buildtime * 10.0f);
+	if (health > maxhealth)
+		health = maxhealth;
+}

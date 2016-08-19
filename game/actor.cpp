@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,31 +28,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef STRUCTURE_H_
-#define STRUCTURE_H_
-
 #include "actor.hpp"
-#include "shape.hpp"
 
-class	Structure : public Actor
+void	Actor::postinstanciation()
 {
-	public:
+	Entity::postinstanciation();
+	engine->callback->start_callback(HASH32("remove_spawnshield"), this, 2.0f, false);
+}
 
-		float		avancement;
-		float		buildtime;
-		bool		ready;
-		bool		powered;
-		
-		Structure(Gameengine *, Replication *, int const, short int const, Entity const *);
-		virtual ~Structure();
-		
-		virtual void	postinstanciation();
-		virtual void	destroy();
+void	Actor::notified_by_owner(Entity *entity, bool const event)
+{
+	Team	*team = (Team *)entity;
+	
+	if (event)
+	{
+		teamid = team->teamid;
+	}
+	else
+	{
+		destroy();
+	}
+}
 
-		virtual void	get_replication(Packet &) const; //ready powered
-		virtual void	replicate(Packet &, float const);
+bool	Actor::damage(Actor *actr, unsigned int const dmg)
+{
+	if ((health -= (spawnshield ? dmg >> 3 : dmg)) < 1)
+	{
+		die();
+		return (false);
+	}
+	return (true);
+}
 
-		virtual bool	build();
-};
+bool	Actor::heal(Actor *actr, unsigned int const hlth)
+{
+	if (health += hlth) > maxhealth)
+		health = maxhealth;
+}
 
-#endif
+void	Actor::die()
+{
+	detroy();
+}
+
+bool	Actor::_remove_spawnshield()
+{
+	spawnshield = false;
+}

@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef ENTITY_H_
-#define ENTITY_H_
+#ifndef ACTOR_H_
+#define ACTOR_H_
 
 #include "entity.hpp"
+#include "body.hpp"
 
-class	Actor
+class	Actor : public Entity
 {
 	public:
 	
+		Axiscylindershape	shape;
+		Body				*body;
+
 		unsigned char	teamid;
+		bool			spawnshield;
+		unsigned short	maxhealth;
+		unsigned short	health;
+	
+
+		virtual void	postinstanciation(); // temporary damage reduction
+
+		virtual void	notified_by_owner(Entity *, bool const); //link with team
+		virtual void	notified_by_owned(Entity *, bool const);
+
+		virtual void	get_replication(Packet &) const; // body teamid maxlife life
+        virtual void	replicate(Packet &, float const);
 		
-		unsigned short	maxlife;
-		unsigned short	life;
+		virtual bool	damage(Actor *, unsigned int const);
+		virtual bool	heal(Actor *, unsigned int const);
+		virtual void	die();
 		
-		bool	take_damage();
+		virtual bool	_remove_spawnshield();
 };
 
 #endif

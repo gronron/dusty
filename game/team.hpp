@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,24 +31,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TEAM_H_
 #define TEAM_H_
 
-#include "actor.hpp"
+#include "entity.hpp"
 
-class	Team : public Actor
+class	Team : public Entity
 {
 	public:
-	
-		int	structureid[64];
-		int	playerid[64];
+
+		unsigned char	teamid;
 		
-		unsigned short	structcount;
+		int				playerid[64];
+		int				structureid[64];
+
 		unsigned short	playercount;
+		unsigned short	structcount;
 
 		unsigned short	maxbuildpoint;
 		unsigned short	buildpoint;
 		unsigned short	score;
 
-		unsigned char	level;
-		unsigned char	teamid;
+		unsigned char	techlevel;
+		
+		int				sqfront;
+		int				sqback;
+		int				spawnqueue[64];
+
+		
+		void	join(int id);
+		void	leave(int id);
+		
+		bool	add_to_spawnqueue(int id);
+		int		pop_next_to_spawn();
+		
+		bool	create_structure(unsigned int const hash, vec<float, 4> const &position);
+		bool	destroy_structure(int id);
 };
 
 #endif
