@@ -57,7 +57,9 @@ void	Expulsor::tick(float const delta)
 			ps->_particles[i].velocity[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			ps->_particles[i].velocity[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			ps->_particles[i].velocity[2] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
+			ps->_particles[i].velocity[3] = 0.0f;
 			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * (float)MT().genrand_real1(velocity[0], velocity[1]);
+			
 		}
 	}
 }
@@ -87,6 +89,7 @@ void	Attractor::tick(float const delta)
 			ps->_particles[i].velocity[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f); 
 			ps->_particles[i].velocity[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
 			ps->_particles[i].velocity[2] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
+			ps->_particles[i].velocity[3] = 0.0f;
 			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * (float)MT().genrand_real1(velocity[0], velocity[1]);
 			ps->_particles[i].position = ps->position - ps->_particles[i].velocity / ps->_particles[i].fade_rate;
 		}
@@ -99,7 +102,7 @@ EFFECTFACTORYREG(Appear);
 
 Appear::Appear(Particlesystem *p, float const t, Df_node const *d) : Particleeffect(p, t, d)
 {
-	if (t < 0.0f)
+	if (t <= 0.0f)
 		fade_rate = *(vec<float, 2> *)d->safe_get("rate", Df_node::FLOAT, 2)->flt;
 	else
 		fade_rate = { 1.0f / t, 1.0f / t };
@@ -108,7 +111,7 @@ Appear::Appear(Particlesystem *p, float const t, Df_node const *d) : Particleeff
 	{
 		if (!ps->_particles[i].active && ps->running)
 		{
-			ps->_particles[i].size = 0.0;
+			ps->_particles[i].size = 0.0f;
 			ps->_particles[i].fade_rate = (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
 		}
 	}
@@ -130,7 +133,7 @@ void	Appear::tick(float const delta)
 		{
 			ps->_particles[i].active = false;
 			ps->_particles[i].size = 0.0f;
-			ps->_particles[i].fade_rate =  (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
+			ps->_particles[i].fade_rate = (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
 		}
 	}
 }
@@ -141,10 +144,11 @@ EFFECTFACTORYREG(Disappear);
 
 Disappear::Disappear(Particlesystem *p, float const t, Df_node const *d) : Particleeffect(p, t, d)
 {
-	if (t < 0.0f)
+	if (t <= 0.0f)
 		fade_rate = *(vec<float, 2> *)d->safe_get("rate", Df_node::FLOAT, 2)->flt;
 	else
 		fade_rate = { 1.0f / t, 1.0f / t };
+
 	for (unsigned int i = 0; i < ps->_prtclssize; ++i)
 	{
 		if (!ps->_particles[i].active && ps->running)
