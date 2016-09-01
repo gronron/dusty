@@ -11,6 +11,22 @@ Gameplay from Tremulous 1.1
 For alien unlocked stuff are evolution, you spend self points to evolve to a more powerfull alien with more and better abilitys
 For human unlocked stuff are weapons, armors and devices.
 
+blaster
+rifle (decent move, good fire rate, good dmg, good precision)
+	shotgun
+	revolver (heavy cal) (good move, slow fire rate, great dmg, great precision)
+	flamethrower
+	chainsaw
+	machine gun (slow move, fast fire rate, great dmg, low precision)
+	sniper (slow move, slow fire rate, huge dmg, huge precision
+	auto sniper (betwenn rifle and sniper)
+	SMG (fast move, fast fire rate, low dmg, decent precision, fast reload)
+	
+	MD
+	LG
+	LUCY
+	PULSE
+
 ---------------------------------------
 
 base entity:

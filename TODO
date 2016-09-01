@@ -9,12 +9,18 @@ warning! function_name: what happned
 start tremulous or lethargy:
 	GO GO GO GO TREmulous: armageddon 1
 
+general:
+	switch to 0.5m per block 1
+	block visibility when targeted for creation or destruction
+	large block creation
+
 console:
 	handle typing screen depassement with <= => shift
 	handle multi line
 	text input history
 interpreter:
 	handle buffer overflow read_number
+
 df:
 	-brace compacting???
 	-debug 0
@@ -27,5 +33,9 @@ physic engine:
 
 graphic engine:
 	-oriented box rendering 1
+	-emissive block 1
 	-ui renderer 3
 
+udp:
+	chunk 0
+	rudp 0
