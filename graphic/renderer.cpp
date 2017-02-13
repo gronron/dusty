@@ -112,9 +112,20 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	platforms = new cl_platform_id[platforms_count];
 	check_error(clGetPlatformIDs(platforms_count, platforms, 0), "clGetPlatformIDs()");
 	
+	std::cout << "Platforms:" << std::endl;
+	for (unsigned int i = 0; i < platforms_count; ++i)
+	{
+		char	platform_vendor[64];
+		char	platform_name[64];
+		
+		check_error(clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 64, platform_vendor, 0), "clGetPlatformInfo()");
+		check_error(clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 64, platform_name, 0), "clGetPlatformInfo()");
+		std::cout << "\t" << platform_vendor << " - " << platform_name << std::endl;
+	}
+	
 	cl_context_properties const	properties[] =
 	{
-		CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0],
+		CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[1],
 		CL_GL_CONTEXT_KHR, (cl_context_properties)_glcontext,
 		CL_WGL_HDC_KHR, (cl_context_properties)info.info.win.hdc,
 		0

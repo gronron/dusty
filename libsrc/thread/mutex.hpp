@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -59,5 +59,66 @@ class	Mutex
 		bool	trylock();
 		void	unlock();
 };
+
+#if defined(_WIN32) || defined(__WIN32__)
+
+inline Mutex::Mutex()
+{
+	InitializeCriticalSection(&_mtx);
+}
+
+inline Mutex::~Mutex()
+{
+	DeleteCriticalSection(&_mtx);
+}
+
+inline void	Mutex::lock()
+{
+	EnterCriticalSection(&_mtx);
+}
+
+inline bool	Mutex::trylock()
+{
+	return (TryEnterCriticalSection(&_mtx) != 0);
+}
+
+inline void	Mutex::unlock()
+{
+	LeaveCriticalSection(&_mtx);
+}
+
+#else
+
+inline Mutex::Mutex()
+{
+	pthread_mutexattr_t	attr;
+
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&_mtx, &attr);
+	pthread_mutexattr_destroy(&attr);
+}
+
+inline Mutex::~Mutex()
+{
+	pthread_mutex_destroy(&_mtx);
+}
+
+inline void	Mutex::lock()
+{
+	pthread_mutex_lock(&_mtx);
+}
+
+inline bool	Mutex::trylock()
+{
+	return (!pthread_mutex_trylock(&_mtx));
+}
+
+inline void	Mutex::unlock()
+{
+	pthread_mutex_unlock(&_mtx);
+}
+
+#endif
 
 #endif

@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -63,5 +63,75 @@ class	Conditionvariable
 		void	wakeall();
 
 };
+
+#if defined(_WIN32) || defined(__WIN32__)
+
+inline Conditionvariable::Conditionvariable()
+{
+	InitializeConditionVariable(&_condvar);
+}
+
+inline Conditionvariable::~Conditionvariable()
+{
+
+}
+
+inline void	Conditionvariable::sleep(Mutex &mtx)
+{
+	SleepConditionVariableCS(&_condvar, &mtx._mtx, INFINITE);
+}
+
+inline void	Conditionvariable::sleep(Mutex &mtx, double const timeout)
+{
+	SleepConditionVariableCS(&_condvar, &mtx._mtx, (int)(timeout * 1000.0));
+}
+
+inline void	Conditionvariable::wake()
+{
+	WakeConditionVariable(&_condvar);
+}
+
+inline void	Conditionvariable::wakeall()
+{
+	WakeAllConditionVariable(&_condvar);
+}
+
+#else
+
+inline Conditionvariable::Conditionvariable()
+{
+	pthread_cond_init(&_condvar, 0);
+}
+
+inline Conditionvariable::~Conditionvariable()
+{
+	pthread_cond_destroy(&_condvar);
+}
+
+inline void	Conditionvariable::sleep(Mutex &mtx)
+{
+	pthread_cond_wait(&_condvar, &mtx._mtx);
+}
+
+inline void			Conditionvariable::sleep(Mutex &mtx, double const timeout)
+{
+	struct timespec	a;
+
+	a.tv_sec = (int)timeout;
+	a.tv_nsec = (int)((timeout - a.tv_sec) * 1000000000.0);
+	pthread_cond_timedwait(&_condvar, &mtx._mtx, &a);
+}
+
+inline void	Conditionvariable::wake()
+{
+	pthread_cond_signal(&_condvar);
+}
+
+inline void	Conditionvariable::wakeall()
+{
+	pthread_cond_broadcast(&_condvar);
+}
+
+#endif
 
 #endif

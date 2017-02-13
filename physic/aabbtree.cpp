@@ -46,6 +46,20 @@ inline float	merged_perimeter(Aabb const &x, Aabb const &y)
 	return (vsum(vmax(x.top, y.top) - vmin(x.bottom, y.bottom)));
 }
 
+inline float			surfacearea(Aabb const &x)
+{
+	vec<float, 4> const	a = x.top - x.bottom;
+
+	return (a[0] * a[1] + a[0] * a[2] + a[1] * a[2]);
+}
+
+inline float			merged_surfacearea(Aabb const &x, Aabb const &y)
+{
+	vec<float, 4> const	a = vmax(x.top, y.top) - vmin(x.bottom, y.bottom);
+
+	return (a[0] * a[1] + a[0] * a[2] + a[1] * a[2]);
+}
+
 Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)
 {
 	_nodes = new Node[_size];

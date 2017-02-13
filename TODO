@@ -11,8 +11,8 @@ start tremulous or lethargy:
 
 general:
 	switch to 0.5m per block 1
-	block visibility when targeted for creation or destruction
-	large block creation
+	block visibility when targeted for creation or destruction 0
+	large block creation 0
 
 console:
 	handle typing screen depassement with <= => shift
@@ -32,9 +32,12 @@ physic engine:
 	-think about continuous collision detection of rotating object 0
 
 graphic engine:
+	-switch from opencl to opengl
+	-light material in df 0
 	-oriented box rendering 1
 	-emissive block 1
 	-ui renderer 3
+	-texture rendering
 
 udp:
 	chunk 0

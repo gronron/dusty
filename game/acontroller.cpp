@@ -78,6 +78,11 @@ void	AController::tick(float delta)
 		controlled->firing = firing;
 		controlled->loadingfire = loadingfire;
 		controlled->dir = engine->graphic->camera.direction;
+		
+		if (controllertype == WORLDCREATOR)
+		{
+			//draw the shit
+		}
 	}
 }
 

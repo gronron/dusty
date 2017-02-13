@@ -69,25 +69,16 @@
     <ClCompile Include="..\..\..\libsrc\endian\packet.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\thread\mutex.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libsrc\random\mt19937.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\endian\endian.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libsrc\df\df_node.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\thread\conditionvariable.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\ui\console.cpp">
@@ -150,9 +141,6 @@
     <ClCompile Include="..\..\..\graphic\graphicengine.cpp">
       <Filter>Source Files\graphic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\graphic\renderer.cpp">
-      <Filter>Source Files\graphic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\projectile.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
@@ -209,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\ui\interpreter_register.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\renderer_ogl.cpp">
+      <Filter>Source Files\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,9 +323,6 @@
     <ClInclude Include="..\..\..\graphic\graphicengine.hpp">
       <Filter>Header Files\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\graphic\renderer.hpp">
-      <Filter>Header Files\graphic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\game\projectile.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
@@ -382,6 +370,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\ui\interpreter.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\math\vec_sse.hpp">
+      <Filter>Header Files\libsrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\graphic\renderer_ogl.hpp">
+      <Filter>Header Files\graphic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

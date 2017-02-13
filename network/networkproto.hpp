@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2016, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef NETPROTO_H_
 #define NETPROTO_H_
 
+#define FIELDSIZE 64
+#define PACKETBUFFER 512
+/*
+enum	Prototype
+{
+	NONE = 0,
+	OUDP,
+	RUDP,
+	ACKRUDP,
+	CHUNK,
+	ACKCHUNK
+};
+
 struct					Header
 {
+	unsigned char		type;
+	unsigned char		channel;
 	short unsigned int	size;
-	char				type;
+};
+
+struct					Rudp
+{
+	Header				hdr;
+	unsigned short int	id;
+	unsigned char		data[1024];
+};
+
+struct					Rudpack
+{
+	Header				hdr;
+	unsigned short int	ackid;
+	unsigned char		ackfield[FIELDSIZE];
+};
+
+struct				Udpchunk
+{
+	Header			hdr;
+	unsigned int	chunkid;
+	unsigned int	chunksize;
+	unsigned int	blockid;
+	unsigned char	data[1024];
+};
+
+struct				Udpchunkack
+{
+	Header			hdr;
+	unsigned int	chunkid;
+	unsigned int	ackid;
+	unsigned char	ackfield[FIELDSIZE];
+};
+*/
+
+struct	Header
+{
+	short int		size;
+	unsigned char	type;
 };
 
 enum	Prototype

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 #include "haabbtree.hpp"
-#include "renderer.hpp"
+#include "renderer_ogl.hpp"
 #include "animation.hpp"
 
 struct						Camera
@@ -59,8 +59,9 @@ struct				Material
 	float			refraction;
 	float			reflection;
 	float			shining;
-	float			padding;
+	float			emissivity;
 };
+
 /*
 struct				Rotation
 {
@@ -87,6 +88,10 @@ class	Graphicengine
 		unsigned int	_materials_size;
 		unsigned int	_materials_count;
 		Material		*_materials;
+		
+		vec<float, 4>	*_vertices;
+		vec<float, 2>	*_texcoord;
+		vec<float, 4>   *_color;
 
 		Haabbtree		aabbtree;
 

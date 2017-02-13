@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,8 @@ struct	vec
 	template<class V, unsigned int W>
 	explicit operator vec<V, W>() const;
 
-	T		&operator[](unsigned int const x);
-	T const	&operator[](unsigned int const x) const;
+	T		&operator[](unsigned int const);
+	T const	&operator[](unsigned int const) const;
 
 	vec	&operator++();
 	vec	operator++(int);
@@ -51,39 +51,39 @@ struct	vec
 	vec	operator--(int);
 
 	template<unsigned int V>
-	vec	&operator=(vec<T, V> const &x);
+	vec	&operator=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator+=(vec<T, V> const &x);
+	vec	&operator+=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator-=(vec<T, V> const &x);
+	vec	&operator-=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator*=(vec<T, V> const &x);
+	vec	&operator*=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator/=(vec<T, V> const &x);
+	vec	&operator/=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator%=(vec<T, V> const &x);
+	vec	&operator%=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator|=(vec<T, V> const &x);
+	vec	&operator|=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator&=(vec<T, V> const &x);
+	vec	&operator&=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator^=(vec<T, V> const &x);
+	vec	&operator^=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator<<=(vec<T, V> const &x);
+	vec	&operator<<=(vec<T, V> const &);
 	template<unsigned int V>
-	vec	&operator>>=(vec<T, V> const &x);
+	vec	&operator>>=(vec<T, V> const &);
 
-	vec	&operator=(T const &x);
-	vec	&operator+=(T const &x);
-	vec	&operator-=(T const &x);
-	vec	&operator*=(T const &x);
-	vec	&operator/=(T const &x);
-	vec	&operator%=(T const &x);
-	vec	&operator|=(T const &x);
-	vec	&operator&=(T const &x);
-	vec	&operator^=(T const &x);
-	vec	&operator<<=(T const &x);
-	vec	&operator>>=(T const &x);
+	vec	&operator=(T const &);
+	vec	&operator+=(T const &);
+	vec	&operator-=(T const &);
+	vec	&operator*=(T const &);
+	vec	&operator/=(T const &);
+	vec	&operator%=(T const &);
+	vec	&operator|=(T const &);
+	vec	&operator&=(T const &);
+	vec	&operator^=(T const &);
+	vec	&operator<<=(T const &);
+	vec	&operator>>=(T const &);
 };
 
 template<class T, unsigned int U> template<class V, unsigned int W>

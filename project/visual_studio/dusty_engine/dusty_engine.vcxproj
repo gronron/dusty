@@ -36,14 +36,16 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game;$(SolutionDir)..\..\game\animations;$(AMDAPPSDKROOT)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\glew;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game;$(SolutionDir)..\..\game\animations;$(AMDAPPSDKROOT)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>
+      </EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;freetype263.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;glew32s.lib;freetype263.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\x64\$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreSpecificDefaultLibraries>
@@ -68,11 +70,10 @@
     <ClCompile Include="..\..\..\graphic\particle\effectfactory.cpp" />
     <ClCompile Include="..\..\..\graphic\particle\particleeffect.cpp" />
     <ClCompile Include="..\..\..\graphic\particle\particlesystem.cpp" />
-    <ClCompile Include="..\..\..\graphic\renderer.cpp" />
+    <ClCompile Include="..\..\..\graphic\renderer_ogl.cpp" />
     <ClCompile Include="..\..\..\graphic\renderer_text.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_node.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp" />
-    <ClCompile Include="..\..\..\libsrc\endian\endian.cpp" />
     <ClCompile Include="..\..\..\libsrc\endian\packet.cpp" />
     <ClCompile Include="..\..\..\libsrc\file\file.cpp" />
     <ClCompile Include="..\..\..\libsrc\hash\crc.cpp" />
@@ -82,9 +83,7 @@
     <ClCompile Include="..\..\..\libsrc\socket\tcpsocket.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\udpsocket.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\winsock_init.cpp" />
-    <ClCompile Include="..\..\..\libsrc\thread\conditionvariable.cpp" />
     <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp" />
-    <ClCompile Include="..\..\..\libsrc\thread\mutex.cpp" />
     <ClCompile Include="..\..\..\libsrc\thread\thread.cpp" />
     <ClCompile Include="..\..\..\libsrc\time\time.cpp" />
     <ClCompile Include="..\..\..\main.cpp" />
@@ -125,7 +124,7 @@
     <ClInclude Include="..\..\..\graphic\particle\effectfactory.hpp" />
     <ClInclude Include="..\..\..\graphic\particle\particleeffect.hpp" />
     <ClInclude Include="..\..\..\graphic\particle\particlesystem.hpp" />
-    <ClInclude Include="..\..\..\graphic\renderer.hpp" />
+    <ClInclude Include="..\..\..\graphic\renderer_ogl.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_node.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_parser.hpp" />
     <ClInclude Include="..\..\..\libsrc\endian\endian.hpp" />
@@ -133,6 +132,7 @@
     <ClInclude Include="..\..\..\libsrc\file\file.hpp" />
     <ClInclude Include="..\..\..\libsrc\hash\crc.hpp" />
     <ClInclude Include="..\..\..\libsrc\math\vec.hpp" />
+    <ClInclude Include="..\..\..\libsrc\math\vec_sse.hpp" />
     <ClInclude Include="..\..\..\libsrc\math\vec_util.hpp" />
     <ClInclude Include="..\..\..\libsrc\new.hpp" />
     <ClInclude Include="..\..\..\libsrc\random\mt19937.hpp" />
