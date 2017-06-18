@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef AABB_H_
-#define AABB_H_
+#pragma once
 
 #include "math/vec.hpp"
 #include "math/vec_util.hpp"
@@ -160,5 +159,3 @@ inline bool				intersect_sphereaabb(vec<float, 4> const &center, float const rad
 
     return (vsum(e) <= radius * radius);
 }
-
-#endif

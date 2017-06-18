@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-207, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,42 +28,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef AABBTREE_H_
-#define AABBTREE_H_
+#pragma once
 
 #include <cmath>
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
+struct	Aabbnode
+{
+	union
+	{
+		int	parent;
+		int	next;
+	};
+	
+	union
+	{
+		struct
+		{
+			int	left;
+			int	right;
+		};
+		unsigned int	data;
+	};
+
+	int		height;
+	Aabb	aabb;
+};
+
+///////////////////////////////////////
+
 class	Aabbtree
 {
 	public:
-	
-		struct	Node
-		{
-			union
-			{
-				int	parent;
-				int	next;
-			};
-			
-			union
-			{
-				struct
-				{
-					int	left;
-					int	right;
-				};
-				unsigned int	data;
-			};
-
-			int		height;
-			Aabb	aabb;
-		};
-	
 
 		unsigned int	_size;
-		Node			*_nodes;
+		Aabbnode		*_nodes;
 
 		int				_root;
 		int				_free;
@@ -73,6 +73,7 @@ class	Aabbtree
 		~Aabbtree();
 		
 		void	reset();
+		void	order_nodes();
 
 		int		add_aabb(Aabb const &, int const data);
 		int		add_saabb(Aabb const &, int const data);
@@ -98,6 +99,21 @@ class	Aabbtree
 
 		void	_balance(int const);
 		void	_rotate(int const, int const, int const);
+};
+
+///////////////////////////////////////
+
+class	Orderedaabbtree
+{
+	public:
+
+		unsigned int	_size;
+		Aabbnode		*_nodes;
+
+		Orderedaabbtree();
+		~Orderedaabbtree();
+
+		void	construct_from(unsigned int const, unsigned int const, Aabbnode const *nodes);
 };
 
 ///////////////////////////////////////
@@ -229,5 +245,3 @@ void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const,
 		while (--top >= 0);
 	}
 }
-
-#endif

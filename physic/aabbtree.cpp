@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-207, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -60,9 +60,9 @@ inline float			merged_surfacearea(Aabb const &x, Aabb const &y)
 	return (a[0] * a[1] + a[0] * a[2] + a[1] * a[2]);
 }
 
-Aabbtree::Aabbtree() : _size(1024), _nodes(0), _root(-1), _free(0)
+Aabbtree::Aabbtree() : _size(1024), _nodes(nullptr), _root(-1), _free(0)
 {
-	_nodes = new Node[_size];
+	_nodes = new Aabbnode[_size];
 	
 	for (unsigned int i = 0; i < _size - 1; ++i)
 	{
@@ -235,13 +235,13 @@ void	Aabbtree::_insert_leaf(int const index)
 		int const	left = _nodes[i].left;
 		int const	right = _nodes[i].right;
 
-		float left_cost = merged_perimeter(_nodes[left].aabb, leafaabb);
-		float right_cost = merged_perimeter(_nodes[right].aabb, leafaabb);
+		float left_cost = merged_surfacearea(_nodes[left].aabb, leafaabb);
+		float right_cost = merged_surfacearea(_nodes[right].aabb, leafaabb);
 		
 		if (_nodes[left].right != -1)
-			left_cost -= perimeter(_nodes[left].aabb);
+			left_cost -= surfacearea(_nodes[left].aabb);
 		if (_nodes[right].right != -1)
-			right_cost -= perimeter(_nodes[right].aabb);
+			right_cost -= surfacearea(_nodes[right].aabb);
 
 		i = left_cost < right_cost ? left : right;
 	}
@@ -377,4 +377,60 @@ void			Aabbtree::_rotate(int const up, int const down, int const sibling)
 		_nodes[up].aabb.merge(_nodes[sibling].aabb, _nodes[left].aabb);
 		_nodes[down].aabb.merge(_nodes[up].aabb, _nodes[right].aabb);
 	}
+}
+
+///////////////////////////////////////
+
+Orderedaabbtree::Orderedaabbtree() : _size(0), _nodes(nullptr)
+{
+
+}
+
+Orderedaabbtree::~Orderedaabbtree()
+{
+	if (_nodes)
+		delete [] _nodes;
+}
+
+void				Orderedaabbtree::construct_from(unsigned int const size, unsigned int const root, Aabbnode const *unordered_nodes)
+{
+	unsigned int	stack[32];
+	unsigned int	new_index_stack[32];
+	unsigned int	top = 1;
+
+	if (_size != size)
+	{
+		_size = size;
+		if (_nodes)
+			delete [] _nodes;
+		_nodes = new Aabbnode[_size];
+	}
+
+	stack[0] = root;
+	new_index_stack[0] = 0;
+	do
+	{
+		const unsigned int	index = stack[--top];
+		const unsigned int	new_index = new_index_stack[top];
+
+		_nodes[new_index] = unordered_nodes[index];
+		_nodes[new_index].father = (new_index - 1) >> 1;
+
+		if (unordered_nodes[index].right != -1)
+		{
+			stack[top] = unordered_nodes[intex].left;
+			_nodes[new_index].left = (new_index << 1) + 1;
+			new_index_stack[top++] = _nodes[new_index].left;
+
+			stack[top++] = unordered_nodes[intex].right;
+			_nodes[new_index].right = (new_index << 1) + 2;
+			new_index_stack[top++] = _nodes[new_index].right;
+		}
+		else
+		{
+			_nodes[new_index].left = -1;
+			_nodes[new_index].right = -1;
+		}
+	}
+	while (top);
 }
