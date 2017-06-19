@@ -433,4 +433,6 @@ void				Orderedaabbtree::construct_from(unsigned int const size, unsigned int co
 		}
 	}
 	while (top);
+
+	_nodes[0].father = -1;
 }
