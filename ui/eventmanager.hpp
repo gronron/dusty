@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include <vector>
-#include "SDL.h"
+#include <SDL/SDL.h>
 #include "controller.hpp"
 
 class	Gameengine;

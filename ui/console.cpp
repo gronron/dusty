@@ -99,7 +99,7 @@ void	Console::put_text(char const *str)
 	_history[_iterator].size = strlen(str);
 	if (_history[_iterator].size > MAXCHARACTER)
 		_history[_iterator].size = MAXCHARACTER;
-	strncpy(_history[_iterator].text, str, _history[_iterator].size);
+	strncpy_s(_history[_iterator].text, sizeof(_history[_iterator].text), str, _history[_iterator].size);
 	_history[_iterator].text[_history[_iterator].size] = '\0';
 	_cut_text(_history[_iterator]);
 	_iterator = (_iterator + 1 ) % MAXHISTORY;

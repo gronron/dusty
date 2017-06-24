@@ -28,6 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include <sstream>
 #include <cstdio>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -67,11 +68,19 @@ char		*read_file(char const *filename, unsigned int *rdsize)
 			}
 		}
 		else
-			perror("read_file(): ");
+		{
+			std::ostringstream msg;
+			msg << "Error! read_file(\"" << filename << "\") ";
+			perror(msg.str().c_str());
+		}
 		_close(fd);
 	}
 	else
-		perror("read_file(): ");
+	{
+		std::ostringstream msg;
+		msg << "Error! read_file(\"" << filename << "\") ";
+		perror(msg.str().c_str());
+	}
 	return (buffer);
 }
 

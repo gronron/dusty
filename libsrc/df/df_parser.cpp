@@ -87,7 +87,7 @@ static void	_add_reference(Parser_state &ps, std::string const &reference)
 
 	Reference	ref;
 	ref.idx = node->idx + (node->size - 1) * sizeof(void *);
-	strcpy(ref.name, reference.c_str());
+	strcpy_s(ref.name, sizeof(ref.name), reference.c_str());
 	ps.reflist.push_back(ref);
 }
 
@@ -328,7 +328,7 @@ static bool		_read_string(Parser_state &ps)
 				str += ps.s[ps.i++];
 		}
 
-		char	*ptr = strdup(str.c_str());
+		char	*ptr = _strdup(str.c_str()); //TODO
 		_add_data(ps, Df_node::STRING, sizeof(char *), &ptr);
 		return (true);
 	}
