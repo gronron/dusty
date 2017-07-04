@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2016, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "renderer.hpp"
+#include "renderer_vk.hpp"
 
 inline int	next_p2(int const x)
 {
@@ -99,8 +99,8 @@ unsigned int	_load_font(char const *filename, Glyph *glyphs)
 			cursor += bitmap->width;
 			glyphs[c].bottomright[0] = (float)cursor++ / size[0];
 			glyphs[c].bottomright[1] = (float)bitmap->rows / size[1];
-			glyphs[c].size[0] = bitmap->width;
-			glyphs[c].size[1] = bitmap->rows;
+			glyphs[c].size[0] = (float)bitmap->width;
+			glyphs[c].size[1] = (float)bitmap->rows;
 			glyphs[c].step[0] = face->glyph->metrics.horiAdvance / 64.0f;
 			glyphs[c].step[1] = face->glyph->metrics.vertAdvance / 64.0f;
 			glyphs[c].center[0] = face->glyph->metrics.vertBearingX / 64.0f;

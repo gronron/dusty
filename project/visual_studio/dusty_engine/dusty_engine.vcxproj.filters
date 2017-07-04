@@ -69,9 +69,6 @@
     <ClCompile Include="..\..\..\libsrc\endian\packet.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\random\mt19937.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
@@ -198,8 +195,11 @@
     <ClCompile Include="..\..\..\ui\interpreter_register.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\graphic\renderer_ogl.cpp">
+    <ClCompile Include="..\..\..\graphic\renderer_vk.cpp">
       <Filter>Source Files\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libsrc\random\random.cpp">
+      <Filter>Source Files\libsrc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -230,12 +230,6 @@
     <ClInclude Include="..\..\..\libsrc\endian\packet.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\thread\mutex.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\random\mt19937.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
@@ -246,9 +240,6 @@
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\df\df_node.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\thread\conditionvariable.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\ui\console.hpp">
@@ -287,9 +278,6 @@
     <ClInclude Include="..\..\..\network\client.hpp">
       <Filter>Header Files\network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\thread\spinlock.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool_util.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
@@ -301,9 +289,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\engine\gameengine.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\graphic\opencl_error.hpp">
-      <Filter>Header Files\graphic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\game\world.hpp">
       <Filter>Header Files\game</Filter>
@@ -374,8 +359,11 @@
     <ClInclude Include="..\..\..\libsrc\math\vec_sse.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\graphic\renderer_ogl.hpp">
+    <ClInclude Include="..\..\..\graphic\renderer_vk.hpp">
       <Filter>Header Files\graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libsrc\random\random.hpp">
+      <Filter>Header Files\libsrc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
