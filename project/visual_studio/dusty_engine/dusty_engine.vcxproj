@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -9,13 +9,13 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9B587A27-35EC-414E-84EA-A0D8CCE51075}</ProjectGuid>
     <RootNamespace>dusty_engine</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>Static</UseOfMfc>
@@ -28,7 +28,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(SolutionDir)..\..\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)..\..\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -45,7 +45,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;glew32s.lib;freetype263.lib;opengl32.lib;$(AMDAPPSDKROOT)\lib\x86_64\OpenCL.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;glew32s.lib;freetype.lib;opengl32.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(SolutionDir)..\..\bin\x64\$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreSpecificDefaultLibraries>
@@ -70,15 +70,15 @@
     <ClCompile Include="..\..\..\graphic\particle\effectfactory.cpp" />
     <ClCompile Include="..\..\..\graphic\particle\particleeffect.cpp" />
     <ClCompile Include="..\..\..\graphic\particle\particlesystem.cpp" />
-    <ClCompile Include="..\..\..\graphic\renderer_ogl.cpp" />
     <ClCompile Include="..\..\..\graphic\renderer_text.cpp" />
+    <ClCompile Include="..\..\..\graphic\renderer_vk.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_node.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp" />
     <ClCompile Include="..\..\..\libsrc\endian\packet.cpp" />
     <ClCompile Include="..\..\..\libsrc\file\file.cpp" />
     <ClCompile Include="..\..\..\libsrc\hash\crc.cpp" />
-    <ClCompile Include="..\..\..\libsrc\random\mt19937.cpp" />
     <ClCompile Include="..\..\..\libsrc\random\prbg.cpp" />
+    <ClCompile Include="..\..\..\libsrc\random\random.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\selector.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\tcpsocket.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\udpsocket.cpp" />
@@ -120,11 +120,10 @@
     <ClInclude Include="..\..\..\graphic\animation.hpp" />
     <ClInclude Include="..\..\..\graphic\graphicengine.hpp" />
     <ClInclude Include="..\..\..\graphic\haabbtree.hpp" />
-    <ClInclude Include="..\..\..\graphic\opencl_error.hpp" />
     <ClInclude Include="..\..\..\graphic\particle\effectfactory.hpp" />
     <ClInclude Include="..\..\..\graphic\particle\particleeffect.hpp" />
     <ClInclude Include="..\..\..\graphic\particle\particlesystem.hpp" />
-    <ClInclude Include="..\..\..\graphic\renderer_ogl.hpp" />
+    <ClInclude Include="..\..\..\graphic\renderer_vk.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_node.hpp" />
     <ClInclude Include="..\..\..\libsrc\df\df_parser.hpp" />
     <ClInclude Include="..\..\..\libsrc\endian\endian.hpp" />
@@ -135,17 +134,14 @@
     <ClInclude Include="..\..\..\libsrc\math\vec_sse.hpp" />
     <ClInclude Include="..\..\..\libsrc\math\vec_util.hpp" />
     <ClInclude Include="..\..\..\libsrc\new.hpp" />
-    <ClInclude Include="..\..\..\libsrc\random\mt19937.hpp" />
     <ClInclude Include="..\..\..\libsrc\random\prbg.hpp" />
+    <ClInclude Include="..\..\..\libsrc\random\random.hpp" />
     <ClInclude Include="..\..\..\libsrc\socket\selector.hpp" />
     <ClInclude Include="..\..\..\libsrc\socket\tcpsocket.hpp" />
     <ClInclude Include="..\..\..\libsrc\socket\udpsocket.hpp" />
     <ClInclude Include="..\..\..\libsrc\stream\socket.hpp" />
-    <ClInclude Include="..\..\..\libsrc\thread\conditionvariable.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool_util.hpp" />
-    <ClInclude Include="..\..\..\libsrc\thread\mutex.hpp" />
-    <ClInclude Include="..\..\..\libsrc\thread\spinlock.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\thread.hpp" />
     <ClInclude Include="..\..\..\libsrc\time\time.hpp" />
     <ClInclude Include="..\..\..\network\client.hpp" />

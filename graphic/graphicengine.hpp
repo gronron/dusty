@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2016, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,12 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef GRAPHICENGINE_H_
-#define GRAPHICENGINE_H_
+#pragma once
 
 #include "math/vec.hpp"
 #include "haabbtree.hpp"
-#include "renderer_gl.hpp"
+#include "renderer_vk.hpp"
 #include "animation.hpp"
 
 struct						Camera
@@ -134,5 +133,3 @@ inline unsigned int	Graphicengine::cut_line(char const *text, vec<float, 2> cons
 {
 	return (_renderer.cut_line(text, scale, width));
 }
-
-#endif
