@@ -91,8 +91,8 @@ void	Player::tick(float const delta)
 				p->ownerid = id;
 				//p->damage = dmg;
 				p->body->position = body->position;
-				a[0] = (float)MT().genrand_real1(-1.0, 1.0);
-				a[1] = (float)MT().genrand_real1(-1.0, 1.0);
+				a[0] = RAND().rand_float(-1.0f, 1.0f);
+				a[1] = RAND().rand_float(-1.0f, 1.0f);
 				p->body->velocity = (vec<float, 4>)vunit<float>(a) * 2.0f;
 			}
 			loadingtime = 0.0f;

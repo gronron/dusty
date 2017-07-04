@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,14 +28,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef LIGHTTHREADPOOL_H_
-#define LIGHTTHREADPOOL_H_
+#pragma once
+
+#include <mutex>
+#include <condition_variable>
 
 #include "thread.hpp"
-#include "mutex.hpp"
-#include "conditionvariable.hpp"
 
-class	Lightthreadpool
+class	LightThreadPool
 {
 	public:
 
@@ -57,14 +57,14 @@ class	Lightthreadpool
 		struct				Worker
 		{
 			Thread			thrd;
-			Lightthreadpool	*ltp;
+			LightThreadPool	*ltp;
 			Task			*tasks;
 			unsigned int	front;
 			unsigned int	back;
 		};
 
 
-		static Lightthreadpool	&get_instance();
+		static LightThreadPool	&get_instance();
 		static void				*_runthrd(void *);
 
 
@@ -75,13 +75,13 @@ class	Lightthreadpool
 
 		Worker				*_wrkrs;
 
-		Mutex				_mtx;
-		Conditionvariable	_mcv;
-		Conditionvariable	_scv;
+		std::mutex				_mtx;
+		std::condition_variable	_mcv;
+		std::condition_variable	_scv;
 
 
-		Lightthreadpool(unsigned int const thrdnbr, unsigned int const queuesize);
-		~Lightthreadpool();
+		LightThreadPool(unsigned int const thrdnbr, unsigned int const queuesize);
+		~LightThreadPool();
 
 		
 		void	add_task(void *(*function)(void*), void *data);
@@ -92,7 +92,7 @@ class	Lightthreadpool
 };
 
 template<template<class, class, class>class F, class T, class U, class V>
-void					Lightthreadpool::run_tasks(unsigned int const size, T *data, U *function, V param)
+void					LightThreadPool::run_tasks(unsigned int const size, T *data, U *function, V param)
 {
 	Taskset<T, U, V>	a[8];
 
@@ -111,5 +111,3 @@ void					Lightthreadpool::run_tasks(unsigned int const size, T *data, U *functio
 	}
 	run();
 }
-
-#endif

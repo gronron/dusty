@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,18 +28,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "math/vec_util.hpp"
-#include "random/random.hpp"
-#include "configmanager.hpp"
-#include "particlesystem.hpp"
-#include "particleeffect.hpp"
+#include "random.hpp"
 
-Particleeffect::Particleeffect(Particlesystem *p, float const t, Df_node const *) : ps(p), timer(t)
+Random					&Random::get_instance()
 {
-	
+	thread_local Random	instance(0);
+
+	return (instance);
 }
 
-Particleeffect::~Particleeffect()
+Random::Random(uint64_t const seed)
 {
-	
+	s[0] = seed;
+	s[1] = seed + seed;
+}
+
+static inline uint64_t rotl(uint64_t const x, int const k)
+{
+	return (x << k) | (x >> (64 - k));
+}
+
+uint64_t			Random::rand()
+{
+	uint64_t const	s0 = s[0];
+	uint64_t		s1 = s[1];
+	uint64_t const	result = s0 + s1;
+
+	s1 ^= s0;
+	s[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14);
+	s[1] = rotl(s1, 36);
+
+	return (result);
 }

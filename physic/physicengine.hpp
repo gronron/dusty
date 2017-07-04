@@ -28,12 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PHYSICENGINE_H_
-#define PHYSICENGINE_H_
+#pragma once
 
+#include <shared_mutex>
 #include "body.hpp"
 #include "aabbtree.hpp"
-#include "thread/mutex.hpp"
 
 class	Shape;
 class	Collider;
@@ -82,7 +81,7 @@ class	Physicengine
 		Aabbtree		_dynamictree;
 		Aabbtree		_statictree;
 
-		Mutex			_spinlock;
+		std::shared_mutex	_mutex;
 
 		int				_currentquery;
 		int				_avoidquery;
@@ -115,5 +114,3 @@ class	Physicengine
 		void	_update_body(int const, int const);
 		void	_solve(Body *, Body *, vec<float, 4> const &);
 };
-
-#endif

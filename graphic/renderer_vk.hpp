@@ -1,5 +1,7 @@
+#pragma once
+
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,31 +30,72 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef SPINLOCK_H_
-#define SPINLOCK_H_
+#include <windows.h>
+#include <GL/gl.h>
+#include <SDL/SDL.h>
+#include "math/vec.hpp"
 
-#include <atomic>
+class	Graphicengine;
 
-class	Spinlock
+struct	Glyph
+{
+	vec<float, 2>	size;
+	vec<float, 2>	topleft;
+	vec<float, 2>	bottomright;
+	vec<float, 2>	step;
+	vec<float, 2>	center;
+};
+
+class	Renderer
 {
 	public:
 
-		std::atomic_flag	_lock = ATOMIC_FLAG_INIT;
+		unsigned int	width;
+		unsigned int	height;
+
+		SDL_Window		*_window;
+		SDL_GLContext	_glcontext;
+
+		GLuint VBO;
+		GLuint VAO;
+		
+		GLuint			_program;
+		
+		GLint			_cameraidx;
+		GLint			_rootidx;
+		GLint			_nodesidx;
+		GLint			_materialsidx;
+		GLint			_lightsnbridx;
+		GLint			_lightsidx;
+		
+		GLuint			_camerabuffer;
+		GLuint			_nodesbuffer;
+		GLuint			_materialsbuffer;
+		GLuint			_lightsbuffer;
+		
+		unsigned int	_nodes_mem_size;
+		unsigned int	_materials_mem_size;
+		unsigned int	_lights_mem_size;
+
+		GLuint			_texture;
+
+		GLuint			_glyphstexture;
+		Glyph			_glyphs[128];
 
 
-		void	lock();
-		void	unlock();
+		Renderer(unsigned int const, unsigned int const, bool const);
+		~Renderer();
+
+		void			set_fullscreen(bool const);
+		void			set_resolution(unsigned int const, unsigned int const);
+		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+		unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
+
+		void			render(Graphicengine const *);
+
+		void			_draw_glyph(vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &, const unsigned int);
+		void			_set_buffer(Graphicengine const *);
 };
-
-inline void	Spinlock::lock()
-{
-	while (_lock.test_and_set(std::memory_order_acquire))
-		;
-}
-
-inline void	Spinlock::unlock()
-{
-	_lock.clear(std::memory_order_release);
-}
 
 #endif

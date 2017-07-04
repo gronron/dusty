@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include "mt19937.hpp"
+#include "random.hpp"
 #include "prbg.hpp"
 
 Prbg::Prbg(float c)
@@ -43,7 +43,7 @@ Prbg::Prbg(float c)
 		chance = c;
 		inverter = false;
 	}
-	counter = (float)MT().genrand_real1(0, 2.0 - chance);
+	counter = RAND().rand_float(0, 2.0f - chance);
 }
 
 Prbg::~Prbg()
@@ -63,14 +63,14 @@ void	Prbg::operator()(float c)
 		chance = c;
 		inverter = false;
 	}
-	counter = (float)MT().genrand_real1(0, 2.0 - chance);
+	counter = RAND().rand_float(0, 2.0f - chance);
 }
 
 bool	Prbg::pick()
 {
 	if ((counter -= chance) <= 0.0f)
 	{
-		counter = (float)MT().genrand_real1(0, 2.0 - chance);
+		counter = RAND().rand_float(0, 2.0f - chance);
 		return (!inverter);
 	}
 	else

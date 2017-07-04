@@ -381,18 +381,18 @@ void			Aabbtree::_rotate(int const up, int const down, int const sibling)
 
 ///////////////////////////////////////
 
-Orderedaabbtree::Orderedaabbtree() : _size(0), _nodes(nullptr)
+OrderedAabbTree::OrderedAabbTree() : _size(0), _nodes(nullptr)
 {
 
 }
 
-Orderedaabbtree::~Orderedaabbtree()
+OrderedAabbTree::~OrderedAabbTree()
 {
 	if (_nodes)
 		delete [] _nodes;
 }
 
-void				Orderedaabbtree::construct_from(unsigned int const size, unsigned int const root, Aabbnode const *unordered_nodes)
+void				OrderedAabbTree::construct_from(unsigned int const size, unsigned int const root, Aabbnode const *unordered_nodes)
 {
 	unsigned int	stack[32];
 	unsigned int	new_index_stack[32];
@@ -403,7 +403,7 @@ void				Orderedaabbtree::construct_from(unsigned int const size, unsigned int co
 		_size = size;
 		if (_nodes)
 			delete [] _nodes;
-		_nodes = new Aabbnode[_size];
+		_nodes = new AabbWithData[_size];
 	}
 
 	stack[0] = root;
@@ -413,26 +413,99 @@ void				Orderedaabbtree::construct_from(unsigned int const size, unsigned int co
 		const unsigned int	index = stack[--top];
 		const unsigned int	new_index = new_index_stack[top];
 
-		_nodes[new_index] = unordered_nodes[index];
-		_nodes[new_index].father = (new_index - 1) >> 1;
+		_nodes[new_index].aabb = unordered_nodes[index].aabb;
+		_nodes[new_index].data = unordered_nodes[index].data;
 
 		if (unordered_nodes[index].right != -1)
 		{
-			stack[top] = unordered_nodes[intex].left;
-			_nodes[new_index].left = (new_index << 1) + 1;
-			new_index_stack[top++] = _nodes[new_index].left;
-
-			stack[top++] = unordered_nodes[intex].right;
-			_nodes[new_index].right = (new_index << 1) + 2;
-			new_index_stack[top++] = _nodes[new_index].right;
-		}
-		else
-		{
-			_nodes[new_index].left = -1;
-			_nodes[new_index].right = -1;
+			_nodes[new_index].data = 0xffffffff;
+			stack[top] = unordered_nodes[index].left;
+			new_index_stack[top++] = (new_index << 1) + 1;
+			new_index_stack[top++] = (new_index << 1) + 2;
 		}
 	}
 	while (top);
-
-	_nodes[0].father = -1;
 }
+/*
+void	build_from(unsigned int const size, AabbWithData const *aabbs)
+{
+	struct				CenterWithIndex
+	{
+		float			center;
+		float			size;
+		unsigned int	index;
+	};
+
+	CenterWithIndex *indexs[3];
+
+	indexs[0] = new CenterWithIndex[size * 3];
+	indexs[1] = indexs[0] + size;
+	indexs[2] = indexs[1] + size;
+
+	for (unsigned int i = 0; i < size; ++i)
+	{
+		vec<float, 4> const center = (aabbs[i].bottom + aabbs[i].top) * 0.5f;
+		vec<float, 4> const size = aabbs[i].top - aabbs[i].bottom;
+
+		indexs[0][i].index = i;
+		indexs[0][i].center = center[0];
+		indexs[0][i].size = size[0];
+
+		indexs[1][i].index = i;
+		indexs[1][i].center = center[1];
+		indexs[1][i].size = size[1];
+
+		indexs[2][i].index = i;
+		indexs[2][i].center = center[2];
+		indexs[2][i].size = size[2];
+	}
+
+	//threadpooling
+	auto cmp = [](auto const &x, auto const &y) { return x.center < y.center; };
+	std::sort(indexs[0], indexs[0] + size, cmp);
+	std::sort(indexs[1], indexs[1] + size, cmp);
+	std::sort(indexs[2], indexs[2] + size, cmp);
+
+	while (notyet)
+	{
+		vec<float, 3> axis_score = {0.0f, 0.0f, 0.0f};
+		vec<float, 3> axis_size;
+
+		axis_size[0] = indexs[0][0].size;
+		axis_size[1] = indexs[1][0].size;
+		axis_size[2] = indexs[2][0].size; 
+
+		for (unsigned int i = 1; i < size; ++i)
+		{
+			axis_score += indexs[0][i - 1].center - index[0][i].center;
+
+			axis_size[0] += indexs[0][i].size;
+			axis_size[1] += indexs[1][i].size;
+			axis_size[2] += indexs[2][i].size;
+		}
+
+		axis_score /= axis_size;
+
+		int best_axis;
+
+		if (axis_score[0] > axis_score[1])
+		{
+			if (axis_score[0] > axis_score[2])
+				best_axis = 0;
+			else
+				best_axis = 2;
+		}
+		else
+		{
+			if (axis_score[1] > axis_score[2])
+				best_axis = 1;
+			else
+				best_axis = 2;
+		}
+
+		//split
+		//rearange
+	}
+
+	delete [] indexs[0];
+}*/

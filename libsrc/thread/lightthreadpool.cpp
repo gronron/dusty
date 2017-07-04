@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "lightthreadpool.hpp"
 
-Lightthreadpool				&Lightthreadpool::get_instance()
+LightThreadPool				&LightThreadPool::get_instance()
 {
-	static	Lightthreadpool	instance(8, 4096);
+	static	LightThreadPool	instance(8, 4096);
 
 	return (instance);
 }
 
-void				*Lightthreadpool::_runthrd(void *data)
+void								*LightThreadPool::_runthrd(void *data)
 {
-	Worker			*wrkr = (Worker *)data;
-	Lightthreadpool	*ltp = wrkr->ltp;
+	Worker							*wrkr = (Worker *)data;
+	LightThreadPool					*ltp = wrkr->ltp;
+	std::unique_lock<std::mutex>	lk(ltp->_mtx, std::defer_lock);
 
 	while (ltp->_running)
 	{
@@ -51,16 +52,16 @@ void				*Lightthreadpool::_runthrd(void *data)
 		}
 		else
 		{
-			ltp->_mtx.lock();
-			ltp->_mcv.wake();
-			ltp->_scv.sleep(ltp->_mtx);
-			ltp->_mtx.unlock();
+			lk.lock();
+			ltp->_mcv.notify_one();
+			ltp->_scv.wait(lk);
+			lk.unlock();
 		}
 	}
 	return (0);
 }
 
-Lightthreadpool::Lightthreadpool(unsigned int const n, unsigned int const s) : _thrdnbr(n), _queuesize(s), _looper(0), _running(true)
+LightThreadPool::LightThreadPool(unsigned int const n, unsigned int const s) : _thrdnbr(n), _queuesize(s), _looper(0), _running(true)
 {
 	_wrkrs = new Worker[_thrdnbr];
 
@@ -70,11 +71,11 @@ Lightthreadpool::Lightthreadpool(unsigned int const n, unsigned int const s) : _
 		_wrkrs[i].tasks = new Task[_queuesize];
 		_wrkrs[i].front = 0;
 		_wrkrs[i].back = 0;
-		_wrkrs[i].thrd.create(Lightthreadpool::_runthrd, _wrkrs + i);
+		_wrkrs[i].thrd.create(LightThreadPool::_runthrd, _wrkrs + i);
 	}
 }
 
-Lightthreadpool::~Lightthreadpool()
+LightThreadPool::~LightThreadPool()
 {
 	_running = false;
 	for (unsigned int i = 0; i < _thrdnbr; ++i)
@@ -85,7 +86,7 @@ Lightthreadpool::~Lightthreadpool()
 	delete [] _wrkrs;
 }
 
-void	Lightthreadpool::add_task(void *(*function)(void*), void *data)
+void	LightThreadPool::add_task(void *(*function)(void*), void *data)
 {
 	if (!((_wrkrs[_looper].front + 1) % _queuesize != _wrkrs[_looper].back))
 		run();
@@ -95,19 +96,18 @@ void	Lightthreadpool::add_task(void *(*function)(void*), void *data)
 	_looper = (_looper + 1) % _thrdnbr;
 }
 
-void		Lightthreadpool::run()
+void								LightThreadPool::run()
 {
-	bool	done = false;
+	bool							done = false;
+	std::unique_lock<std::mutex>	lk(_mtx);
 
-	_mtx.lock();
-	_scv.wakeall();
+	_scv.notify_all();
 	while (!done)
 	{
 		done = true;
 		for (unsigned int i = 0; i < _thrdnbr; ++i)
 			done = done && (_wrkrs[i].front == _wrkrs[i].back);
 		if (!done)
-			_mcv.sleep(_mtx);
+			_mcv.wait(lk);
 	}
-	_mtx.unlock();
 }

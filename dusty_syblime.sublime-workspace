@@ -1,0 +1,971 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"axis",
+				"axis_score"
+			],
+			[
+				"soc",
+				"axis_score"
+			],
+			[
+				"index",
+				"indexs"
+			],
+			[
+				"aa",
+				"aabbs"
+			],
+			[
+				"_ca",
+				"_camerabuffer"
+			],
+			[
+				"_cam",
+				"_cameraidx"
+			],
+			[
+				"_l",
+				"_lightsidx"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "graphic/renderer_gl.hpp",
+			"settings":
+			{
+				"buffer_size": 3242,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "graphic/renderer_gl.cpp",
+			"settings":
+			{
+				"buffer_size": 11859,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "bin/x64/vertex.glsl",
+			"settings":
+			{
+				"buffer_size": 79,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "bin/x64/frag.glsl",
+			"settings":
+			{
+				"buffer_size": 243,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "graphic/renderer_vk.hpp",
+			"settings":
+			{
+				"buffer_size": 3217,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "graphic/renderer_vk.cpp",
+			"settings":
+			{
+				"buffer_size": 4113,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "game/commoneffect.cpp",
+			"settings":
+			{
+				"buffer_size": 5667,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "/******************************************************************************\nCopyright (c) 2015-2017, Geoffrey TOURON\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are met:\n\n* Redistributions of source code must retain the above copyright notice, this\n  list of conditions and the following disclaimer.\n\n* Redistributions in binary form must reproduce the above copyright notice,\n  this list of conditions and the following disclaimer in the documentation\n  and/or other materials provided with the distribution.\n\n* Neither the name of dusty nor the names of its\n  contributors may be used to endorse or promote products derived from\n  this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\nAND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\nOR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n******************************************************************************/\n\n#pragma once\n\n#include <cstdint>\n\n#define RAND() Random::get_instance()\n\nclass Random\n{\n\tpublic:\n\n\tuint64_t\ts[2];\n\n\n\tstatic Random&\tget_instance();\n\n\n\tRandom(uint64_t const seed);\n\n\tvoid\t\tseed(uint64_t const);\n\tuint64_t\trand();\n\n\tint32_t\t\trand_int() { return ((int32_t)rand()); }\n\tuint32_t\trand_uint() { return ((uint32_t)rand()); }\n\n\tfloat\t\trand_float() { return (rand_int() * (1.0f / 2147483647.0f)); }\n\tfloat\t\trand_pfloat() { return (rand_uint() * (1.0f / 4294967295.0f)); }\n\tfloat\t\trand_nzpfloat() { return (1.0f - (rand_int() * (1.0f / 4294967296.0f))); }\n\tfloat\t\trand_float(float const min, float const max) { return (min + rand_pfloat() * (max - min)); }\n\n};\n",
+			"file": "libsrc/random/random.hpp",
+			"file_size": 2365,
+			"file_write_time": 131434829972553761,
+			"settings":
+			{
+				"buffer_size": 2310,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "libsrc/random/random.cpp",
+			"settings":
+			{
+				"buffer_size": 2144,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "bin/x64/raytracer.cl",
+			"settings":
+			{
+				"buffer_size": 14399,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Bonjour,\n\nJe suis à la recherche d'un emploi de développeur dans le domaine du jeu vidéo.\n\nMes experiences m'ont permis d'acquérir de nombreuses compétences et d'étayer au fur et à mesure mes choix concernant mon parcours professionnel.\nAprès des études à Epitech, différents stages dont un chez F4 sur le jeu Empire of Sports, puis divers emplois en tant que développeur C++,\nje souhaite prendre part à des projets dans le domaine du jeux video afin de pouvoir allier passion et savoir faire.\nLe challenge technique m'attire tout autant que le plaisir et l'émotion vehiculés par les jeux vidéo.\nEtant autodidacte, j'ai completé mon expérience en développant un moteur de jeux vidéo en C++ pour mettre en pratique mon savoir et mes compétences.\nJ'ai développé le maximum de choses sans utiliser de bibliothèques tierces, afin d'acquérir de larges connaissances et de contrôler au mieux les performances et la qualité de mon projet.\nMon travail s'est porté essentiellement sur l'architecture générale du moteur, la sérialisation de données, le réseau, la physique et le rendu 3D.\nAujourd'hui je continue de développer ce moteur, Dusty Engine, et je cherche activement un emploi qui me permettrait de commencer une carrière et de m'épanouir dans ce domaine.\n\nJe suis persévérant, curieux, perfectionniste et je recherche une entreprise à taille humaine, favorisant la communication, l'innovation et ayant de l'ambition.\nJe suis disponible pour un entretien, afin de discuter plus longuement de ma candidature chez vous et du projet sur lequel vous travaillez.\n\nJe vous presente mes sincères salutations.\n\n__________________________________________________________\n\nMadame, Monsieur, \n\nJe suis développeur de jeu vidéo, disponible pour un poste de programmeur moteur/gameplay.\n\nJ’ai découvert la programmation de jeux vidéo pendant mes études à Epitech. Attiré par le challenge technique ainsi que le plaisir et l'émotion véhiculés par les jeux vidéo, j'ai décidé de me spécialiser dans ce domaine.\nJ’ai pu acquérir une vision plus large et professionnelle sur le développement de jeux vidéo durant mon stage au sein de l’équipe de développement du studio F4.\nActuellement je développe, en autodidacte, mon propre moteur en C++, Dusty engine, pour parfaire mes connaissances.\n\nEtant curieux, créatif/rigoureux, passionné avec une bonne expérience du travail en équipe à travers les différents projets auxquels j’ai participé, je serai heureux de rejoindre votre équipe gameplay/moteur pour y apporter mes compétences et mon enthousiasme.\n\nJe me tiens à votre disposition pour un entretien, afin de vous exposer ma motivation, vous présenter mes travaux et discuter de vos projets.\n\nJe vous présente, Madame, Monsieur, mes sincères salutations.\n\n__________________________________________________________\n\nMadame, Monsieur,\n\nJe suis développeur de jeu vidéo, actuellement en poste dans le studio parisien Eugen Systems.\n\nJ'ai participé, au sein d'une équipe d'une cinquantaine de personnes, à la réalisation du jeu vidéo Steel Division: Normandi 44.\nJ'ai principalement développé l'intelligence artificielle et contribué à l'interface utilisateur, au gameplay et aux corrections de bugs.\nCette expérience m'a permis de compléter mes connaissances sur divers surjets tel que l'optimisation et l'architecture.\n\nAuparavant je travaillais sur mon propre moteur de jeu vidéo, Dusty Engine, écrit en C++. Grâce à cela je me suis constitué un solide savoir sur le rendu 3D, les moteurs physiques et réseaux.\n\nAujourd'hui je recherche de nouveaux challenges et espère intégrer une entreprise dans laquelle je pourrais prendre part avec de plus grandes responsabilités tant au sein de mon équipe qu'en apport sur des projets.\nCurieux, créatif, rigoureux et passionné, avec une bonne expérience du travail en équipe, je serai heureux de rejoindre la vôtre en tant que développeur gameplay/moteur pour y apporter mes compétences et mon enthousiasme.\n\nJe me tiens à votre disposition pour un entretien, afin de vous exposer ma motivation, vous présenter mes travaux et discuter des projets que nous pourrions réaliser ensemble.\n\nJe vous présente, Madame, Monsieur, mes sincères salutations.\n",
+			"file": "/D/letter.txt",
+			"file_size": 4341,
+			"file_write_time": 131399564940000000,
+			"settings":
+			{
+				"buffer_size": 4175,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Geoffrey/Documents/Visual Studio 2017/config.txt",
+			"settings":
+			{
+				"buffer_size": 53,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "physic/aabbtree.hpp",
+			"settings":
+			{
+				"buffer_size": 6065,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "physic/aabbtree.cpp",
+			"settings":
+			{
+				"buffer_size": 12318,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "game/poeng/player.hpp",
+			"settings":
+			{
+				"buffer_size": 2821,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "#include \"common.hpp\"\n#include \"player.hpp\"\n#include \"projectile.hpp\"\n#include \"acontroller.hpp\"\n\n#include <iostream>\n#define M_E 2.718281828459045\n\nFACTORYREG(Player);\n\nPlayer::Player(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o), damage(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)\n{\n\tshape.size = 1.0f;\n\tengine->physic->new_body(&body, &shape, this); // un body peut etre allouer mais pas utiliser, histoire de laisser le temps d'initialiser des variables\n\tbody->dynamic = true;\n\tbody->position = 5.0f; // ouai position est un vecteur de 4 float, et on assigne 5 a tout  le monde\n}\n\nPlayer::~Player()\n{\n\n}\n\nvoid\tPlayer::postinstanciation()\n{\n\tEntity::postinstanciation();\n\tengine->physic->init_body(body); // on init le body, il va maintenant etre pris en compte par le moteur physique\n\tif (engine->graphic)\n\t{\n\t\t//ps = new Particlesystem(engine->graphic, 1.0f, \"player\", &body);\n\t\t//engine->graphic->add(ps);\n\t\t//hud = new Hud(1.0f, &cleared, this);\n\t}\n\tif (!engine->master)\n\t\tengine->notify_owner(this, true); // ca devrait etre fait dans entity peut etre\n\n}\n\nvoid\tPlayer::destroy()\n{\n\tEntity::destroy();\n\tengine->physic->delete_body(body); // on demande au moteur physique de desalloc le body, y a pas de deinit\n\tif (engine->graphic)\n\t\t;//engine->graphic->remove(ps);\n}\n\nvoid\tPlayer::notified_by_owner(Entity *e, bool const)\n{\n\tAController\t*c = (AController *)e; // le controller est operationel il on se lie a lui.\n\n\tc->controlled = this;\n}\n\nvoid\tPlayer::get_replication(Packet &pckt) const\n{\n\tEntity::get_replication(pckt);\n\tpckt.write(dir);\n\tpckt.write(firing);\n\tbody->get_replication(pckt);\n}\n\nvoid\tPlayer::replicate(Packet &pckt, float const p)\n{\n\tEntity::replicate(pckt, p);\n\tpckt.read(dir);\n\tpckt.read(firing);\n\tbody->replicate(pckt, p);\n}\n\nvoid\tPlayer::tick(float const delta)\n{\n\tEntity::tick(delta);\n\t//ici faut mettre a jour la vitesse du body en fonction de l'etat du controller\n\t// presque chaque modif de chaque parti du moteur est garantie de ne pas cracher et de fonctionner\n\t// presque car evidement y a des valeur a ne pas trop toucher, mais ca c'est la vie, par example passer un body de dynamic a statique ca ne va pas le faire.\n}\n\nbool\t\t\tPlayer::collide(Collider *x)\n{\n\t//collieder peut etre cast en une entity, on peu dynamic cast comme un gros salle pour savoir si on rentrer dans un mure ou autres\n\t// le return sert a dir si on veut ignorer la collision ou non, si je l'ignore et pas l'entity en face, l'entity rebondira et pas moi par example\n\treturn (false);\n}\n",
+			"file": "game/poeng/player.cpp",
+			"file_size": 3464,
+			"file_write_time": 131434835688181131,
+			"settings":
+			{
+				"buffer_size": 2560,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "game/poeng/world.cpp",
+			"settings":
+			{
+				"buffer_size": 13106,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "game/poeng/world.hpp",
+			"settings":
+			{
+				"buffer_size": 3034,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "libsrc/thread/lightthreadpool.cpp",
+			"settings":
+			{
+				"buffer_size": 3473,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "HOWTO.txt",
+			"settings":
+			{
+				"buffer_size": 1782,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/Geoffrey/Documents/GitHub/dusty",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/game",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/thread"
+	],
+	"file_history":
+	[
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/game/poeng/actor.hpp",
+		"/C/Users/Geoffrey/Desktop/reponses.txt",
+		"/D/cv_content.txt",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/random.hpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/random.cpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/randon.cpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/randon.hpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/thread/lightthreadpool.cpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/prbg.cpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/prbg.hpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/mt19937.cpp",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/libsrc/random/mt19937.hpp",
+		"/D/letter.txt",
+		"/E/backup2/Documents/Rockstar Games/Social Club/Profiles/autosignin.dat",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/bin/x64/raytracer.glsl",
+		"/C/Users/Geoffrey/Documents/GitHub/dusty/graphic/graphicengine.hpp"
+	],
+	"find":
+	{
+		"height": 0.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 15,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "graphic/renderer_gl.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3242,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1642,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "graphic/renderer_gl.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11859,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								11859
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2296.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "bin/x64/vertex.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 79,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18,
+								18
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 19,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "bin/x64/frag.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 243,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								243,
+								243
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "graphic/renderer_vk.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3217,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								117,
+								117
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "graphic/renderer_vk.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4113,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1886,
+								1886
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 765.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "game/commoneffect.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5667,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2595,
+								2595
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 270.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "libsrc/random/random.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2310,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1802,
+								1821
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "libsrc/random/random.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2144,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1834,
+								1834
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 315.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "bin/x64/raytracer.cl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14399,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1873,
+								1873
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 298.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/D/letter.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4175,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2916,
+								2916
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 90.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "/C/Users/Geoffrey/Documents/Visual Studio 2017/config.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 53,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								53,
+								48
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "physic/aabbtree.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6065,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3303,
+								3303
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1237.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "physic/aabbtree.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12318,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9610,
+								9610
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 5553.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "game/poeng/player.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2821,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2026,
+								2026
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 380.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "game/poeng/player.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2560,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								288,
+								267
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "game/poeng/world.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13106,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 344.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "game/poeng/world.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3034,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 405.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "libsrc/thread/lightthreadpool.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3473,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								103,
+								103
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"file": "HOWTO.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1782,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "dusty_syblime.sublime-project",
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 203.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

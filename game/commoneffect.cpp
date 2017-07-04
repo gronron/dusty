@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include "df/df_node.hpp"
-#include "random/mt19937.hpp"
+#include "random/random.hpp"
 #include "particle/effectfactory.hpp"
 #include "commoneffect.hpp"
 
@@ -54,11 +54,11 @@ void	Expulsor::tick(float const delta)
 		if (!ps->_particles[i].active)
 		{
 			ps->_particles[i].position = ps->position;
-			ps->_particles[i].velocity[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
-			ps->_particles[i].velocity[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
-			ps->_particles[i].velocity[2] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
+			ps->_particles[i].velocity[0] = RAND().rand_float() * 2.0f - 1.0f;
+			ps->_particles[i].velocity[1] = RAND().rand_float() * 2.0f - 1.0f;
+			ps->_particles[i].velocity[2] = RAND().rand_float() * 2.0f - 1.0f;
 			ps->_particles[i].velocity[3] = 0.0f;
-			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * (float)MT().genrand_real1(velocity[0], velocity[1]);
+			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * RAND().rand_float(velocity[0], velocity[1]);
 			
 		}
 	}
@@ -86,11 +86,11 @@ void	Attractor::tick(float const delta)
 
 		if (!ps->_particles[i].active)
 		{
-			ps->_particles[i].velocity[0] = (float)(MT().genrand_real1() * 2.0f - 1.0f); 
-			ps->_particles[i].velocity[1] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
-			ps->_particles[i].velocity[2] = (float)(MT().genrand_real1() * 2.0f - 1.0f);
+			ps->_particles[i].velocity[0] = RAND().rand_float() * 2.0f - 1.0f;
+			ps->_particles[i].velocity[1] = RAND().rand_float() * 2.0f - 1.0f;
+			ps->_particles[i].velocity[2] = RAND().rand_float() * 2.0f - 1.0f;
 			ps->_particles[i].velocity[3] = 0.0f;
-			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * (float)MT().genrand_real1(velocity[0], velocity[1]);
+			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * RAND().rand_float(velocity[0], velocity[1]);
 			ps->_particles[i].position = ps->position - ps->_particles[i].velocity / ps->_particles[i].fade_rate;
 		}
 	}
@@ -112,7 +112,7 @@ Appear::Appear(Particlesystem *p, float const t, Df_node const *d) : Particleeff
 		if (!ps->_particles[i].active && ps->running)
 		{
 			ps->_particles[i].size = 0.0f;
-			ps->_particles[i].fade_rate = (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
+			ps->_particles[i].fade_rate = RAND().rand_float(fade_rate[0], fade_rate[1]);
 		}
 	}
 }
@@ -133,7 +133,7 @@ void	Appear::tick(float const delta)
 		{
 			ps->_particles[i].active = false;
 			ps->_particles[i].size = 0.0f;
-			ps->_particles[i].fade_rate = (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
+			ps->_particles[i].fade_rate = RAND().rand_float(fade_rate[0], fade_rate[1]);
 		}
 	}
 }
@@ -153,8 +153,8 @@ Disappear::Disappear(Particlesystem *p, float const t, Df_node const *d) : Parti
 	{
 		if (!ps->_particles[i].active && ps->running)
 		{
-			ps->_particles[i].size = (float)MT().genrand_real1(0.0, 0.8);
-			ps->_particles[i].fade_rate = (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
+			ps->_particles[i].size = RAND().rand_float(0.0f, 0.8f);
+			ps->_particles[i].fade_rate = RAND().rand_float(fade_rate[0], fade_rate[1]);
 		}
 	}
 }
@@ -175,7 +175,7 @@ void	Disappear::tick(float const delta)
 		{
 			ps->_particles[i].active = false;
 			ps->_particles[i].size = 1.0f;
-			ps->_particles[i].fade_rate = (float)MT().genrand_real1(fade_rate[0], fade_rate[1]);
+			ps->_particles[i].fade_rate = RAND().rand_float(fade_rate[0], fade_rate[1]);
 		}
 	}
 }

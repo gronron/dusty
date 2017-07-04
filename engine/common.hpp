@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define COMMON_H_
 
 #include "math/vec_util.hpp"
-#include "random/mt19937.hpp"
+#include "random/random.hpp"
 #include "endian/packet.hpp"
 #include "replication.hpp"
 #include "factory.hpp"

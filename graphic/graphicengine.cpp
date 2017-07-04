@@ -102,7 +102,8 @@ void	Graphicengine::tick(float const delta)
 	}
 
 	char	str[16];
-	_renderer.draw_text(itoa((int)(1.0f / delta), str, 10), {camera.resolution[0] - 64.0f, 16.0f}, {0.3f, 0.3f}, {0.35f, 0.6f, 0.35f, 1.0f});
+	_itoa_s((int)(1.0f / delta), str, sizeof(str), 10);
+	_renderer.draw_text(str, {camera.resolution[0] - 64.0f, 16.0f}, {0.3f, 0.3f}, {0.35f, 0.6f, 0.35f, 1.0f});
 
 	aabbtree.attach_transient_tree();
 	_renderer.render(this);

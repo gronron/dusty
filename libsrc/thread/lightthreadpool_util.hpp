@@ -38,7 +38,7 @@ struct	Caller_f
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			taskset->function(taskset->data + i);
@@ -51,7 +51,7 @@ struct	Caller_fa
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			taskset->function(taskset->data + i, taskset->param);
@@ -64,7 +64,7 @@ struct	Caller_fp
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			taskset->function(*(taskset->data + i));
@@ -77,7 +77,7 @@ struct	Caller_fpa
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			taskset->function(*(taskset->data + i), taskset->param);
@@ -90,7 +90,7 @@ struct	Caller_m
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			(taskset->data + i)->(taskset->function)();
@@ -103,7 +103,7 @@ struct	Caller_ma
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			(taskset->data + i)->(taskset->function)(taskset->param);
@@ -116,7 +116,7 @@ struct	Caller_mp
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			(*(taskset->data + i))->(taskset->function)();
@@ -129,7 +129,7 @@ struct	Caller_mpa
 {
 	static void		*caller(void *data)
 	{
-		Lightthreadpool::Taskset<T, U, V>	*taskset = (Lightthreadpool::Taskset<T, U, V> *)data;
+		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
 			(*(taskset->data + i))->(taskset->function)(taskset->param);

@@ -28,97 +28,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef MUTEX_H_
-#define MUTEX_H_
+#pragma once
 
-#if defined(_WIN32) || defined(__WIN32__)
-	#ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
-	#endif
-	#include <windows.h>
-	#undef near
-	#undef far
-#else
-	#include <pthread.h>
-#endif
+#include <cstdint>
 
-class	Mutex
+#define RAND() Random::get_instance()
+
+class Random
 {
 	public:
 
-		#if defined(_WIN32) || defined(__WIN32__)
-		CRITICAL_SECTION	_mtx;
-		#else
-		pthread_mutex_t		_mtx;
-		#endif
+	uint64_t	s[2];
 
-		Mutex();
-		~Mutex();
 
-		void	lock();
-		bool	trylock();
-		void	unlock();
+	static Random&	get_instance();
+
+
+	Random(uint64_t const);
+
+	void		seed(uint64_t const);
+	uint64_t	rand();
+
+	int32_t		rand_int() { return ((int32_t)rand()); }
+	uint32_t	rand_uint() { return ((uint32_t)rand()); }
+
+	float		rand_float() { return (rand_int() * (1.0f / 2147483647.0f)); }
+	float		rand_pfloat() { return (rand_uint() * (1.0f / 4294967295.0f)); }
+	float		rand_nzpfloat() { return (1.0f - (rand_int() * (1.0f / 4294967296.0f))); }
+	float		rand_float(float const min, float const max) { return (min + rand_pfloat() * (max - min)); }
+
 };
-
-#if defined(_WIN32) || defined(__WIN32__)
-
-inline Mutex::Mutex()
-{
-	InitializeCriticalSection(&_mtx);
-}
-
-inline Mutex::~Mutex()
-{
-	DeleteCriticalSection(&_mtx);
-}
-
-inline void	Mutex::lock()
-{
-	EnterCriticalSection(&_mtx);
-}
-
-inline bool	Mutex::trylock()
-{
-	return (TryEnterCriticalSection(&_mtx) != 0);
-}
-
-inline void	Mutex::unlock()
-{
-	LeaveCriticalSection(&_mtx);
-}
-
-#else
-
-inline Mutex::Mutex()
-{
-	pthread_mutexattr_t	attr;
-
-	pthread_mutexattr_init(&attr);
-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-	pthread_mutex_init(&_mtx, &attr);
-	pthread_mutexattr_destroy(&attr);
-}
-
-inline Mutex::~Mutex()
-{
-	pthread_mutex_destroy(&_mtx);
-}
-
-inline void	Mutex::lock()
-{
-	pthread_mutex_lock(&_mtx);
-}
-
-inline bool	Mutex::trylock()
-{
-	return (!pthread_mutex_trylock(&_mtx));
-}
-
-inline void	Mutex::unlock()
-{
-	pthread_mutex_unlock(&_mtx);
-}
-
-#endif
-
-#endif

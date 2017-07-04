@@ -34,8 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
-struct	Aabbnode
+struct		Aabbnode
 {
+	Aabb	aabb;
 	union
 	{
 		int	parent;
@@ -53,7 +54,6 @@ struct	Aabbnode
 	};
 
 	int		height;
-	Aabb	aabb;
 };
 
 ///////////////////////////////////////
@@ -103,15 +103,21 @@ class	Aabbtree
 
 ///////////////////////////////////////
 
-class	Orderedaabbtree
+struct	AabbWithData
+{
+	Aabb			aabb;
+	unsigned int	data;
+};
+
+class	OrderedAabbTree
 {
 	public:
 
 		unsigned int	_size;
-		Aabbnode		*_nodes;
+		AabbWithData	*_nodes;
 
-		Orderedaabbtree();
-		~Orderedaabbtree();
+		OrderedAabbTree();
+		~OrderedAabbTree();
 
 		void	construct_from(unsigned int const, unsigned int const, Aabbnode const *nodes);
 };

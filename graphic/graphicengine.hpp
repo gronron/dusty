@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math/vec.hpp"
 #include "haabbtree.hpp"
-#include "renderer_ogl.hpp"
+#include "renderer_gl.hpp"
 #include "animation.hpp"
 
 struct						Camera
