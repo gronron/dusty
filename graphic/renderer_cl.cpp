@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "file/file.hpp"
 #include "graphicengine.hpp"
-#include "renderer.hpp"
+#include "renderer_cl.hpp"
 
 struct				Computedcamera
 {
@@ -125,7 +125,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	
 	cl_context_properties const	properties[] =
 	{
-		CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[1],
+		CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0],
 		CL_GL_CONTEXT_KHR, (cl_context_properties)_glcontext,
 		CL_WGL_HDC_KHR, (cl_context_properties)info.info.win.hdc,
 		0
@@ -242,7 +242,7 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		if (_nodes_mem_size)
 			clReleaseMemObject(_nodes_mem);
 		_nodes_mem_size = ge->aabbtree._size;
-		_nodes_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _nodes_mem_size * sizeof(Aabbtree::Node), 0, &error);
+		_nodes_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _nodes_mem_size * sizeof(Aabbnode), 0, &error);
 		check_error(error, "clCreateBuffer()");
 	}
 	if (_materials_mem_size < ge->_materials_size)
@@ -262,7 +262,7 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		_lights_mem = clCreateBuffer(_context, CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY, _lights_mem_size * sizeof(Light), 0, &error);
 		check_error(error, "clCreateBuffer()");
 	}
-	check_error(clEnqueueWriteBuffer(_queue, _nodes_mem, CL_FALSE, 0, ge->aabbtree._size * sizeof(Aabbtree::Node), (void *)ge->aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
+	check_error(clEnqueueWriteBuffer(_queue, _nodes_mem, CL_FALSE, 0, ge->aabbtree._size * sizeof(Aabbnode), (void *)ge->aabbtree._nodes, 0, 0, 0), "clEnqueueWriteBuffer()");
 	check_error(clEnqueueWriteBuffer(_queue, _lights_mem, CL_FALSE, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights, 0, 0, 0), "clEnqueueWriteBuffer()");
 }
 
