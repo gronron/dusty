@@ -37,58 +37,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class	LightThreadPool
 {
-	public:
+public:
 
-		struct		Task
-		{
-			void	*(*function)(void*);
-			void	*data;
-		};
+	struct		Task
+	{
+		void	*(*function)(void*);
+		void	*data;
+	};
 
-		template<class T, class U, class V>
-		struct				Taskset
-		{
-			unsigned int	size;
-			T				*data;
-			U				*function;
-			V				param;
-		};
+	template<class T, class U, class V>
+	struct				Taskset
+	{
+		unsigned int	size;
+		T				*data;
+		U				*function;
+		V				param;
+	};
 
-		struct				Worker
-		{
-			Thread			thrd;
-			LightThreadPool	*ltp;
-			Task			*tasks;
-			unsigned int	front;
-			unsigned int	back;
-		};
-
-
-		static LightThreadPool	&get_instance();
-		static void				*_runthrd(void *);
+	struct				Worker
+	{
+		Thread			thrd;
+		LightThreadPool	*ltp;
+		Task			*tasks;
+		unsigned int	front;
+		unsigned int	back;
+	};
 
 
-		unsigned int		_thrdnbr;
-		unsigned int		_queuesize;
-		unsigned int		_looper;
-		bool				_running;
-
-		Worker				*_wrkrs;
-
-		std::mutex				_mtx;
-		std::condition_variable	_mcv;
-		std::condition_variable	_scv;
+	static LightThreadPool	&get_instance();
+	static void				*_runthrd(void *);
 
 
-		LightThreadPool(unsigned int const thrdnbr, unsigned int const queuesize);
-		~LightThreadPool();
+	unsigned int		_thrdnbr;
+	unsigned int		_queuesize;
+	unsigned int		_looper;
+	bool				_running;
 
-		
-		void	add_task(void *(*function)(void*), void *data);
-		void	run();
-		
-		template<template<class, class, class>class F, class T, class U, class V>
-		void	run_tasks(unsigned int const size, T *data, U *function, V param);
+	Worker				*_wrkrs;
+
+	std::mutex				_mtx;
+	std::condition_variable	_mcv;
+	std::condition_variable	_scv;
+
+
+	LightThreadPool(unsigned int const thrdnbr, unsigned int const queuesize);
+	~LightThreadPool();
+
+	
+	void	add_task(void *(*function)(void*), void *data);
+	void	run();
+	
+	template<template<class, class, class>class F, class T, class U, class V>
+	void	run_tasks(unsigned int const size, T *data, U *function, V param);
 };
 
 template<template<class, class, class>class F, class T, class U, class V>
@@ -111,3 +111,60 @@ void					LightThreadPool::run_tasks(unsigned int const size, T *data, U *functio
 	}
 	run();
 }
+
+#ifdef SECONDI
+
+//setcontext posix
+
+class	LightThreadPool
+{
+public:
+
+	struct		Task
+	{
+		void	*(*function)(void*);
+		void	*data;
+	};
+
+	struct				TasksGroup
+	{
+		Task const 		*tasks;
+		unsigned int	tasksnbr;
+		unsigned int	nexttask;
+		int				waitingindex;
+	};
+
+	struct				WaitingFiber
+	{
+		union
+		{
+			Fiber		*fiber;
+			int			next;
+		};
+		unsigned int	remainingchildtask;
+	};
+
+	Thread			*_threads;
+	unsigned int	_thrdsnbr;
+
+	TasksGroup		_tasksgroup[1024];
+	unsigned int	_front;
+	unsigned int	_back;
+	//fifo task with prio // buffer tournant
+
+	WaitingFiber	_waitingfibers[256];
+	int				_free;
+	//array of counter for task goup completion, can be associated with waiting fiber
+
+	static LightThreadPool	&get_instance();
+	static void				*_run_thread(void *);
+
+	LightThreadPool(unsigned int const thrdnbr, unsigned int const queuesize);
+	~LightThreadPool();
+
+	void	add_tasks(unsigned int const, Task const * const, unsigned int * const);
+	void	wait_tasks(unsigned int const);
+
+};
+
+#endif

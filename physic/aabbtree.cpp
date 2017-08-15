@@ -410,8 +410,8 @@ void				OrderedAabbTree::construct_from(unsigned int const size, unsigned int co
 	new_index_stack[0] = 0;
 	do
 	{
-		const unsigned int	index = stack[--top];
-		const unsigned int	new_index = new_index_stack[top];
+		unsigned int const	index = stack[--top];
+		unsigned int const	new_index = new_index_stack[top];
 
 		_nodes[new_index].aabb = unordered_nodes[index].aabb;
 		_nodes[new_index].data = unordered_nodes[index].data;
@@ -421,6 +421,7 @@ void				OrderedAabbTree::construct_from(unsigned int const size, unsigned int co
 			_nodes[new_index].data = 0xffffffff;
 			stack[top] = unordered_nodes[index].left;
 			new_index_stack[top++] = (new_index << 1) + 1;
+			stack[top] = unordered_nodes[index].right;
 			new_index_stack[top++] = (new_index << 1) + 2;
 		}
 	}
