@@ -111,3 +111,42 @@ void								LightThreadPool::run()
 			_mcv.wait(lk);
 	}
 }
+
+#ifdef SECONDI
+
+void								*LightThreadPool::_runthrd(void *data)
+{
+	LightThreadPool					*ltp = (LightThreadPool *)data;
+
+	while (ltp->_running)
+	{
+		//take a task
+		//launch it
+		//decount waiting fiber
+
+
+	}
+	return (0);
+}
+
+LightThreadPool::LightThreadPool(unsigned int const n, unsigned int const s)
+{
+	_free = 0;
+	for (unsigned int i = 0; i < 256;)
+		_waitingfibers[i].next = ++i;
+	_waitingfibers[255].next = -1;
+
+
+	_threads = new Thread[_thrdsnbr];
+
+	//init data
+
+	for (unsigned int i = 0; i < _thrdsnbr; ++i)
+	{
+		_threads[i].create(LightThreadPool::_run_thread, this);
+		SetThreadAffinityMask(_threads[i].thr, 1 << i);
+	}
+}
+
+
+#endif
