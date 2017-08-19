@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "renderer_cl.hpp"
+#include "renderer_gl.hpp"
 
 inline int	next_p2(int const x)
 {

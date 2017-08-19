@@ -185,3 +185,4 @@ pip-log.txt
 .mr.developer.cfg
 *.opendb
 *.db
+*.sublime-workspace

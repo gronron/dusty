@@ -88,6 +88,7 @@ int			main(int ac, char **av)
 		++i;
 		if ((t += d) > 1.0f)
 		{
+			std::cout << i << std::endl;
 			t = 0.0;
 			i = 0;
 		}

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <windows.h>
 #include <GL/gl.h>
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include "math/vec.hpp"
 
 class	Graphicengine;
@@ -56,6 +56,9 @@ class	Renderer
 
 		SDL_Window		*_window;
 		SDL_GLContext	_glcontext;
+
+		GLuint VBO;
+		GLuint VAO;
 		
 		GLuint			_program;
 		
@@ -66,6 +69,7 @@ class	Renderer
 		GLint			_lightsnbridx;
 		GLint			_lightsidx;
 		
+		GLuint			_camerabuffer;
 		GLuint			_nodesbuffer;
 		GLuint			_materialsbuffer;
 		GLuint			_lightsbuffer;
@@ -91,6 +95,7 @@ class	Renderer
 
 		void			render(Graphicengine const *);
 
+		void			_draw_glyph(vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &, const unsigned int);
 		void			_set_buffer(Graphicengine const *);
 };
 

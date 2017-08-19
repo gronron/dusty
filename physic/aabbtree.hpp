@@ -39,21 +39,19 @@ struct		Aabbnode
 	Aabb	aabb;
 	union
 	{
-		int	parent;
-		int	next;
-	};
-	
-	union
-	{
 		struct
 		{
+			int	parent;
 			int	left;
 			int	right;
+			int	height;
 		};
-		unsigned int	data;
+		struct
+		{
+			int				next;
+			unsigned int	data;
+		};
 	};
-
-	int		height;
 };
 
 ///////////////////////////////////////

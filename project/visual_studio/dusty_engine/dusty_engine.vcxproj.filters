@@ -198,7 +198,7 @@
     <ClCompile Include="..\..\..\libsrc\random\random.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\graphic\renderer_cl.cpp">
+    <ClCompile Include="..\..\..\graphic\renderer_gl.cpp">
       <Filter>Source Files\graphic</Filter>
     </ClCompile>
   </ItemGroup>
@@ -362,7 +362,7 @@
     <ClInclude Include="..\..\..\libsrc\random\random.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\graphic\renderer_cl.hpp">
+    <ClInclude Include="..\..\..\graphic\renderer_gl.hpp">
       <Filter>Header Files\graphic</Filter>
     </ClInclude>
   </ItemGroup>

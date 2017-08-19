@@ -30,12 +30,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <SDL/SDL.h>
 #include "math/vec.hpp"
 
+#define VK_USE_PLATFORM_WIN32_KHR
+#include <vulkan/vulkan.h>
+
 class	Graphicengine;
+
+struct	SDL_Window;
 
 struct	Glyph
 {
@@ -54,33 +56,10 @@ class	Renderer
 		unsigned int	height;
 
 		SDL_Window		*_window;
-		SDL_GLContext	_glcontext;
 
-		GLuint VBO;
-		GLuint VAO;
-		
-		GLuint			_program;
-		
-		GLint			_cameraidx;
-		GLint			_rootidx;
-		GLint			_nodesidx;
-		GLint			_materialsidx;
-		GLint			_lightsnbridx;
-		GLint			_lightsidx;
-		
-		GLuint			_camerabuffer;
-		GLuint			_nodesbuffer;
-		GLuint			_materialsbuffer;
-		GLuint			_lightsbuffer;
-		
-		unsigned int	_nodes_mem_size;
-		unsigned int	_materials_mem_size;
-		unsigned int	_lights_mem_size;
-
-		GLuint			_texture;
-
-		GLuint			_glyphstexture;
-		Glyph			_glyphs[128];
+		VkInstance		_instance;
+		VkDevice		_device;
+		VkSurfaceKHR	_surface;
 
 
 		Renderer(unsigned int const, unsigned int const, bool const);
@@ -88,12 +67,16 @@ class	Renderer
 
 		void			set_fullscreen(bool const);
 		void			set_resolution(unsigned int const, unsigned int const);
-		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
-		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
-		unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
+		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const {};
+		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const {};
+		unsigned int	cut_line(char const *text, vec<float, 2> const &, float const) const { return (unsigned int)strlen(text); };
 
 		void			render(Graphicengine const *);
 
-		void			_draw_glyph(vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &, const unsigned int);
+		void			_draw_glyph(vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &, const unsigned int) {};
 		void			_set_buffer(Graphicengine const *);
+
+		void			_create_vk_instance();
+		void			_create_vk_device();
+		void			_create_vk_surface();
 };

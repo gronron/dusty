@@ -44,7 +44,7 @@ class Random
 	static Random&	get_instance();
 
 
-	Random(uint64_t const);
+	Random(uint64_t const seed);
 
 	void		seed(uint64_t const);
 	uint64_t	rand();

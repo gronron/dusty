@@ -287,7 +287,7 @@ void	Renderer::render(Graphicengine const *ge)
 
 	glFinish();
 	check_error(clEnqueueAcquireGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueAcquireGLObjects()");
-	check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, image_size, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
+	//check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, image_size, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
 	check_error(clEnqueueReleaseGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueReleaseGLObjects()");
 	clFinish(_queue);
 

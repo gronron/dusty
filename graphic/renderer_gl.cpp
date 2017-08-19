@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec_util.hpp"
 #include "file/file.hpp"
 #include "graphicengine.hpp"
-#include "renderer_ogl.hpp"
+#include "renderer_gl.hpp"
 
 struct				Computedcamera
 {
@@ -93,7 +93,6 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 		exit(EXIT_FAILURE);
 	}
 
-	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -117,7 +116,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	GLuint	vertexshader;
 	GLuint	fragshader;
 	GLint	success;
-	GLchar	infoLog[512];
+	GLchar	infoLog[4096];
 	
 	char	*source;
 	if (!(source = read_file("vertex.glsl", 0)))
@@ -128,10 +127,11 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glCompileShader(vertexshader);
 	
 	glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &success);
+	glGetShaderInfoLog(fragshader, 4096, 0, infoLog);
+	std::cout << infoLog << std::endl;
 	if(	!success)
 	{
-		glGetShaderInfoLog(vertexshader, 512, 0, infoLog);
-		std::cout << "error! glCompileShader fails on vexter shader: \n" << infoLog << std::endl;
+		std::cout << "error! glCompileShader() fails on vexter shader\n" << std::endl;
 		exit(EXIT_FAILURE);
 	};
 	
@@ -144,10 +144,11 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glCompileShader(fragshader);
 	
 	glGetShaderiv(fragshader, GL_COMPILE_STATUS, &success);
+	glGetShaderInfoLog(fragshader, 4096, 0, infoLog);
+	std::cout << infoLog << std::endl;
 	if(	!success)
 	{
-		glGetShaderInfoLog(fragshader, 512, 0, infoLog);
-		std::cout << "error! glCompileShader fails on fragment shader: \n" << infoLog << std::endl;
+		std::cout << "error! glCompileShader() fails on fragment shader\n" << std::endl;
 		exit(EXIT_FAILURE);
 	};
 	
@@ -161,7 +162,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glGetProgramiv(_program, GL_LINK_STATUS, &success);
 	if(!success)
 	{
-		glGetProgramInfoLog(_program, 512, 0, infoLog);
+		glGetProgramInfoLog(_program, 4096, 0, infoLog);
 		std::cout << "error! glLinkProgram fails: \n" << infoLog << std::endl;
 	}
 
@@ -171,16 +172,80 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glUseProgram(_program);
 
 	glBindFragDataLocation(_program, 0, "color");
-	_cameraidx = glGetUniformLocation(_program, "camera");
+	_cameraidx = glGetUniformBlockIndex(_program, "_camera");
+	std::cerr << "_cameraidx: " << _cameraidx << std::endl;
+	glUniformBlockBinding(_program, _cameraidx, 1);
+
 	_rootidx = glGetUniformLocation(_program, "root");
-	_nodesidx = glGetUniformLocation(_program, "nodes");
-	_materialsidx = glGetUniformLocation(_program, "materials");
-	_lightsnbridx = glGetUniformLocation(_program, "lightsnbr");
-	_lightsidx = glGetUniformLocation(_program, "lights");
+	std::cerr << "_rootidx: " << _rootidx << std::endl;
+
+	_nodesidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_nodes");
+	std::cerr << "_nodesidx: " << _nodesidx << std::endl;
+	glShaderStorageBlockBinding(_program, _nodesidx, 3);
+
+	_materialsidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_materials");
+	std::cerr << "_materialsidx: " << _materialsidx << std::endl;
+	glShaderStorageBlockBinding(_program, _materialsidx, 4);
+
+	_lightsnbridx = glGetUniformLocation(_program, "lights_number");
+	std::cerr << "_lightsnbridx: " << _lightsnbridx << std::endl;
+
+	_lightsidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_lights");
+	std::cerr << "_lightsidx: " << _lightsidx << std::endl;
+	glShaderStorageBlockBinding(_program, _lightsidx, 6);
+
+	//glGenBuffers(1, &_nodesbuffer);
+	//glGenBuffers(1, &_materialsbuffer);
+	//glGenBuffers(1, &_lightsbuffer);
+
+	GLfloat vertices[] = {
+    	-1.0f,	1.0f,	0.0f,
+    	1.0f,	1.0f,	0.0f,
+     	-1.0f,	-1.0f,	0.0f,
+     	1.0f,	1.0f,	0.0f,
+     	1.0f,	-1.0f,	0.0f,
+     	-1.0f,	-1.0f,	0.0f
+	};
+
+
+	//camera
+	glGenBuffers(1, &_camerabuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, _camerabuffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(Computedcamera), 0, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, _camerabuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glGenBuffers(1, &_nodesbuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, 4096 * sizeof(Aabbnode), 0, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _nodesbuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 	glGenBuffers(1, &_materialsbuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _materialsbuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, _materialsbuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 	glGenBuffers(1, &_lightsbuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, _lightsbuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	//if (glGetError() != GL_NO_ERROR) exit(-1);
+
+	////////
+
+	glGenVertexArrays(1, &VAO); 
+	glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    // 2. Copy our vertices array in a buffer for OpenGL to use
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // 3. Then set our vertex attributes pointers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);  
+	//4. Unbind the VAO
+	glBindVertexArray(0);
 }
 
 Renderer::~Renderer()
@@ -230,67 +295,60 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 	{
 		_nodes_mem_size = ge->aabbtree._size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(Aabbtree::Node), 0, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _nodesbuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(Aabbnode), 0, GL_DYNAMIC_DRAW);
+		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, _nodesidx, _nodesbuffer);
 	}
 	if (_materials_mem_size < ge->_materials_size)
 	{
 		_materials_mem_size = ge->_materials_size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _materialsbuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, _materials_mem_size * sizeof(Material), (void *)ge->_materials, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, _materialsbuffer);
+		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, _materialsidx, _materialsbuffer);
 	}
 	if (_lights_mem_size < ge->_lights_size)
 	{
 		_lights_mem_size = ge->_lights_size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, _lights_mem_size * sizeof(Light), 0, GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 7, _lightsbuffer);
+		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, _lightsidx, _lightsbuffer);
 	}
-	
+
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
-	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, _nodes_mem_size * sizeof(Aabbtree::Node), (void *)ge->aabbtree._nodes);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, _nodes_mem_size * sizeof(Aabbnode), (void *)ge->aabbtree._nodes);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights);
+
+	glProgramUniform1i(_program, _rootidx, ge->aabbtree._root);
+	glProgramUniform1ui(_program, _lightsnbridx, ge->_lights_count);
 }
 
 void	Renderer::render(Graphicengine const *ge)
 {
-/*	Computedcamera	cm;
+	Computedcamera	cm;
 
 	_compute_camera(ge->camera, cm);
+	glBindBuffer(GL_UNIFORM_BUFFER, _camerabuffer);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Computedcamera), (void *)&cm);
 	_set_buffer(ge);
 
-	check_error(clEnqueueWriteBuffer(_queue, _camera_mem, CL_FALSE, 0, sizeof(Computedcamera), (void *)&cm, 0, 0, 0), "clEnqueueWriteBuffer()");
-	check_error(clSetKernelArg(_kernel, 0, sizeof(cl_mem), &_camera_mem), "clSetKernelArg(camera)");
-	check_error(clSetKernelArg(_kernel, 1, sizeof(int), &ge->aabbtree._root), "clSetKernelArg(root)");
-	check_error(clSetKernelArg(_kernel, 2, sizeof(cl_mem), &_nodes_mem), "clSetKernelArg(nodes)");
-	check_error(clSetKernelArg(_kernel, 3, sizeof(cl_mem), &_materials_mem), "clSetKernelArg(materials)");
-	check_error(clSetKernelArg(_kernel, 4, sizeof(unsigned int), &ge->_lights_count), "clSetKernelArg(lights_count)");
-	check_error(clSetKernelArg(_kernel, 5, sizeof(cl_mem), &_lights_mem), "clSetKernelArg(lights)");
-	check_error(clSetKernelArg(_kernel, 6, sizeof(cl_mem), &_image_mem), "clSetKernelArg(image)");
+	//glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+	//glBindTexture(GL_TEXTURE_2D, _texture);
 
-	size_t const	origin[3] = { 0, 0, 0 };
-	size_t const	image_size[3] = { width, height, 1 };
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0); 
 
-	glFinish();
-	check_error(clEnqueueAcquireGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueAcquireGLObjects()");
-	check_error(clEnqueueNDRangeKernel(_queue, _kernel, 2, 0, image_size, 0, 0, 0, 0), "clEnqueueNDRangeKernel()");
-	check_error(clEnqueueReleaseGLObjects(_queue, 1, &_image_mem, 0, 0, 0), "clEnqueueReleaseGLObjects()");
-	clFinish(_queue);*/
-
-	glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
-	glBindTexture(GL_TEXTURE_2D, _texture);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	/*glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);	glVertex3f(0.0, 0.0f, 0.0f);
 		glTexCoord2f(1.0f, 0.0f);	glVertex3f((float)width, 0.0f, 0.0f);
 		glTexCoord2f(1.0f, 1.0f);	glVertex3f((float)width, (float)height, 0.0f);
 		glTexCoord2f(0.0f, 1.0f);	glVertex3f(0.0, (float)height, 0.0f);
-	glEnd();
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnd();*/
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glFinish();
+
 	SDL_GL_SwapWindow(_window);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
