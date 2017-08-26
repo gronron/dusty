@@ -54,12 +54,11 @@ void	Expulsor::tick(float const delta)
 		if (!ps->_particles[i].active)
 		{
 			ps->_particles[i].position = ps->position;
-			ps->_particles[i].velocity[0] = RAND().rand_float() * 2.0f - 1.0f;
-			ps->_particles[i].velocity[1] = RAND().rand_float() * 2.0f - 1.0f;
-			ps->_particles[i].velocity[2] = RAND().rand_float() * 2.0f - 1.0f;
+			ps->_particles[i].velocity[0] = RAND().rand_float();
+			ps->_particles[i].velocity[1] = RAND().rand_float();
+			ps->_particles[i].velocity[2] = RAND().rand_float();
 			ps->_particles[i].velocity[3] = 0.0f;
 			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * RAND().rand_float(velocity[0], velocity[1]);
-			
 		}
 	}
 }
@@ -86,9 +85,9 @@ void	Attractor::tick(float const delta)
 
 		if (!ps->_particles[i].active)
 		{
-			ps->_particles[i].velocity[0] = RAND().rand_float() * 2.0f - 1.0f;
-			ps->_particles[i].velocity[1] = RAND().rand_float() * 2.0f - 1.0f;
-			ps->_particles[i].velocity[2] = RAND().rand_float() * 2.0f - 1.0f;
+			ps->_particles[i].velocity[0] = RAND().rand_float();
+			ps->_particles[i].velocity[1] = RAND().rand_float();
+			ps->_particles[i].velocity[2] = RAND().rand_float();
 			ps->_particles[i].velocity[3] = 0.0f;
 			ps->_particles[i].velocity = vunit<float>(ps->_particles[i].velocity) * RAND().rand_float(velocity[0], velocity[1]);
 			ps->_particles[i].position = ps->position - ps->_particles[i].velocity / ps->_particles[i].fade_rate;

@@ -72,53 +72,53 @@ struct				Rotation
 
 class	Graphicengine
 {
-	public:
+public:
+
+	Camera			camera;
+
+	unsigned int	_animations_size;
+	unsigned int	_animations_count;
+	Animation		**_animations;
+
+	unsigned int	_lights_size;
+	unsigned int	_lights_count;
+	Light			*_lights;
+	Light			***_lights_links;
+
+	unsigned int	_materials_size;
+	unsigned int	_materials_count;
+	Material		*_materials;
 	
-		Camera			camera;
+	vec<float, 4>	*_vertices;
+	vec<float, 2>	*_texcoord;
+	vec<float, 4>   *_color;
 
-		unsigned int	_animations_size;
-		unsigned int	_animations_count;
-		Animation		**_animations;
+	Haabbtree		aabbtree;
+	OrderedAabbTree	oatree;
 
-		unsigned int	_lights_size;
-		unsigned int	_lights_count;
-		Light			*_lights;
-		Light			***_lights_links;
-
-		unsigned int	_materials_size;
-		unsigned int	_materials_count;
-		Material		*_materials;
-		
-		vec<float, 4>	*_vertices;
-		vec<float, 2>	*_texcoord;
-		vec<float, 4>   *_color;
-
-		Haabbtree		aabbtree;
-		OrderedAabbTree	oatree;
-
-		Renderer		_renderer;
+	Renderer		_renderer;
 
 
-		Graphicengine();
-		~Graphicengine();
+	Graphicengine();
+	~Graphicengine();
 
-		void	set_fullscreen(bool const);
-		void	set_resolution(unsigned int const, unsigned int const);
-		void	set_camera(vec<float, 4> const &, vec<float, 2> const &);
+	void	set_fullscreen(bool const);
+	void	set_resolution(unsigned int const, unsigned int const);
+	void	set_camera(vec<float, 4> const &, vec<float, 2> const &);
 
-		void	tick(float const delta);
+	void	tick(float const delta);
 
-		void	add_animation(Animation *);
-		void	remove_animation(Animation *);
+	void	add_animation(Animation *);
+	void	remove_animation(Animation *);
 
-		void	new_light(Light **);
-		void	delete_light(Light *);
-		
-		void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
-		void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
-		unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
+	void	new_light(Light **);
+	void	delete_light(Light *);
+	
+	void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+	void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+	unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
 
-		void	_load_materials(char const *filename);
+	void	_load_materials(char const *filename);
 };
 
 inline void	Graphicengine::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const

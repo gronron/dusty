@@ -176,27 +176,20 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	std::cerr << "_cameraidx: " << _cameraidx << std::endl;
 	glUniformBlockBinding(_program, _cameraidx, 1);
 
-	_rootidx = glGetUniformLocation(_program, "root");
-	std::cerr << "_rootidx: " << _rootidx << std::endl;
-
 	_nodesidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_nodes");
 	std::cerr << "_nodesidx: " << _nodesidx << std::endl;
-	glShaderStorageBlockBinding(_program, _nodesidx, 3);
+	glShaderStorageBlockBinding(_program, _nodesidx, 2);
 
 	_materialsidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_materials");
 	std::cerr << "_materialsidx: " << _materialsidx << std::endl;
-	glShaderStorageBlockBinding(_program, _materialsidx, 4);
+	glShaderStorageBlockBinding(_program, _materialsidx, 3);
 
 	_lightsnbridx = glGetUniformLocation(_program, "lights_number");
 	std::cerr << "_lightsnbridx: " << _lightsnbridx << std::endl;
 
 	_lightsidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_lights");
 	std::cerr << "_lightsidx: " << _lightsidx << std::endl;
-	glShaderStorageBlockBinding(_program, _lightsidx, 6);
-
-	//glGenBuffers(1, &_nodesbuffer);
-	//glGenBuffers(1, &_materialsbuffer);
-	//glGenBuffers(1, &_lightsbuffer);
+	glShaderStorageBlockBinding(_program, _lightsidx, 5);
 
 	GLfloat vertices[] = {
     	-1.0f,	1.0f,	0.0f,
@@ -206,7 +199,6 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
      	1.0f,	-1.0f,	0.0f,
      	-1.0f,	-1.0f,	0.0f
 	};
-
 
 	//camera
 	glGenBuffers(1, &_camerabuffer);
@@ -218,17 +210,17 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glGenBuffers(1, &_nodesbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, 4096 * sizeof(AabbNode), 0, GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _nodesbuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _nodesbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glGenBuffers(1, &_materialsbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _materialsbuffer);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, _materialsbuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _materialsbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glGenBuffers(1, &_lightsbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, _lightsbuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, _lightsbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	//if (glGetError() != GL_NO_ERROR) exit(-1);
 
@@ -269,24 +261,18 @@ void	Renderer::set_fullscreen(bool const fullscreen)
 
 void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
 {
-/*	cl_int	error;
-
 	width = w;
 	height = h;
+
+	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glViewport(0, 0, w, h);
-	glOrtho(0, w, h, 0, -1, 1);
+	glOrtho(0, width, height, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	glBindTexture(GL_TEXTURE_2D, _texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
-	glFinish();
-
-	clReleaseMemObject(_image_mem);
-	_image_mem = clCreateFromGLTexture(_context, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, _texture, &error);
-	check_error(error, "clCreateImage()");*/
 }
 
 void		Renderer::_set_buffer(Graphicengine const *ge)
@@ -296,21 +282,18 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 		_nodes_mem_size = ge->oatree._size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(OrderedAabbNode), 0, GL_DYNAMIC_DRAW);
-		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, _nodesidx, _nodesbuffer);
 	}
 	if (_materials_mem_size < ge->_materials_size)
 	{
 		_materials_mem_size = ge->_materials_size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _materialsbuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, _materials_mem_size * sizeof(Material), (void *)ge->_materials, GL_DYNAMIC_DRAW);
-		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, _materialsidx, _materialsbuffer);
 	}
 	if (_lights_mem_size < ge->_lights_size)
 	{
 		_lights_mem_size = ge->_lights_size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, _lights_mem_size * sizeof(Light), 0, GL_DYNAMIC_DRAW);
-		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, _lightsidx, _lightsbuffer);
 	}
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
@@ -318,7 +301,6 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights);
 
-	glProgramUniform1i(_program, _rootidx, 0);
 	glProgramUniform1ui(_program, _lightsnbridx, ge->_lights_count);
 }
 

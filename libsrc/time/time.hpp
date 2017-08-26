@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015, Geoffrey TOURON
+Copyright (c) 2015-207, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef TIME_H_
-#define TIME_H_
+#pragma once
 
 void	dsleep(double const second);
 double	dclock();
-
-#endif

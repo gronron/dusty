@@ -83,8 +83,6 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 	end[1] = 64;
 	end[2] = 1;
 	fill(start, end, 1);
-
-	//generate_chunk(chunks);
 	
 	if (engine->graphic)
 	{
@@ -95,6 +93,8 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 
 		_reduce_world();
 	}
+
+	load("dusty_world.dstw");
 }
 
 World::~World()

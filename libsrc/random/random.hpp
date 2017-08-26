@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class Random
 {
-	public:
+public:
 
 	uint64_t	s[2];
 

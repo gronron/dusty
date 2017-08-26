@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2016, Geoffrey TOURON
+Copyright (c) 2015-2017, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef HAABBTREE_H_
-#define HAABBTREE_H_
+#pragma once
 
 #include "aabbtree.hpp"
 
 class	Haabbtree : public AabbTree
 {
-	public:
+public:
 
-		int		_realroot;
-		bool	_transitory;
+	int		_realroot;
+	bool	_transitory;
 
 
-		Haabbtree();
-		
-		void	add_transient_aabb(Aabb const &, int const data);
-		void	attach_transient_tree();
-		void	delete_transient_tree();
+	Haabbtree();
+	
+	void	add_transient_aabb(Aabb const &, int const data);
+	void	attach_transient_tree();
+	void	delete_transient_tree();
 };
 
 class	Maabbtree : public AabbTree
 {
-	public:
+public:
 
-		int		close_current_tree();
-		void	delete_tree(int const);
+	int		close_current_tree();
+	void	delete_tree(int const);
 };
-
-#endif

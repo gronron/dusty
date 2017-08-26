@@ -71,8 +71,6 @@ layout (std140) uniform _camera
     Camera camera;
 };
 
-uniform int root;
-
 layout (std430) readonly buffer _nodes
 {
     AabbNode nodes[];
@@ -136,7 +134,7 @@ bool			find_closest(in const Ray ray, inout Impact data)
 	float		near_stack[SEARCHSTACKSIZE];
 	int			top = 0;
 
-	stack[top] = root;
+	stack[top] = 0;
 	near_stack[top] = 0.0f;
 	do
 	{
@@ -207,7 +205,7 @@ float		find_closest_s(in const Ray ray, in const int value, out int idx)
 	float		near_stack[SEARCHSTACKSIZE];
 	int			top = 0;
 
-	stack[top] = root;
+	stack[top] = 0;
 	near_stack[top] = 0.0f;
 	do
 	{
@@ -265,7 +263,7 @@ float		find_closest_s(in const Ray ray, in const int value, out int idx)
 	if (idx == -1)
 	{
 		float	far;
-		intersect_rayaabb(invray, root, far, near);
+		intersect_rayaabb(invray, 0, far, near);
 	}
 	return (near);
 }
@@ -277,7 +275,7 @@ float			find_closest_o(in const Ray ray, in const int idx)
 	int			top = 0;
 	float		near = 2.0f;
 
-	stack[top] = root;
+	stack[top] = 0;
 	do
 	{
 		const int	index = stack[top];
@@ -311,7 +309,7 @@ bool			compute_shadow(in const Ray ray, in const float distance, in const int id
 	int			stack[SEARCHSTACKSIZE];
 	int			top = 0;
 
-	stack[top] = root;
+	stack[top] = 0;
 	do
 	{
 		const int	index = stack[top];
@@ -357,7 +355,7 @@ float		compute_aocclusion(in const vec4 origin, in const vec4 normal)
 	aabb.bottom = (origin - vec4(1.0f, 1.0f, 1.0f, 0.0f)) + normal * (1.0f + FLT_EPSILON);
 	aabb.top = aabb.bottom + vec4(2.0f, 2.0f, 2.0f, 0.0f);
 
-	stack[top] = root;
+	stack[top] = 0;
 	do
 	{
 		const int	index = stack[top];
@@ -411,7 +409,7 @@ void		main()
 
 			shadowray.origin = ray.origin + ray.direction * impact.near;
 
-			for (unsigned int i = 0; i < lights_number; ++i)
+			for (uint i = 0; i < lights_number; ++i)
 			{
 				shadowray.direction = lights[i].position - shadowray.origin;
 				const float	distance = length(shadowray.direction);

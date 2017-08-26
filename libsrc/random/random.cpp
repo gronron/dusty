@@ -27,12 +27,15 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
+/* xoroshiro128+ written in 2016 by David Blackman and Sebastiano Vigna (vigna@acm.org) */
+
 
 #include "random.hpp"
+#include "time/time.hpp"
 
 Random					&Random::get_instance()
 {
-	thread_local Random	instance(0);
+	thread_local Random	instance((uint64_t)dclock());
 
 	return (instance);
 }
@@ -40,7 +43,7 @@ Random					&Random::get_instance()
 Random::Random(uint64_t const seed)
 {
 	s[0] = seed;
-	s[1] = seed + seed;
+	s[1] = seed + (seed >> 2);
 }
 
 static inline uint64_t rotl(uint64_t const x, int const k)
