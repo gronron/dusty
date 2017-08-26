@@ -78,8 +78,8 @@ class	Physicengine
 		unsigned int	_prsize;
 		Pair			*_pairs;
 
-		Aabbtree		_dynamictree;
-		Aabbtree		_statictree;
+		AabbTree		_dynamictree;
+		AabbTree		_statictree;
 
 		std::shared_mutex	_mutex;
 

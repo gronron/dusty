@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "aabbtree.hpp"
 
-class	Haabbtree : public Aabbtree
+class	Haabbtree : public AabbTree
 {
 	public:
 
@@ -48,7 +48,7 @@ class	Haabbtree : public Aabbtree
 		void	delete_transient_tree();
 };
 
-class	Maabbtree : public Aabbtree
+class	Maabbtree : public AabbTree
 {
 	public:
 

@@ -217,7 +217,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 
 	glGenBuffers(1, &_nodesbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, 4096 * sizeof(Aabbnode), 0, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, 4096 * sizeof(AabbNode), 0, GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _nodesbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -291,11 +291,11 @@ void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
 
 void		Renderer::_set_buffer(Graphicengine const *ge)
 {
-	if (_nodes_mem_size < ge->aabbtree._size)
+	if (_nodes_mem_size < ge->oatree._size)
 	{
-		_nodes_mem_size = ge->aabbtree._size;
+		_nodes_mem_size = ge->oatree._size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(Aabbnode), 0, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(OrderedAabbNode), 0, GL_DYNAMIC_DRAW);
 		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, _nodesidx, _nodesbuffer);
 	}
 	if (_materials_mem_size < ge->_materials_size)
@@ -314,11 +314,11 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 	}
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
-	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, _nodes_mem_size * sizeof(Aabbnode), (void *)ge->aabbtree._nodes);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->oatree._count * sizeof(OrderedAabbNode), (void *)ge->oatree._nodes);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights);
 
-	glProgramUniform1i(_program, _rootidx, ge->aabbtree._root);
+	glProgramUniform1i(_program, _rootidx, 0);
 	glProgramUniform1ui(_program, _lightsnbridx, ge->_lights_count);
 }
 

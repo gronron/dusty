@@ -106,6 +106,7 @@ void	Graphicengine::tick(float const delta)
 	_renderer.draw_text(str, {camera.resolution[0] - 64.0f, 16.0f}, {0.3f, 0.3f}, {0.35f, 0.6f, 0.35f, 1.0f});
 
 	aabbtree.attach_transient_tree();
+	oatree.construct_from(*(AabbTree *)&aabbtree);
 	_renderer.render(this);
 	aabbtree.delete_transient_tree();
 }

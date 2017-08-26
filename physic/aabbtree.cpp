@@ -31,20 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "new.hpp"
 #include "math/vec_util.hpp"
-#include "aabbtree.hpp"
+#include "AabbTree.hpp"
 
 #define GAP 0.2f
 #define	MUL 2.0f
-
-inline float	perimeter(Aabb const &x)
-{
-	return (vsum(x.top - x.bottom));
-}
-
-inline float	merged_perimeter(Aabb const &x, Aabb const &y)
-{
-	return (vsum(vmax(x.top, y.top) - vmin(x.bottom, y.bottom)));
-}
 
 inline float			surfacearea(Aabb const &x)
 {
@@ -60,9 +50,9 @@ inline float			merged_surfacearea(Aabb const &x, Aabb const &y)
 	return (a[0] * a[1] + a[0] * a[2] + a[1] * a[2]);
 }
 
-Aabbtree::Aabbtree() : _size(1024), _nodes(nullptr), _root(-1), _free(0)
+AabbTree::AabbTree() : _size(1024), _nodes(nullptr), _root(-1), _free(0)
 {
-	_nodes = new Aabbnode[_size];
+	_nodes = new AabbNode[_size];
 	
 	for (unsigned int i = 0; i < _size - 1; ++i)
 	{
@@ -73,12 +63,12 @@ Aabbtree::Aabbtree() : _size(1024), _nodes(nullptr), _root(-1), _free(0)
 	_nodes[_size - 1].height = -1;
 }
 
-Aabbtree::~Aabbtree()
+AabbTree::~AabbTree()
 {
 	delete [] _nodes;
 }
 
-void	Aabbtree::reset()
+void	AabbTree::reset()
 {
 	_root = -1;
 	_free = 0;
@@ -91,7 +81,7 @@ void	Aabbtree::reset()
 	_nodes[_size - 1].height = -1;
 }
 
-int				Aabbtree::add_aabb(Aabb const &aabb, int const data)
+int				AabbTree::add_aabb(Aabb const &aabb, int const data)
 {
 	int const	index = _allocate_node();
 	
@@ -105,7 +95,7 @@ int				Aabbtree::add_aabb(Aabb const &aabb, int const data)
 	return (index);
 }
 
-int				Aabbtree::add_saabb(Aabb const &aabb, int const data)
+int				AabbTree::add_saabb(Aabb const &aabb, int const data)
 {
 	int const	index = _allocate_node();
 
@@ -119,7 +109,7 @@ int				Aabbtree::add_saabb(Aabb const &aabb, int const data)
 	return (index);
 }
 
-void	Aabbtree::remove_aabb(int const index)
+void	AabbTree::remove_aabb(int const index)
 {
 	if (!_nodes[index].height)
 	{
@@ -128,7 +118,7 @@ void	Aabbtree::remove_aabb(int const index)
 	}
 }
 
-void	Aabbtree::remove_aabbs(unsigned int const data)
+void	AabbTree::remove_aabbs(unsigned int const data)
 {
 	for (unsigned int i = 0; i < _size; ++i)
 	{
@@ -140,7 +130,7 @@ void	Aabbtree::remove_aabbs(unsigned int const data)
 	}
 }
 
-bool					Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity)
+bool					AabbTree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> const &velocity)
 {
 	Aabb				a = aabb;
 	vec<float, 4> const	b = velocity * MUL;
@@ -165,7 +155,7 @@ bool					Aabbtree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> co
 	return (true);
 }
 
-bool	Aabbtree::move_saabb(int const index, Aabb const &aabb)
+bool	AabbTree::move_saabb(int const index, Aabb const &aabb)
 {
 	if (_nodes[index].aabb.is_containing(aabb))
 		return (false);
@@ -177,19 +167,19 @@ bool	Aabbtree::move_saabb(int const index, Aabb const &aabb)
 	return (true);
 }
 
-void	Aabbtree::update_aabbdata(int const index, int const data)
+void	AabbTree::update_aabbdata(int const index, int const data)
 {
 	_nodes[index].data = data;
 }
 
-void	Aabbtree::update_aabbsdata(int const olddata, int const newdata)
+void	AabbTree::update_aabbsdata(int const olddata, int const newdata)
 {
 	for (unsigned int i = 0; i < _size; ++i)
 		if (_nodes[i].height == 0 && _nodes[i].data == olddata)
 			 _nodes[i].data = newdata;
 }
 
-int		Aabbtree::_allocate_node()
+int		AabbTree::_allocate_node()
 {
 	int	index;
 
@@ -212,14 +202,14 @@ int		Aabbtree::_allocate_node()
 	return (index);
 }
 
-void	Aabbtree::_free_node(int const index)
+void	AabbTree::_free_node(int const index)
 {
 	_nodes[index].height = -1;
 	_nodes[index].next = _free;
 	_free = index;
 }
 
-void	Aabbtree::_insert_leaf(int const index)
+void	AabbTree::_insert_leaf(int const index)
 {
 	if (_root == -1)
 	{
@@ -269,7 +259,7 @@ void	Aabbtree::_insert_leaf(int const index)
 	_balance(_nodes[index].parent);
 }
 
-void	Aabbtree::_remove_leaf(int const index)
+void	AabbTree::_remove_leaf(int const index)
 {
 	if (index == _root)
 		_root = -1;
@@ -298,7 +288,7 @@ void	Aabbtree::_remove_leaf(int const index)
 	}
 }
 
-void	Aabbtree::_balance(int const index)
+void	AabbTree::_balance(int const index)
 {
 	for (int i = index; i != -1; i = _nodes[i].parent)
 	{
@@ -328,7 +318,7 @@ void	Aabbtree::_balance(int const index)
 	}
 }
 
-void			Aabbtree::_rotate(int const up, int const down, int const sibling)
+void			AabbTree::_rotate(int const up, int const down, int const sibling)
 {
 	int const	left = _nodes[down].left;
 	int const	right = _nodes[down].right;
@@ -381,51 +371,60 @@ void			Aabbtree::_rotate(int const up, int const down, int const sibling)
 
 ///////////////////////////////////////
 
-OrderedAabbTree::OrderedAabbTree() : _size(0), _nodes(nullptr)
+OrderedAabbTree::OrderedAabbTree() : _size(0), _count(0), _indexes(nullptr), _nodes(nullptr)
 {
 
 }
 
 OrderedAabbTree::~OrderedAabbTree()
 {
-	if (_nodes)
+	if (_size)
+	{
+		delete [] _indexes;
 		delete [] _nodes;
+	}
 }
 
-void				OrderedAabbTree::construct_from(unsigned int const size, unsigned int const root, Aabbnode const *unordered_nodes)
+void	OrderedAabbTree::construct_from(const AabbTree &aabbtree)
 {
-	unsigned int	stack[32];
-	unsigned int	new_index_stack[32];
-	unsigned int	top = 1;
+	_count = 0;
 
-	if (_size != size)
+	if (aabbtree._root == -1)
+		return;
+
+	if (_size != aabbtree._size)
 	{
-		_size = size;
+		_size = aabbtree._size;
 		if (_nodes)
+		{
+			delete [] _indexes;
 			delete [] _nodes;
-		_nodes = new AabbWithData[_size];
+		}
+		_indexes = new int[_size];
+		_nodes = new OrderedAabbNode[_size];
 	}
 
-	stack[0] = root;
-	new_index_stack[0] = 0;
-	do
+	_indexes[_count++] = aabbtree._root;
+
+	for (unsigned int i = 0; i < _count; ++i)
 	{
-		unsigned int const	index = stack[--top];
-		unsigned int const	new_index = new_index_stack[top];
+		unsigned int const	index = _indexes[i];
 
-		_nodes[new_index].aabb = unordered_nodes[index].aabb;
-		_nodes[new_index].data = unordered_nodes[index].data;
+		_nodes[i].aabb = aabbtree._nodes[index].aabb;
 
-		if (unordered_nodes[index].right != -1)
+		if (aabbtree._nodes[index].right != -1)
 		{
-			_nodes[new_index].data = 0xffffffff;
-			stack[top] = unordered_nodes[index].left;
-			new_index_stack[top++] = (new_index << 1) + 1;
-			stack[top] = unordered_nodes[index].right;
-			new_index_stack[top++] = (new_index << 1) + 2;
+			_nodes[i].data = -1;
+			_nodes[i].children = _count;
+			_indexes[_count++] = aabbtree._nodes[index].left;
+			_indexes[_count++] = aabbtree._nodes[index].right;
+		}
+		else
+		{
+			_nodes[i].data = aabbtree._nodes[index].data;
+			_nodes[i].children = -1;
 		}
 	}
-	while (top);
 }
 /*
 void	build_from(unsigned int const size, AabbWithData const *aabbs)

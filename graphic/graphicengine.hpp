@@ -69,21 +69,6 @@ struct				Rotation
 	int				index;
 };
 */
-struct			RenderingFrame
-{
-	Camera			camera;
-
-	unsigned int	_lights_size;
-	unsigned int	_lights_count;
-	Light			*_lights;
-
-	unsigned int	_materials_size;
-	unsigned int	_materials_count;
-	Material		*_materials;
-
-	unsigned int	_nodes_size;
-	AabbWithData	_nodes;
-};
 
 class	Graphicengine
 {
@@ -109,6 +94,7 @@ class	Graphicengine
 		vec<float, 4>   *_color;
 
 		Haabbtree		aabbtree;
+		OrderedAabbTree	oatree;
 
 		Renderer		_renderer;
 

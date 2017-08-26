@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
-struct		Aabbnode
+struct		AabbNode
 {
 	Aabb	aabb;
 	union
@@ -48,82 +48,90 @@ struct		Aabbnode
 		};
 		struct
 		{
-			int				next;
-			unsigned int	data;
+			int	next;
+			int	data;
 		};
+	};
+};
+
+union			OrderedAabbNode
+{
+	Aabb		aabb;
+	struct
+	{
+		float	padding_[3];
+		int		data;
+		float	_padding[3];
+		int		children;
 	};
 };
 
 ///////////////////////////////////////
 
-class	Aabbtree
+class	AabbTree
 {
-	public:
+public:
 
-		unsigned int	_size;
-		Aabbnode		*_nodes;
+	unsigned int	_size;
+	AabbNode		*_nodes;
 
-		int				_root;
-		int				_free;
+	int				_root;
+	int				_free;
 
 
-		Aabbtree();
-		~Aabbtree();
-		
-		void	reset();
-		void	order_nodes();
+	AabbTree();
+	~AabbTree();
+	
+	void	reset();
+	void	order_nodes();
 
-		int		add_aabb(Aabb const &, int const data);
-		int		add_saabb(Aabb const &, int const data);
-		void	remove_aabb(int const);
-		void	remove_aabbs(unsigned int const);
-		bool	move_aabb(int const, Aabb const &, vec<float, 4> const &);
-		bool	move_saabb(int const, Aabb const &);
-		void	update_aabbdata(int const, int const data);
-		void	update_aabbsdata(int const oldata, int const newdata);
+	int		add_aabb(Aabb const &, int const data);
+	int		add_saabb(Aabb const &, int const data);
+	void	remove_aabb(int const);
+	void	remove_aabbs(unsigned int const);
+	bool	move_aabb(int const, Aabb const &, vec<float, 4> const &);
+	bool	move_saabb(int const, Aabb const &);
+	void	update_aabbdata(int const, int const data);
+	void	update_aabbsdata(int const oldata, int const newdata);
 
-		template<class T>
-		void	query(Aabb const &, T *, void (T::*)(int const, int const)) const;
-		template <class T>
-		void	raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
-		template <class T>
-		void	raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
+	template<class T>
+	void	query(Aabb const &, T *, void (T::*)(int const, int const)) const;
+	template <class T>
+	void	raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
+	template <class T>
+	void	raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const;
 
-		int		_allocate_node();
-		void	_free_node(int const);
+	int		_allocate_node();
+	void	_free_node(int const);
 
-		void	_insert_leaf(int const);
-		void	_remove_leaf(int const);
+	void	_insert_leaf(int const);
+	void	_remove_leaf(int const);
 
-		void	_balance(int const);
-		void	_rotate(int const, int const, int const);
+	void	_balance(int const);
+	void	_rotate(int const, int const, int const);
 };
 
 ///////////////////////////////////////
-
-struct	AabbWithData
-{
-	Aabb			aabb;
-	unsigned int	data;
-};
 
 class	OrderedAabbTree
 {
 	public:
 
 		unsigned int	_size;
-		AabbWithData	*_nodes;
+		unsigned int	_count;
+		int				*_indexes;
+		OrderedAabbNode	*_nodes;
 
 		OrderedAabbTree();
 		~OrderedAabbTree();
 
-		void	construct_from(unsigned int const, unsigned int const, Aabbnode const *nodes);
+	void	construct_from(const AabbTree &);
 };
 
 ///////////////////////////////////////
 
 template<class T>
-void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const, int const)) const
+void	AabbTree::query(Aabb const &aabb, T* object, void (T::*callback)(int const, int const)) const
 {
 	if (_root != -1)
 	{
@@ -151,7 +159,7 @@ void	Aabbtree::query(Aabb const &aabb, T* object, void (T::*callback)(int const,
 }
 
 template <class T>
-void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const
+void	AabbTree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const
 {
 	if (_root != -1)
 	{
@@ -182,7 +190,7 @@ void	Aabbtree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(in
 }
 
 template <class T>
-void	Aabbtree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const //need correction
+void	AabbTree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const, int const, float const, float const)) const //need correction
 {
 	if (_root != -1)
 	{

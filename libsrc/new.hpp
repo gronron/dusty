@@ -28,10 +28,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef NEW_H_
-#define NEW_H_
+#pragma once
 
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 
 template<class T>
 T		*resize(T *ptr, unsigned int const oldsize, unsigned int const newsize)
@@ -40,8 +40,7 @@ T		*resize(T *ptr, unsigned int const oldsize, unsigned int const newsize)
 
 	if (!(a = new T[newsize]))
 		exit(EXIT_FAILURE);
-	for (unsigned int i = 0; i < (oldsize < newsize ? oldsize : newsize); ++i)
-		a[i] = ptr[i];
+	memcpy(a, ptr, (oldsize < newsize ? oldsize : newsize) * sizeof(T));
 	delete [] ptr;
 
 	return (a);
@@ -91,5 +90,3 @@ void	delete_space(T ***a)
 	delete [] *a;
 	delete [] a;
 }
-
-#endif

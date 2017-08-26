@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "haabbtree.hpp"
 
-Haabbtree::Haabbtree() : Aabbtree(), _realroot(-1), _transitory(false)
+Haabbtree::Haabbtree() : AabbTree(), _realroot(-1), _transitory(false)
 {
 
 }
