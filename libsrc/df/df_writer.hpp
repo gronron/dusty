@@ -28,12 +28,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef DF_WRITER_H_
-#define DF_WRITER_H_
+#pragma once
 
 #include <iostream>
 #include "df_node.hpp"
 
 bool	df_write(Df_node *node, std::ostream &os, unsigned int indent_size = 0);
-
-#endif

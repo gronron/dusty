@@ -28,13 +28,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef DF_PARSER_H_
-#define DF_PARSER_H_
+#pragma once
 
 #include <iostream>
 #include "df_node.hpp"
 
 Df_node	*df_parse(char const *data);
 Df_node	*df_parse_file(char const *filename);
-
-#endif

@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2017, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,13 @@ struct	Glyph
 	vec<float, 2>	center;
 };
 
+struct	DChar
+{
+	vec<float, 4>	position;
+	vec<float, 4>	color;
+	vec<float, 2>	coord;
+};
+
 class	Renderer
 {
 public:
@@ -80,6 +87,10 @@ public:
 
 	GLuint			_glyphstexture;
 	Glyph			_glyphs[128];
+
+	unsigned int	_vertices_size;
+	unsigned int	_vertices_count;
+	float			*_text_vertices;
 
 
 	Renderer(unsigned int const, unsigned int const, bool const);

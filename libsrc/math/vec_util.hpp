@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef VEC_UTIL_H_
-#define VEC_UTIL_H_
+#pragma once
 
 #include <cmath>
 #include "vec.hpp"
@@ -304,5 +303,3 @@ namespace Sgl
 	}
 
 }
-
-#endif

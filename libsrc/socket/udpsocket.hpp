@@ -28,73 +28,70 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef UDPSOCKET_H_
-#define UDPSOCKET_H_
+#pragma once
 
 #include "socket.hpp"
 
-class	Udp_server
+class	UDPServer
 {
-	public:
+public:
 
-		struct	Client
-		{
-			sockaddr_in	addr;
-			char		ip[IP_STRSIZE];
-			char		port[PORT_STRSIZE];
-			int			next;
-		};
-
-
-		Socket			_id;
-
-		unsigned int	_maxclts;
-		Client			*_clients;
-		int				_free;
-		
-		sockaddr_in		_tempaddr;
+	struct	Client
+	{
+		sockaddr_in	addr;
+		char		ip[IP_STRSIZE];
+		char		port[PORT_STRSIZE];
+		int			next;
+	};
 
 
-		Udp_server();
-		Udp_server(char const *port, bool const ipv6);
-		~Udp_server();
+	Socket			_id;
 
-		bool		operator()();
-		bool		operator()(char const *port, bool const ipv6);
+	unsigned int	_maxclts;
+	Client			*_clients;
+	int				_free;
+	
+	sockaddr_in		_tempaddr;
 
-		bool		is_good() const;
 
-		char const	*get_clientip(int const id) const;
-		char const	*get_clientport(int const id) const;
+	UDPServer();
+	UDPServer(char const *port, bool const ipv6);
+	~UDPServer();
 
-		int			add_client();
-		void		rm_client(int const id);
+	bool		operator()();
+	bool		operator()(char const *port, bool const ipv6);
 
-		int			read(int &id, unsigned int const size, void *data);
-		int			write(int const id, unsigned int const size, void const *data);
+	bool		is_good() const;
+
+	char const	*get_clientip(int const id) const;
+	char const	*get_clientport(int const id) const;
+
+	int			add_client();
+	void		rm_client(int const id);
+
+	int			read(int &id, unsigned int const size, void *data);
+	int			write(int const id, unsigned int const size, void const *data);
 };
 
-class	Udpsocket
+class	UDPSocket
 {
-	public:
+public:
 
-		static int const	MAXUDPSIZE = 65535;
+	static int const	MAXUDPSIZE = 65535;
 
-		Socket	_id;
+	Socket	_id;
 
-		Udpsocket();
-		Udpsocket(char const *ip, char const *port, bool ipv6);
-		Udpsocket(char const *ip, char const *pin, char const *pout, bool ipv6);
-		~Udpsocket();
+	UDPSocket();
+	UDPSocket(char const *ip, char const *port, bool ipv6);
+	UDPSocket(char const *ip, char const *pin, char const *pout, bool ipv6);
+	~UDPSocket();
 
-		bool	operator()();
-		bool	operator()(char const *ip, char const *port, bool ipv6);
-		bool	operator()(char const *ip, char const *pin, char const *pout, bool ipv6);
+	bool	operator()();
+	bool	operator()(char const *ip, char const *port, bool ipv6);
+	bool	operator()(char const *ip, char const *pin, char const *pout, bool ipv6);
 
-		bool	is_good() const;
+	bool	is_good() const;
 
-		int		read(unsigned int const size, void *data);
-		int		write(unsigned int const size, void const *data);
+	int		read(unsigned int const size, void *data);
+	int		write(unsigned int const size, void const *data);
 };
-
-#endif

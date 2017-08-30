@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef SOCKET_H_
-#define SOCKET_H_
+#pragma once
 
 #if defined(_WIN32) || defined(__WIN32__)
 	#include <SDKDDKVer.h>
@@ -57,5 +56,3 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int const	IP_STRSIZE = 64;
 int const	PORT_STRSIZE = 8;
-
-#endif

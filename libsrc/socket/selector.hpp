@@ -28,31 +28,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef SELECTOR_H_
-#define SELECTOR_H_
+#pragma once
 
 #include "socket.hpp"
 
 class	Selector
 {
-    public:
+public:
 
-		Socket				_nfds;
-		fd_set				_readfds;
-		fd_set				_tempfds;
+	Socket				_nfds;
+	fd_set				_readfds;
+	fd_set				_tempfds;
 
 
-		Selector();
-		~Selector();
+	Selector();
+	~Selector();
 
-		template<class T>
-        void	add_socket(T const &);
-        template<class T>
-        void	rm_socket(T const &);
-        template<class T>
-        bool	is_ready(T const &);
+	template<class T>
+      void	add_socket(T const &);
+      template<class T>
+      void	rm_socket(T const &);
+      template<class T>
+      bool	is_ready(T const &);
 
-        bool	check(float timeout);
+      bool	check(float timeout);
 };
 
 template<class T>
@@ -74,5 +73,3 @@ inline bool	Selector::is_ready(T const &x)
 {
 	return (FD_ISSET(x._id, &_tempfds) != 0);
 }
-
-#endif

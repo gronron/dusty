@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2016, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef RUDP_H_
-#define RUDP_H_
+#pragma once
 
 #include "networkproto.hpp"
 
 class	Rudpsender
 {
-	public:
+public:
+
+	unsigned int	front;
+	unsigned int	back;
+
+	Rudp			packets[PACKETBUFFER];
 	
-		unsigned int	front;
-		unsigned int	back;
+	unsigned char	ack[FIELDSIZE];
 	
-		Rudp			packets[PACKETBUFFER];
-		
-		unsigned char	ack[FIELDSIZE];
-		
-		void	acknowledge(Packet &);
-		void	send(Packet &);
-		bool	tick(float const, Udpsocket &);
+	void	acknowledge(Packet &);
+	void	send(Packet &);
+	bool	tick(float const, UDPSocket &);
 };
 
 class	Rudpreceiver
 {
-	public:
+public:
+
+	unsigned int	ackid;
+
+	unsigned char	ack[FIELDSIZE];
 	
-		unsigned int	ackid;
-	
-		unsigned char	ack[FIELDSIZE];
-		
-		void	check(Packet &);
-		bool	tick(float const, Udpsocket &);
+	void	check(Packet &);
+	bool	tick(float const, UDPSocket &);
 };
 
 class	Mrudpsender
 {
-	public:
-	
-		unsigned int	front;
-		unsigned int	back;
-	
-		Rudp			packets[PACKETBUFFER];
-		
-		unsigned char	ack[256][FIELDSIZE];
-	
-		void	acknowledge(int const, acket &);
-		void	send(Packet &);
-		bool	tick(float const, Udpserver &);
-};
+public:
 
-#endif
+	unsigned int	front;
+	unsigned int	back;
+
+	Rudp			packets[PACKETBUFFER];
+	
+	unsigned char	ack[256][FIELDSIZE];
+
+	void	acknowledge(int const, acket &);
+	void	send(Packet &);
+	bool	tick(float const, Udpserver &);
+};

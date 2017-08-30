@@ -48,26 +48,26 @@ void	p_perror(char const *msg)
 	}
 	else
 	{
-		std::cerr << "Error: perror fails on FormatMessage" << std::endl;
+		std::cerr << "error! perror fails on FormatMessage" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
 
 class	Winsock_init
 {
-	public:
+public:
 
-		WSAData	wsaData;
+	WSAData	wsaData;
 
-		Winsock_init();
-		~Winsock_init();
+	Winsock_init();
+	~Winsock_init();
 };
 
 Winsock_init::Winsock_init()
 {
 	if (WSAStartup(MAKEWORD(2,2), &wsaData))
 	{
-		std::cerr << "Error: WSAStartup()" << std::endl;
+		std::cerr << "error! WSAStartup()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }

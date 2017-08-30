@@ -32,23 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdio>
 #include "tcpsocket.hpp"
 
-Tcp_server::Tcp_server() : _id(INVALID_SOCKET)
+TCPServer::TCPServer() : _id(INVALID_SOCKET)
 {
 
 }
 
-Tcp_server::Tcp_server(char const *port, bool ipv6) : _id(INVALID_SOCKET)
+TCPServer::TCPServer(char const *port, bool ipv6) : _id(INVALID_SOCKET)
 {
 	(*this)(port, ipv6);
 }
 
-Tcp_server::~Tcp_server()
+TCPServer::~TCPServer()
 {
 	if (_id != INVALID_SOCKET)
 		closesocket(_id);
 }
 
-bool	Tcp_server::operator()()
+bool	TCPServer::operator()()
 {
 	if (_id != INVALID_SOCKET)
 	{
@@ -58,7 +58,7 @@ bool	Tcp_server::operator()()
 	return (true);
 }
 
-bool				Tcp_server::operator()(char const *port, bool ipv6)
+bool				TCPServer::operator()(char const *port, bool ipv6)
 {
 	struct addrinfo	*res;
 	struct addrinfo	hints;
@@ -76,53 +76,53 @@ bool				Tcp_server::operator()(char const *port, bool ipv6)
 		{
 			if (bind(_id, res->ai_addr, res->ai_addrlen))
 			{
-				p_perror("Error: bind()");
+				p_perror("error! bind()");
 				(*this)();
 			}
 			else if (listen(_id, 5))
 			{
-				p_perror("Error: listen()");
+				p_perror("error! listen()");
 				(*this)();
 			}
 		}
 		else
-			p_perror("Error: socket()");
+			p_perror("error! socket()");
 		freeaddrinfo(res);
 	}
 	else
-		fprintf(stderr, "Error: getaddrinfo() %s\n", gai_strerror(err));
+		fprintf(stderr, "error! getaddrinfo() %s\n", gai_strerror(err));
 	return (_id != INVALID_SOCKET);
 }
 
-bool	Tcp_server::is_good() const
+bool	TCPServer::is_good() const
 {
 	return (_id != INVALID_SOCKET);
 }
 
 ///////////////////////////////////////
 
-Tcpsocket::Tcpsocket() : _id(INVALID_SOCKET)
+TCPSocket::TCPSocket() : _id(INVALID_SOCKET)
 {
 
 }
 
-Tcpsocket::Tcpsocket(Tcp_server &x, char *ip, char *port) : _id(INVALID_SOCKET)
+TCPSocket::TCPSocket(TCPServer &x, char *ip, char *port) : _id(INVALID_SOCKET)
 {
 	(*this)(x, ip, port);
 }
 
-Tcpsocket::Tcpsocket(char const *ip, char const *port) : _id(INVALID_SOCKET)
+TCPSocket::TCPSocket(char const *ip, char const *port) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, port);
 }
 
-Tcpsocket::~Tcpsocket()
+TCPSocket::~TCPSocket()
 {
 	if (_id != INVALID_SOCKET)
 		closesocket(_id);
 }
 
-bool	Tcpsocket::operator()()
+bool	TCPSocket::operator()()
 {
 	if (_id != INVALID_SOCKET)
 	{
@@ -132,7 +132,7 @@ bool	Tcpsocket::operator()()
 	return (true);
 }
 
-bool	Tcpsocket::operator()(Tcp_server &x, char *ip, char *port)
+bool	TCPSocket::operator()(TCPServer &x, char *ip, char *port)
 {
 	(*this)();
 	if (x._id != INVALID_SOCKET)
@@ -140,18 +140,18 @@ bool	Tcpsocket::operator()(Tcp_server &x, char *ip, char *port)
 		struct sockaddr_in	b;
 		socklen_t c = sizeof(b);
 		if ((_id = accept(x._id, (struct sockaddr *)&b, &c)) == INVALID_SOCKET)
-			p_perror("Error: accept()");
+			p_perror("error! accept()");
 		else if (ip || port)
 		{
 			int	err;
 			if ((err = getnameinfo((struct sockaddr *)&b, c, ip, ip ? IP_STRSIZE : 0, port, port ? PORT_STRSIZE : 0, NI_NUMERICHOST | NI_NUMERICSERV)))
-				fprintf(stderr, "Error: getnameinfo() %s\n", gai_strerror(err));
+				fprintf(stderr, "error! getnameinfo() %s\n", gai_strerror(err));
 		}
 	}
 	return (_id != INVALID_SOCKET);
 }
 
-bool				Tcpsocket::operator()(char const *ip, char const *port)
+bool				TCPSocket::operator()(char const *ip, char const *port)
 {
 	struct addrinfo	*res;
 	struct addrinfo	hints;
@@ -169,46 +169,46 @@ bool				Tcpsocket::operator()(char const *ip, char const *port)
 		{
 			if (connect(_id, res->ai_addr, res->ai_addrlen))
 			{
-				p_perror("Error: connect()");
+				p_perror("error! connect()");
 				(*this)();
 			}
 		}
 		else
-			p_perror("Error: socket()");
+			p_perror("error! socket()");
 		freeaddrinfo(res);
 	}
 	else
-		fprintf(stderr, "Error: getaddrinfo() %s\n", gai_strerror(err));
+		fprintf(stderr, "error! getaddrinfo() %s\n", gai_strerror(err));
 	return (_id != INVALID_SOCKET);
 }
 
-bool	Tcpsocket::is_good() const
+bool	TCPSocket::is_good() const
 {
 	return (_id != INVALID_SOCKET);
 }
 
-int 		Tcpsocket::read(unsigned int const size, void *data)
+int 		TCPSocket::read(unsigned int const size, void *data)
 {
 	int	rsize;
 
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = recv(_id, (char *)data, size, 0)) < 0)
-			p_perror("Error: recv()");
+			p_perror("error! recv()");
 		return (rsize);
 	}
 	else
 		return (-1);
 }
 
-int			Tcpsocket::write(unsigned int const size, void const *data)
+int			TCPSocket::write(unsigned int const size, void const *data)
 {
 	int	rsize;
 
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = send(_id, (char const *)data, size, 0)) < 0)
-			p_perror("Error: send()");
+			p_perror("error! send()");
 		return (rsize);
 	}
 	else

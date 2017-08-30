@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2017, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 /* xoroshiro128+ written in 2016 by David Blackman and Sebastiano Vigna (vigna@acm.org) */
-
 
 #include "random.hpp"
 #include "time/time.hpp"

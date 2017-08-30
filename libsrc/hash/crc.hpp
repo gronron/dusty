@@ -29,8 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 //for big endian reverse >> to << and change table
 
-#ifndef CRC_H_
-#define CRC_H_
+#pragma once
 
 #define CRC32(x) force_constexpr32<crc32_r(0xFFFFFFFF, x)>()
 #define CRC64(x) force_constexpr64<crc64_r(0xFFFFFFFFFFFFFFFF, x)>()
@@ -200,5 +199,3 @@ unsigned long long int constexpr force_constexpr64()
 {
 	return (x);
 }
-
-#endif

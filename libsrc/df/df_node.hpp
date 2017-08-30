@@ -28,54 +28,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef DF_NODE_H_
-#define DF_NODE_H_
+#pragma once
 
 #include <string>
 
 class			Df_node
 {
-	public:
-	
-		enum	Type
-		{
-			NONE,
-			BLOCK,
-			REFERENCE,
-			INT,
-			FLOAT,
-			DOUBLE,
-			STRING
-		};
+public:
+
+	enum	Type
+	{
+		NONE,
+		BLOCK,
+		REFERENCE,
+		INT,
+		FLOAT,
+		DOUBLE,
+		STRING
+	};
 
 
-		unsigned int	size;
-		Type			type;
-		std::string		name;
+	unsigned int	size;
+	Type			type;
+	std::string		name;
 
-		union
-		{
-			Df_node		**node;
-			void		*data;
-			int			idx;
-			int 		*nbr;
-			float		*flt;
-			double		*dbl;
-			char		**cstr;
-		};
-	
-		unsigned int	data_size;
-		char			*data_storage;	// allocated with malloc
+	union
+	{
+		Df_node		**node;
+		void		*data;
+		int			idx;
+		int 		*nbr;
+		float		*flt;
+		double		*dbl;
+		char		**cstr;
+	};
+
+	unsigned int	data_size;
+	char			*data_storage;	// allocated with malloc
 
 
-		Df_node();
-		~Df_node();
+	Df_node();
+	~Df_node();
 
-		Df_node const	*get(std::string const &researched_name) const;
-		Df_node	const	*get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const;
-		Df_node const	*safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const;
+	Df_node const	*get(std::string const &researched_name) const;
+	Df_node	const	*get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const;
+	Df_node const	*safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const;
 
-		void			print() const;
+	void			print() const;
 };
-
-#endif

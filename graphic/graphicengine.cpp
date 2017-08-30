@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2017, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,10 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "configmanager.hpp"
 #include "graphicengine.hpp"
 
-Graphicengine::Graphicengine() :	_animations_size(4096), _animations_count(0), _animations(0),
-									_lights_size(4096), _lights_count(0), _lights(0), _lights_links(0),
-									_materials_size(0), _materials_count(0), _materials(0),
-									_renderer(1440, 900, false)
+Graphicengine::Graphicengine()
+	: _animations_size(4096)
+	, _animations_count(0)
+	, _animations(0)
+	, _lights_size(4096)
+	, _lights_count(0)
+	, _lights(0)
+	, _lights_links(0)
+	, _materials_size(0)
+	, _materials_count(0)
+	, _materials(0),
+	_renderer(1440, 900, false)
 {
 	camera.position = 0.0f;
 	camera.direction = 0.0f;

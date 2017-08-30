@@ -46,7 +46,7 @@ Client::Client(Messagequeue *m, char const *ip, char const *port) : mq(m), _tcp(
 	_tcp.read(sizeof(Header), &hdr);
 	if (hdr.type != CNTID || hdr.size != sizeof(cntid) || hdr.size != _tcp.read(hdr.size, &cntid))
 	{
-		std::cerr << "Error: Client::Client() fails to receive connection id." << std::endl;
+		std::cerr << "error! Client::Client() fails to receive connection id." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	std::cout << "Connected" << std::endl;
@@ -59,7 +59,7 @@ Client::~Client()
 
 void						Client::tick(float delta)
 {
-	char					a[Udpsocket::MAXUDPSIZE];
+	char					a[UDPSocket::MAXUDPSIZE];
 	int						size;
 	Messagequeue::Message	*msg;
 	Header					hdr;
@@ -72,10 +72,10 @@ void						Client::tick(float delta)
 		{
 			if (!connected)
 				connected = true;
-			if ((size = _udp.read(Udpsocket::MAXUDPSIZE, a)) > 0)
+			if ((size = _udp.read(UDPSocket::MAXUDPSIZE, a)) > 0)
 				mq->push_in_pckt(-1, ping.ping, size, a);
 			else if (size < 0)
-				std::cerr << "Error: Client::tick() fails to read on udp" << std::endl;
+				std::cerr << "error! Client::tick() fails to read on udp" << std::endl;
 		}
 		if (_slctr.is_ready(_tcp))
 			_comtcp();
@@ -106,7 +106,7 @@ void		Client::_comtcp()
 	Header	hdr;
 	int		size;
 	int		id;
-	char	data[Udpsocket::MAXUDPSIZE];
+	char	data[UDPSocket::MAXUDPSIZE];
 
 	if ((size = _tcp.read(sizeof(hdr), &hdr)) > 0)
 	{
@@ -141,7 +141,7 @@ void		Client::_comtcp()
 			}
 		}
 		else
-			std::cerr << "Warning: Client::_comtcp() receives bad data" << std::endl;
+			std::cerr << "warning! Client::_comtcp() receives bad data" << std::endl;
 	}
 	else
 	{

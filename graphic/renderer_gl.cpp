@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2016, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -191,15 +191,6 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	std::cerr << "_lightsidx: " << _lightsidx << std::endl;
 	glShaderStorageBlockBinding(_program, _lightsidx, 5);
 
-	GLfloat vertices[] = {
-    	-1.0f,	1.0f,	0.0f,
-    	1.0f,	1.0f,	0.0f,
-     	-1.0f,	-1.0f,	0.0f,
-     	1.0f,	1.0f,	0.0f,
-     	1.0f,	-1.0f,	0.0f,
-     	-1.0f,	-1.0f,	0.0f
-	};
-
 	//camera
 	glGenBuffers(1, &_camerabuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, _camerabuffer);
@@ -209,7 +200,6 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 
 	glGenBuffers(1, &_nodesbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, 4096 * sizeof(AabbNode), 0, GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _nodesbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -225,6 +215,16 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	//if (glGetError() != GL_NO_ERROR) exit(-1);
 
 	////////
+
+	float const	vertices[] =
+	{
+    	-1.0f,	1.0f,	0.0f,
+    	1.0f,	1.0f,	0.0f,
+     	-1.0f,	-1.0f,	0.0f,
+     	1.0f,	1.0f,	0.0f,
+     	1.0f,	-1.0f,	0.0f,
+     	-1.0f,	-1.0f,	0.0f
+	};
 
 	glGenVertexArrays(1, &VAO); 
 	glGenBuffers(1, &VBO);

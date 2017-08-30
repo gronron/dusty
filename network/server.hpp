@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef SERVER_H_
-#define SERVER_H_
+#pragma once
 
 #include "socket/selector.hpp"
 #include "socket/tcpsocket.hpp"
@@ -40,42 +39,40 @@ class	Messagequeue;
 
 class	Server
 {
-	public:
+public:
 
-		struct			Client
-		{
-			Tcpsocket	tcp;
-			int			udpid;
-			char		ip[IP_STRSIZE];
-			char		port[PORT_STRSIZE];
-			Ping		*ping;
-		};
-
-
-		static float const	pingrate;
-		static float const	timeout;
+	struct			Client
+	{
+		TCPSocket	tcp;
+		int			udpid;
+		char		ip[IP_STRSIZE];
+		char		port[PORT_STRSIZE];
+		Ping		*ping;
+	};
 
 
-		Messagequeue		*mq;
+	static float const	pingrate;
+	static float const	timeout;
 
-		Selector			_slctr;
-		Tcp_server			_tcpsrv;
-		Udp_server			_udpsrv;
-		unsigned int		_maxclts;
-		Client				*_clients;
-	
 
-		Server(Messagequeue *, char const *port);
-		~Server();
+	Messagequeue		*mq;
 
-		void	tick(float const);
+	Selector			_slctr;
+	TCPServer			_tcpsrv;
+	UDPServer			_udpsrv;
+	unsigned int		_maxclts;
+	Client				*_clients;
 
-		void	_addclient();
-		void	_pingclient(float const);
-		bool	_comtcpclient(int const);
-		void	_receivepacket();
-		void	_sendpacket();
-		void	_delclient(int const);
+
+	Server(Messagequeue *, char const *port);
+	~Server();
+
+	void	tick(float const);
+
+	void	_addclient();
+	void	_pingclient(float const);
+	bool	_comtcpclient(int const);
+	void	_receivepacket();
+	void	_sendpacket();
+	void	_delclient(int const);
 };
-
-#endif

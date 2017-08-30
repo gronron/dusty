@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PRBG_H_
-#define PRBG_H_
+#pragma once
 
 // Pseudo Random Binary Generator
 // randomise a boolean with the probability to be true
@@ -38,19 +37,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class	Prbg
 {
-	public:
+public:
+
+	float	chance;
+	float	counter;
+	bool	inverter;
 	
-		float	chance;
-		float	counter;
-		bool	inverter;
-		
-		
-		Prbg(float probability);
-		~Prbg();
+	
+	Prbg(float probability);
+	~Prbg();
 
-		void	operator()(float probability);
-		
-		bool	pick();
+	void	operator()(float probability);
+	
+	bool	pick();
 };
-
-#endif

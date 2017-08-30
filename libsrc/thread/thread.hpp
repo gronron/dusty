@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef THREAD_H_
-#define THREAD_H_
+#pragma once
 
 #if defined(_WIN32) || defined(__WIN32__)
 	#ifndef WIN32_LEAN_AND_MEAN
@@ -42,25 +41,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class	Thread
 {
-	public:
+public:
 
-		#if defined(_WIN32) || defined(__WIN32__)
-		HANDLE		thr;
-		DWORD		thrid;
-		#else
-		pthread_t	thr;
-		#endif
+	#if defined(_WIN32) || defined(__WIN32__)
+	HANDLE		thr;
+	DWORD		thrid;
+	#else
+	pthread_t	thr;
+	#endif
 
-		static unsigned int	get_corenumber();
+	static unsigned int	get_corenumber();
 
 
-		Thread();
-		Thread(void *(*function)(void*), void *data);
-		~Thread();
+	Thread();
+	Thread(void *(*function)(void*), void *data);
+	~Thread();
 
-		bool	create(void *(*function)(void*), void *data);
-		void	exit(bool const code);
-		bool	wait();
+	bool	create(void *(*function)(void*), void *data);
+	void	exit(bool const code);
+	bool	wait();
 };
-
-#endif

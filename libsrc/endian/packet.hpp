@@ -28,42 +28,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef PACKET_H_
-#define PACKET_H_
+#pragma once
 
 #include <vector>
 
 class	Packet
 {
-	public:
+public:
 
-		unsigned int		_getit;
-		std::vector<char>	_data;
+	unsigned int		_getit;
+	std::vector<char>	_data;
 
 
-		Packet();
-		Packet(Packet const &);
-		template<class T>
-		Packet(T const &);
-		Packet(unsigned int const, char const *);
-		~Packet();
-		
-		void	operator()();
-		void	operator()(Packet const &);
-		template<class T>
-		void	operator()(T const &);
-		void	operator()(unsigned int const, char const *);
+	Packet();
+	Packet(Packet const &);
+	template<class T>
+	Packet(T const &);
+	Packet(unsigned int const, char const *);
+	~Packet();
+	
+	void	operator()();
+	void	operator()(Packet const &);
+	template<class T>
+	void	operator()(T const &);
+	void	operator()(unsigned int const, char const *);
 
-		unsigned int	get_size() const;
-		char const		*get_data() const;
+	unsigned int	get_size() const;
+	char const		*get_data() const;
 
-		bool	read(unsigned int const, char *);
-		bool	write(unsigned int const, char const *);
+	bool	read(unsigned int const, char *);
+	bool	write(unsigned int const, char const *);
 
-		template<class T>
-		bool	read(T &);
-		template<class T>
-		bool	write(T const &);
+	template<class T>
+	bool	read(T &);
+	template<class T>
+	bool	write(T const &);
 };
 
 template<class T>
@@ -93,5 +92,3 @@ bool	Packet::write(T const &d)
 {
 	return (write(sizeof(d), (char *)&d));
 }
-
-#endif

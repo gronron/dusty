@@ -28,48 +28,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef TCPSOCKET_H_
-#define TCPSOCKET_H_
+#pragma once
 
 #include "socket.hpp"
 
-class	Tcp_server
+class	TCPServer
 {
-	public:
+public:
 
-		Socket	_id;
+	Socket	_id;
 
 
-		Tcp_server();
-		Tcp_server(char const *port, bool ipv6);
-		~Tcp_server();
+	TCPServer();
+	TCPServer(char const *port, bool ipv6);
+	~TCPServer();
 
-		bool	operator()();
-		bool	operator()(char const *port, bool ipv6);
+	bool	operator()();
+	bool	operator()(char const *port, bool ipv6);
 
-		bool	is_good() const;
+	bool	is_good() const;
 };
 
-class	Tcpsocket
+class	TCPSocket
 {
-	public:
+public:
 
-		Socket	_id;
+	Socket	_id;
 
 
-		Tcpsocket();
-		Tcpsocket(Tcp_server &srv, char *ip, char *port);
-		Tcpsocket(char const *ip, char const *port);
-		~Tcpsocket();
+	TCPSocket();
+	TCPSocket(TCPServer &srv, char *ip, char *port);
+	TCPSocket(char const *ip, char const *port);
+	~TCPSocket();
 
-		bool	operator()();
-		bool	operator()(Tcp_server &, char *ip, char *port);
-		bool	operator()(char const *ip, char const *port);
+	bool	operator()();
+	bool	operator()(TCPServer &, char *ip, char *port);
+	bool	operator()(char const *ip, char const *port);
 
-		bool	is_good() const;
+	bool	is_good() const;
 
-		int		read(unsigned int const size, void *data);
-		int		write(unsigned int const size, void const *data);
+	int		read(unsigned int const size, void *data);
+	int		write(unsigned int const size, void const *data);
 };
-
-#endif

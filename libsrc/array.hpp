@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2017, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef ARRAY_H_
-#define ARRAY_H_
+#pragma once
 
 #include "new.hpp"
 
@@ -186,5 +185,3 @@ inline void	Array<T>::remove(T const &x)
 		;
 	data[index] = data[--number];
 }
-
-#endif

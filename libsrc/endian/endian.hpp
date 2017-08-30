@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2017, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef ENDIAN_H_
-#define ENDIAN_H_
+#pragma once
 
 union		u_int16
 {
@@ -97,5 +96,3 @@ inline long long	switch_endianess(long long x)
 	a.c[7] = b.c[0];
 	return (a.a);
 }
-
-#endif

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../new.hpp"
 #include "udpsocket.hpp"
 
-Udp_server::Udp_server() : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free(0)
+UDPServer::UDPServer() : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free(0)
 {
 	_clients = new Client[_maxclts];
 	for (unsigned int i = 0; i < _maxclts; ++i)
@@ -41,7 +41,7 @@ Udp_server::Udp_server() : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free
 	_clients[_maxclts - 1].next = -1;
 }
 
-Udp_server::Udp_server(char const *port, bool const ipv6) : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free(0)
+UDPServer::UDPServer(char const *port, bool const ipv6) : _id(INVALID_SOCKET), _maxclts(64), _clients(0), _free(0)
 {
 	_clients = new Client[_maxclts];
 	for (unsigned int i = 0; i < _maxclts; ++i)
@@ -50,14 +50,14 @@ Udp_server::Udp_server(char const *port, bool const ipv6) : _id(INVALID_SOCKET),
 	(*this)(port, ipv6);
 }
 
-Udp_server::~Udp_server()
+UDPServer::~UDPServer()
 {
 	if (_id != INVALID_SOCKET)
 		closesocket(_id);
 	delete [] _clients;
 }
 
-bool	Udp_server::operator()()
+bool	UDPServer::operator()()
 {
 	if (_id != INVALID_SOCKET)
 	{
@@ -71,7 +71,7 @@ bool	Udp_server::operator()()
 	return (true);
 }
 
-bool				Udp_server::operator()(char const *port, bool const ipv6)
+bool				UDPServer::operator()(char const *port, bool const ipv6)
 {
 	struct addrinfo	*rs;
 	struct addrinfo	ai;
@@ -89,25 +89,25 @@ bool				Udp_server::operator()(char const *port, bool const ipv6)
 		{
 			if (bind(_id, rs->ai_addr, rs->ai_addrlen))
 			{
-				p_perror("Error: bind()");
+				p_perror("error! bind()");
 				(*this)();
 			}
 		}
 		else
-			p_perror("Error: socket()");
+			p_perror("error! socket()");
 		freeaddrinfo(rs);
 	}
 	else
-		fprintf(stderr, "Error: getaddrinfo() %s\n", gai_strerror(err));
+		fprintf(stderr, "error! getaddrinfo() %s\n", gai_strerror(err));
 	return (_id != INVALID_SOCKET);
 }
 
-bool	Udp_server::is_good() const
+bool	UDPServer::is_good() const
 {
 	return (_id != INVALID_SOCKET);
 }
 
-char const	*Udp_server::get_clientip(int const id) const
+char const	*UDPServer::get_clientip(int const id) const
 {
 	if (id >= 0 && _clients[id].next < 0)
 		return (_clients[id].ip);
@@ -115,7 +115,7 @@ char const	*Udp_server::get_clientip(int const id) const
 		return (0);
 }
 
-char const	*Udp_server::get_clientport(int const id) const
+char const	*UDPServer::get_clientport(int const id) const
 {
 	if (id >= 0 && _clients[id].next < 0)
 		return (_clients[id].port);
@@ -123,7 +123,7 @@ char const	*Udp_server::get_clientport(int const id) const
 		return (0);
 }
 
-int					Udp_server::add_client()
+int					UDPServer::add_client()
 {
 	unsigned int	id;
 	int				err;
@@ -147,12 +147,12 @@ int					Udp_server::add_client()
 	}
 	else
 	{
-		fprintf(stderr, "Error: getnameinfo() %s\n", gai_strerror(err));
+		fprintf(stderr, "error! getnameinfo() %s\n", gai_strerror(err));
 		return (-1);
 	}
 }
 
-void	Udp_server::rm_client(int const id)
+void	UDPServer::rm_client(int const id)
 {
 	if (id >= 0 && _clients[id].next < 0)
 	{
@@ -161,7 +161,7 @@ void	Udp_server::rm_client(int const id)
 	}
 }
 
-int				Udp_server::read(int &id, unsigned int const size, void *data)
+int				UDPServer::read(int &id, unsigned int const size, void *data)
 {
 	socklen_t	sl = sizeof(_tempaddr);
 	int			rsize;
@@ -179,18 +179,18 @@ int				Udp_server::read(int &id, unsigned int const size, void *data)
 		}
 	}
 	else
-		p_perror("Error: recvfrom()");
+		p_perror("error! recvfrom()");
 	return (rsize);
 }
 
-int		Udp_server::write(int const id, unsigned int const size, void const *data)
+int		UDPServer::write(int const id, unsigned int const size, void const *data)
 {
 	int	rsize;
 
 	if (id >= 0 && _clients[id].next < 0)
 	{
 		if ((rsize = sendto(_id, (char const *)data, size, 0, (struct sockaddr *)&_clients[id].addr, sizeof(_clients[id].addr))) < 0)
-			p_perror("Error: sendto()");
+			p_perror("error! sendto()");
 		return (rsize);
 	}
 	else
@@ -199,28 +199,28 @@ int		Udp_server::write(int const id, unsigned int const size, void const *data)
 
 ///////////////////////////////////////
 
-Udpsocket::Udpsocket() : _id(INVALID_SOCKET)
+UDPSocket::UDPSocket() : _id(INVALID_SOCKET)
 {
 
 }
 
-Udpsocket::Udpsocket(char const *ip, char const *port, bool const ipv6) : _id(INVALID_SOCKET)
+UDPSocket::UDPSocket(char const *ip, char const *port, bool const ipv6) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, port, ipv6);
 }
 
-Udpsocket::Udpsocket(char const *ip, char const *pin, char const *pout, bool const ipv6) : _id(INVALID_SOCKET)
+UDPSocket::UDPSocket(char const *ip, char const *pin, char const *pout, bool const ipv6) : _id(INVALID_SOCKET)
 {
 	(*this)(ip, pin, pout, ipv6);
 }
 
-Udpsocket::~Udpsocket()
+UDPSocket::~UDPSocket()
 {
 	if (_id != INVALID_SOCKET)
 		closesocket(_id);
 }
 
-bool	Udpsocket::operator()()
+bool	UDPSocket::operator()()
 {
 	if (_id != INVALID_SOCKET)
 	{
@@ -230,7 +230,7 @@ bool	Udpsocket::operator()()
 	return (true);
 }
 
-bool				Udpsocket::operator()(char const *ip, char const *port, bool const ipv6)
+bool				UDPSocket::operator()(char const *ip, char const *port, bool const ipv6)
 {
 	struct addrinfo	*rs;
 	struct addrinfo	ai;
@@ -247,20 +247,20 @@ bool				Udpsocket::operator()(char const *ip, char const *port, bool const ipv6)
 		{
 			if (connect(_id, rs->ai_addr, rs->ai_addrlen))
 			{
-				p_perror("Error: connect()");
+				p_perror("error! connect()");
 				(*this)();
 			}
 		}
 		else
-			p_perror("Error: socket()");
+			p_perror("error! socket()");
 	}
 	else
-		fprintf(stderr, "Error: getaddrinfo() %s\n", gai_strerror(err));
+		fprintf(stderr, "error! getaddrinfo() %s\n", gai_strerror(err));
 	freeaddrinfo(rs);
 	return (_id != INVALID_SOCKET);
 }
 
-bool				Udpsocket::operator()(char const *ip, char const *pin, char const *pout, bool const ipv6)
+bool				UDPSocket::operator()(char const *ip, char const *pin, char const *pout, bool const ipv6)
 {
 	struct addrinfo	*rs, *rb;
 	struct addrinfo	ai;
@@ -279,55 +279,55 @@ bool				Udpsocket::operator()(char const *ip, char const *pin, char const *pout,
 			{
 				if (bind(_id, rb->ai_addr, rb->ai_addrlen))
 				{
-					p_perror("Error: bind()");
+					p_perror("error! bind()");
 					(*this)();
 				}
 				else if (connect(_id, rs->ai_addr, rs->ai_addrlen))
 				{
-					p_perror("Error: connect()");
+					p_perror("error! connect()");
 					(*this)();
 				}
 			}
 			else
-				p_perror("Error: socket()");
+				p_perror("error! socket()");
 			freeaddrinfo(rb);
 		}
 		else
-			fprintf(stderr, "Error: getaddrinfo() %s\n", gai_strerror(err));
+			fprintf(stderr, "error! getaddrinfo() %s\n", gai_strerror(err));
 		freeaddrinfo(rs);
 	}
 	else
-		fprintf(stderr, "Error: getaddrinfo() %s\n", gai_strerror(err));
+		fprintf(stderr, "error! getaddrinfo() %s\n", gai_strerror(err));
 	return (_id != INVALID_SOCKET);
 }
 
-bool	Udpsocket::is_good() const
+bool	UDPSocket::is_good() const
 {
 	return (_id != INVALID_SOCKET);
 }
 
-int			Udpsocket::read(unsigned int const size, void *data)
+int			UDPSocket::read(unsigned int const size, void *data)
 {
 	int		rsize;
 
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = recv(_id, (char *)data, size, 0)) < 0)
-			p_perror("Error: recv()");
+			p_perror("error! recv()");
 		return (rsize);
 	}
 	else
 		return (-1);
 }
 
-int			Udpsocket::write(unsigned int const size, void const *data)
+int			UDPSocket::write(unsigned int const size, void const *data)
 {
 	int	rsize;
 
 	if (_id != INVALID_SOCKET)
 	{
 		if ((rsize = send(_id, (char const *)data, size, 0)) < 0)
-			p_perror("Error: recv()");
+			p_perror("error! recv()");
 		return (rsize);
 	}
 	else

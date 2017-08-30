@@ -61,7 +61,7 @@ bool	Thread::create(void *(*function)(void*), void *data)
 	thr = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(function), data, 0, &thrid);
 	if (!thr)
 	{
-		std::cerr << "Error: CreateThread()" << std::endl;
+		std::cerr << "error! CreateThread()" << std::endl;
 		return (false);
 	}
 	return (true);
@@ -130,7 +130,7 @@ bool	Thread::create(void *(*function)(void*), void *data)
 	pthread_create(&thr, 0, f, data);
 	if (!thr)
 	{
-		std::cerr << "Error: pthread_create()" << std::endl;
+		std::cerr << "error! pthread_create()" << std::endl;
 		return (false);
 	}
 	return (true);

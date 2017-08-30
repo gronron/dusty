@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef CLIENT_H_
-#define CLIENT_H_
+#pragma once
 
 #include "socket/selector.hpp"
 #include "socket/tcpsocket.hpp"
@@ -48,8 +47,8 @@ class	Client
 		Messagequeue	*mq;
 
 		Selector		_slctr;
-		Tcpsocket		_tcp;
-		Udpsocket		_udp;
+		TCPSocket		_tcp;
+		UDPSocket		_udp;
 		short int		cntid;
 		Ping			ping;
 		bool			connected;
@@ -63,5 +62,3 @@ class	Client
 
 		void	_comtcp();
 };
-
-#endif

@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2017, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef VEC_H_
-#define VEC_H_
+#pragma once
 
 template<class T, unsigned int U>
 struct	vec
@@ -783,5 +782,3 @@ inline bool	operator>=(T const &x, vec<T, U> const &y)
 }
 
 #include "vec_sse.hpp"
-
-#endif

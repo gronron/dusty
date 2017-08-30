@@ -28,8 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef VEC_SSE_H_
-#define VEC_SSE_H_
+#pragma once
 
 #include "xmmintrin.h"
 #include "smmintrin.h"
@@ -319,5 +318,3 @@ inline vec<float, 4>	vround(vec<float, 4> const &x)
 	a.v = _mm_round_ps(x.v, _MM_FROUND_TO_NEAREST_INT |_MM_FROUND_NO_EXC);
 	return (a);
 }
-
-#endif

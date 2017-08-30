@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright (c) 2015-2016, Geoffrey TOURON
+Copyright (c) 2015, Geoffrey TOURON
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,74 +28,71 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef RUDPCHUNK_H_
-#define RUDPCHUNK_H_
+#pragma once
 
 #define BLOCKSIZE 1024
 
 class	Chunksender
 {
-	public:
-	
-		struct	Client
-		{
-			unsigned int	bucket;
-			unsigned int	front;
-			unsigned int	back;
-			unsigned int	chunkqueue[256];
-			Ack				acks[8];
-		};
-	
-		struct				Ack
-		{
-			unsigned int	id;
-			unsigned char	field[64];
-		}
-	
-		struct				Chunk
-		{
-			unsigned int	id;
-			unsigned int	blockcount;
-			Udpchunk		*blocks;
-			unsigned int	clientcount;
-			Ack				*clientacks;
-		};
-	
-		unsigned int	count;
-		unsigned int	size;
-		Chunk			*chunks;
+public:
+
+	struct	Client
+	{
+		unsigned int	bucket;
+		unsigned int	front;
+		unsigned int	back;
+		unsigned int	chunkqueue[256];
+		Ack				acks[8];
+	};
+
+	struct				Ack
+	{
+		unsigned int	id;
+		unsigned char	field[64];
+	}
+
+	struct				Chunk
+	{
+		unsigned int	id;
+		unsigned int	blockcount;
+		Udpchunk		*blocks;
+		unsigned int	clientcount;
+		Ack				*clientacks;
+	};
+
+	unsigned int	count;
+	unsigned int	size;
+	Chunk			*chunks;
 
 
-		Chunksender();
-		~Chunksender();
-	
-		void	acknowledge(int const, unsigned int const size, Udpchunkack const *);
-		void	send(Message *);
-		void	tick(float const, Udpserver &);
+	Chunksender();
+	~Chunksender();
+
+	void	acknowledge(int const, unsigned int const size, Udpchunkack const *);
+	void	send(Message *);
+	void	tick(float const, Udpserver &);
 };
 
 class	Chunkreicever
 {
-	public:
-	
-		struct				Chunk
-		{
-			unsigned int	id;
-			unsigned int	size;
-			unsigned char	*data;
-			unsigned int	ackid;
-			unsigned char	*ackfield;
-		};
-	
-		unsigned int	count;
-		unsigned int	size;
-		Chunk			*chunks;
-		
-		unsigned int	activeid;
-		unsigned char	activefield[64];
-	
-		void	check(unsigned int const size, Udpchunk const*);
-		bool	tick(float const, Udpsocket &);
-};
+public:
 
-#endif
+	struct				Chunk
+	{
+		unsigned int	id;
+		unsigned int	size;
+		unsigned char	*data;
+		unsigned int	ackid;
+		unsigned char	*ackfield;
+	};
+
+	unsigned int	count;
+	unsigned int	size;
+	Chunk			*chunks;
+	
+	unsigned int	activeid;
+	unsigned char	activefield[64];
+
+	void	check(unsigned int const size, Udpchunk const*);
+	bool	tick(float const, UDPSocket &);
+};
