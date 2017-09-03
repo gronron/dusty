@@ -30,14 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #version 430 core
 
-#define	SEARCHSTACKSIZE 24
 #define RAYSTACKSIZE 4
 
 const float INFINITY = 1.0f / 0.0f;
-const float FLT_EPSILON = 0.0001;
-
-int			stack[SEARCHSTACKSIZE];
-float		near_stack[SEARCHSTACKSIZE];
+const float FLT_EPSILON = 0.0001f;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -123,6 +119,10 @@ layout (std430) readonly buffer _lights
 
 ///////////////////////////////////////////////////////////////////////////////
 
+int	stack[24]; //should be as low as possible, it cost a lot
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool			intersect_rayaabb(in const Ray ray, in const int aabbidx, out float tnear, out float tfar)
 {
 	const vec3	tbot = (nodes[aabbidx].bottom - ray.origin.xyz) * ray.direction.xyz;
@@ -166,59 +166,52 @@ bool			find_closest(in const Ray ray, inout Impact data)
 	int			top = 0;
 
 	stack[top] = 0;
-	near_stack[top] = 0.0f;
 	do
 	{
-		if (near_stack[top] < data.near)
+		const int	index = stack[top];
+
+		float	lnear;
+		float	rnear;
+		float	far;
+
+		const int	left = nodes[index].children;
+		const int	right = nodes[index].children + 1;
+		bool		ltrue = intersect_rayaabb(invray, left, lnear, far) && lnear < data.near;
+		bool		rtrue = intersect_rayaabb(invray, right, rnear, far) && rnear < data.near;
+
+		if (ltrue && nodes[left].children == -1)
 		{
-			const int	index = stack[top];
-
-			if (nodes[index].children == -1)
+			if (left != idx && lnear < data.near)
 			{
-				if (index != idx)
-				{
-					data.index = index;
-					data.near = near_stack[top];
-				}
+				data.index = left;
+				data.near = lnear;
 			}
-			else
+			ltrue = false;
+		}
+
+		if (rtrue && nodes[right].children == -1)
+		{
+			if (right != idx && rnear < data.near)
 			{
-				float	lnear;
-				float	rnear;
-				float	far;
-
-				const int	left = nodes[index].children;
-				const int	right = nodes[index].children + 1;
-				const bool	ltrue = intersect_rayaabb(invray, left, lnear, far);
-				const bool	rtrue = intersect_rayaabb(invray, right, rnear, far);
-
-				if (lnear > rnear)
-				{
-					if (ltrue)
-					{
-						near_stack[top] = lnear;
-						stack[top++] = left;
-					}
-					if (rtrue)
-					{
-						near_stack[top] = rnear;
-						stack[top++] = right;
-					}
-				}
-				else
-				{
-					if (rtrue)
-					{
-						near_stack[top] = rnear;
-						stack[top++] = right;
-					}
-					if (ltrue)
-					{
-						near_stack[top] = lnear;
-						stack[top++] = left;
-					}
-				}
+				data.index = right;
+				data.near = rnear;
 			}
+			rtrue = false;
+		}
+
+		if (lnear > rnear)
+		{
+			if (ltrue)
+				stack[top++] = left;
+			if (rtrue)
+				stack[top++] = right;
+		}
+		else
+		{
+			if (rtrue)
+				stack[top++] = right;
+			if (ltrue)
+				stack[top++] = left;
 		}
 	}
 	while (--top >= 0);
@@ -226,7 +219,7 @@ bool			find_closest(in const Ray ray, inout Impact data)
 	return (data.index != -1 ? compute_rayaabb_normal(invray, data.index, data.normal) : false);
 }
 
-float		find_closest_s(in const Ray ray, in const int value, out int idx)
+float			find_closest_s(in const Ray ray, in const int value, out int idx)
 {
 	const Ray	invray = { ray.origin, 1.0f / ray.direction };
 	int			top = 0;
@@ -234,56 +227,52 @@ float		find_closest_s(in const Ray ray, in const int value, out int idx)
 
 	idx = -1;
 	stack[top] = 0;
-	near_stack[top] = 0.0f;
 	do
 	{
-		if (near_stack[top] < near)
+		const int	index = stack[top];
+
+		float	lnear;
+		float	rnear;
+		float	far;
+
+		const int	left = nodes[index].children;
+		const int	right = nodes[index].children + 1;
+		bool		ltrue = nodes[left].children == -1 && nodes[left].data == value ? false : (intersect_rayaabb(invray, left, lnear, far) && lnear < near);
+		bool		rtrue = nodes[right].children == -1 && nodes[right].data == value ? false : (intersect_rayaabb(invray, right, rnear, far) && rnear < near);
+
+		if (ltrue && nodes[left].children == -1)
+		{	
+			if (lnear < near)
+			{
+				idx = left;
+				near = lnear;
+			}
+			ltrue = false;
+		}
+
+		if (rtrue && nodes[right].children == -1)
 		{
-			const int	index = stack[top];
-
-			if (nodes[index].children == -1)
+			if (rnear < near)
 			{
-				idx = index;
-				near = near_stack[top];
+				idx = right;
+				near = rnear;
 			}
-			else
-			{
-				float	lnear;
-				float	rnear;
-				float	far;
+			rtrue = false;
+		}
 
-				const int	left = nodes[index].children;
-				const int	right = nodes[index].children + 1;
-				const bool	ltrue = nodes[left].children == -1 && nodes[left].data == value ? false : intersect_rayaabb(invray, left, lnear, far);
-				const bool	rtrue = nodes[right].children == -1 && nodes[right].data == value ? false : intersect_rayaabb(invray, right, rnear, far);
-
-				if (lnear > rnear)
-				{
-					if (ltrue)
-					{
-						near_stack[top] = lnear;
-						stack[top++] = left;
-					}
-					if (rtrue)
-					{
-						near_stack[top] = rnear;
-						stack[top++] = right;
-					}
-				}
-				else
-				{
-					if (rtrue)
-					{
-						near_stack[top] = rnear;
-						stack[top++] = right;
-					}
-					if (ltrue)
-					{
-						near_stack[top] = lnear;
-						stack[top++] = left;
-					}
-				}
-			}
+		if (lnear > rnear)
+		{
+			if (ltrue)
+				stack[top++] = left;
+			if (rtrue)
+				stack[top++] = right;
+		}
+		else
+		{
+			if (rtrue)
+				stack[top++] = right;
+			if (ltrue)
+				stack[top++] = left;
 		}
 	}
 	while (--top >= 0);
