@@ -1,0 +1,290 @@
+
+none
+{
+	color			{ 0.0f 0.0f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+white
+{
+	color			{ 1.0f 1.0f 1.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+grey
+{
+	color			{ 0.5f 0.5f 0.5f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+black
+{
+	color			{ 0.0f 0.0f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+red
+{
+	color			{ 1.0f 0.0f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+green
+{
+	color			{ 0.0f 1.0f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+blue
+{
+	color			{ 0.0f 0.0f 1.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+iron
+{
+	color			{ 0.6f 0.6f 0.6f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.3f
+	shinning		0.0f
+	padding			0.0f
+}
+
+copper
+{
+	color			{ 1.0f 0.55f 0.3f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.3f
+	shinning		0.0f
+	padding			0.0f
+}
+
+silver
+{
+	color			{ 0.85f 0.85f 0.85f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.5f
+	shinning		0.0f
+	padding			0.0f
+}
+
+gold
+{
+	color			{ 1.1f 0.9f 0.05f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.45f
+	shinning		0.0f
+	padding			0.0f
+}
+
+mirror
+{
+	color			{ 0.0f 0.0f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.95f
+	shinning		0.0f
+	padding			0.0f
+}
+
+glass
+{
+	color			{ 0.92f 0.94f 0.96f }
+	transparency	0.95f
+	refraction		1.5f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+light_blue_glass
+{
+	color			{ 0.80f 0.85f 1.0f }
+	transparency	0.90f
+	refraction		1.5f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+ligth_green_glass
+{
+	color			{ 0.80f 1.0f 0.85f }
+	transparency	0.90f
+	refraction		1.5f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+grass
+{
+	color			{ 0.5f 0.3f 0.02f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+dirt
+{
+	color			{ 0.5f 0.3f 0.02f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+clay
+{
+	color			{ 0.5f 0.3f 0.02f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+white_sand
+{
+	color			{ 1.0f 0.9f 0.5f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+sand
+{
+	color			{ 0.95f 0.8f 0.4f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+orange_sand
+{
+	color			{ 1.0f 0.6f 0.4f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+stone
+{
+	color			{ 0.4f 0.4f 0.4f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+dark_stone
+{
+	color			{ 0.25f 0.25f 0.25f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+ligth_wood
+{
+	color			{ 0.4f 0.2f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+wood
+{
+	color			{ 0.4f 0.2f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+dark_wood
+{
+	color			{ 0.4f 0.2f 0.0f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+light_leaf
+{
+	color			{ 0.1f 0.4f 0.01f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+leaf
+{
+	color			{ 0.1f 0.4f 0.01f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}
+
+dark_leaf
+{
+	color			{ 0.1f 0.4f 0.01f }
+	transparency	0.0f
+	refraction		0.0f
+	reflection		0.0f
+	shinning		0.0f
+	padding			0.0f
+}

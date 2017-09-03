@@ -1,0 +1,55 @@
+projectile
+{
+	material	5
+	scale		0.2f
+	number		80
+	
+	effects
+	{
+		Expulsor
+		{
+			timer -1.0f
+			data
+			{
+				velocity	{ 1.0f 4.0f }
+			}
+		}
+		
+		Disappear
+		{
+			timer -1.0f
+			data
+			{
+				rate	{ 1.0f 1.6f }
+			}
+		}
+	}
+}
+
+explosion
+{
+	material	4
+	scale		0.3f
+	number		128
+
+	effects
+	{
+		Attractor
+		{
+			timer	0.5f
+			data
+			{
+				velocity	{ 4.0f 10.0f }
+			}
+		}
+		
+		Appear
+		{
+			timer	0.5f
+			data
+			{
+				rate	{ 1.0f 2.0f }
+			}
+		}
+	}
+}
