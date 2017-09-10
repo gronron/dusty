@@ -62,9 +62,9 @@ void	Console::tick(float const delta)
 
 void					Console::draw()
 {
-	vec<float, 2>		position = { 8.0f, 400.0f };
-	vec<float, 2> const	scale = { 0.25f, 0.25f };
-	vec<float, 4> const	color = { 0.4f, 0.65f, 0.4f, 1.0f };
+	vec<float, 2>		position = { 0.01f, 0.6f };
+	vec<float, 2> const	scale = { 0.0005f, 0.0005f };
+	vec<float, 4> const	color = {0.9f, 0.5f, 0.125f, 1.0f};
 
 	if (engine->event->typing)
 	{
@@ -75,7 +75,7 @@ void					Console::draw()
 		engine->graphic->draw_text(_text, position, scale, color);
 		_text[_cursor] = c;
 	}
-	position[1] -= 32.0f;
+	position[1] -= 0.05f;
 	if (_lastmsgtimer > 0.0f || engine->event->typing)
 	{
 		for (int j = (int)_iterator - 1; position[1] > 0.0f; --j)
@@ -87,7 +87,7 @@ void					Console::draw()
 			for (unsigned int i = 0; i < _history[j].linecount; ++i)
 			{
 				engine->graphic->draw_text(_history[j].stop[i], _history[j].text + _history[j].start[i], position, scale, color);
-				position[1] -= 32.0f;
+				position[1] -= 0.05f;
 			}
 		}
 	}
@@ -176,7 +176,7 @@ void	Console::move_cursor(char const move)
 void	Console::_cut_text(Text &text)
 {
 	vec<float, 2> const	scale = { 0.4f, 0.4f };
-	
+
 	text.linecount = 0;
 	for (unsigned int offset = 0; offset < text.size && text.linecount < 8; ++text.linecount)
 	{

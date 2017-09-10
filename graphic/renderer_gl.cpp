@@ -50,7 +50,7 @@ struct				Computedcamera
 	vec<float, 2>	half_resolution;
 };
 
-void	_compute_camera(Camera const &camera, Computedcamera &cm)
+static void	_compute_camera(Camera const &camera, Computedcamera &cm)
 {
 	cm.position = camera.position;
 	cm.forward = (camera.direction * (float)camera.resolution[0]) / (tan(camera.fov / 2.0f) * 2.0f);
@@ -61,7 +61,108 @@ void	_compute_camera(Camera const &camera, Computedcamera &cm)
 
 unsigned int	_load_font(char const *, Glyph *);
 
-Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullscreen) : width(w), height(h), _window(0), _glcontext(0), _texture(0), _nodes_mem_size(0), _materials_mem_size(0), _lights_mem_size(0)
+void	check_error(int const line)
+{
+	GLenum const error = glGetError();
+
+	if (error == GL_NO_ERROR)
+		return;
+
+	std::cerr << line << " ";
+
+	switch (error)
+	{
+	case GL_INVALID_ENUM:
+		std::cerr << "GL_INVALID_ENUM" << std::endl;
+		break;
+	case GL_INVALID_VALUE:
+		std::cerr << "GL_INVALID_VALUE" << std::endl;
+		break;
+	case GL_INVALID_OPERATION:
+		std::cerr << "GL_INVALID_OPERATION" << std::endl;
+		break;
+	case GL_STACK_OVERFLOW:
+		std::cerr << "GL_STACK_OVERFLOW" << std::endl;
+		break;
+	case GL_STACK_UNDERFLOW:
+		std::cerr << "GL_STACK_UNDERFLOW" << std::endl;
+		break;
+	case GL_OUT_OF_MEMORY:
+		std::cerr << "GL_OUT_OF_MEMORY" << std::endl;
+		break;
+	case GL_TABLE_TOO_LARGE:
+		std::cerr << "GL_TABLE_TOO_LARGE" << std::endl;
+		break;
+	default:
+		std::cerr << "default" << std::endl;
+		break;
+	}
+}
+
+static GLuint	_build_program(char const * const vertex_name, char const * const frag_name)
+{
+	GLuint	program;
+	char	*source;
+	GLuint	vertexshader;
+	GLuint	fragshader;
+	GLint	success;
+	GLchar	infoLog[4096];
+
+	if (!(source = read_file(vertex_name, 0)))
+		exit(EXIT_FAILURE);
+
+	vertexshader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexshader, 1, &source, 0);
+	glCompileShader(vertexshader);
+
+	glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &success);
+	glGetShaderInfoLog(vertexshader, 4096, 0, infoLog);
+	std::cout << infoLog << std::endl;
+	if (!success)
+	{
+		std::cout << "error! glCompileShader() fails on vertex shader: " << vertex_name << std::endl;
+		exit(EXIT_FAILURE);
+	};
+
+	delete [] source;
+
+	if (!(source = read_file(frag_name, 0)))
+		exit(EXIT_FAILURE);
+
+	fragshader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragshader, 1, &source, 0);
+	glCompileShader(fragshader);
+
+	glGetShaderiv(fragshader, GL_COMPILE_STATUS, &success);
+	glGetShaderInfoLog(fragshader, 4096, 0, infoLog);
+	std::cout << infoLog << std::endl;
+	if (!success)
+	{
+		std::cout << "error! glCompileShader() fails on fragment shader: " << frag_name << std::endl;
+		exit(EXIT_FAILURE);
+	};
+
+	delete [] source;
+
+	program = glCreateProgram();
+	glAttachShader(program, vertexshader);
+	glAttachShader(program, fragshader);
+	glLinkProgram(program);
+
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if(!success)
+	{
+		glGetProgramInfoLog(program, 4096, 0, infoLog);
+		std::cout << "error! glLinkProgram fails: \n" << infoLog << std::endl;
+	}
+
+	glDeleteShader(vertexshader);
+	glDeleteShader(fragshader);
+
+	return (program);
+}
+
+Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullscreen) : width(w), height(h), _window(0), _glcontext(0), _nodes_mem_size(0), _materials_mem_size(0), _lights_mem_size(0), _text_vertices(8192)
 {
 	SDL_SysWMinfo 	info;
 
@@ -70,9 +171,9 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 		std::cerr << "error! SDL_Init()" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
@@ -95,106 +196,96 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glActiveTexture(GL_TEXTURE0);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	
 	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 
-	glGenTextures(1, &_texture);
-	glBindTexture(GL_TEXTURE_2D, _texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
-	_glyphstexture = _load_font("cousine-bold.ttf", _glyphs);
+	_init_main_renderer();
+	_init_text_renderer();
+}
+
+Renderer::~Renderer()
+{
+	SDL_SetRelativeMouseMode(SDL_FALSE);
+
+	glDeleteBuffers(1, &_nodesbuffer);
+	glDeleteBuffers(1, &_materialsbuffer);
+	glDeleteBuffers(1, &_lightsbuffer);
+
+	glDeleteTextures(1, &_glyphstexture);
+	SDL_GL_DeleteContext(_glcontext);
+	SDL_DestroyWindow(_window);
+	SDL_Quit();
+}
+
+void	Renderer::set_fullscreen(bool const fullscreen)
+{
+	SDL_SetWindowFullscreen(_window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+}
+
+void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
+{
+	width = w;
+	height = h;
+
+	glViewport(0, 0, width, height);
+}
+
+void	Renderer::render(Graphicengine const *ge)
+{
+	Computedcamera	cm;
+
+	_compute_camera(ge->camera, cm);
+	glBindBuffer(GL_UNIFORM_BUFFER, _camerabuffer);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Computedcamera), (void *)&cm);
+	_set_buffer(ge);
+
+	glUseProgram(_main_program);
+	glBindVertexArray(_main_vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	glUseProgram(_text_program);
+	glBindVertexArray(_text_vao);
+	glBindTexture(GL_TEXTURE_2D, _glyphstexture);
+	glDrawArrays(GL_TRIANGLES, 0, _text_vertices.number);
+	glBindVertexArray(0);
+
 	glFinish();
 
-	GLuint	vertexshader;
-	GLuint	fragshader;
-	GLint	success;
-	GLchar	infoLog[4096];
-	
-	char	*source;
-	if (!(source = read_file("vertex.glsl", 0)))
-		exit(EXIT_FAILURE);
+	check_error(__LINE__);
 
-	vertexshader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexshader, 1, &source, 0);
-	glCompileShader(vertexshader);
-	
-	glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &success);
-	glGetShaderInfoLog(fragshader, 4096, 0, infoLog);
-	std::cout << infoLog << std::endl;
-	if(	!success)
-	{
-		std::cout << "error! glCompileShader() fails on vexter shader\n" << std::endl;
-		exit(EXIT_FAILURE);
-	};
-	
-	delete [] source;
-	if (!(source = read_file("frag.glsl", 0)))
-		exit(EXIT_FAILURE);
-	
-	fragshader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragshader, 1, &source, 0);
-	glCompileShader(fragshader);
-	
-	glGetShaderiv(fragshader, GL_COMPILE_STATUS, &success);
-	glGetShaderInfoLog(fragshader, 4096, 0, infoLog);
-	std::cout << infoLog << std::endl;
-	if(	!success)
-	{
-		std::cout << "error! glCompileShader() fails on fragment shader\n" << std::endl;
-		exit(EXIT_FAILURE);
-	};
-	
-	delete [] source;
+	SDL_GL_SwapWindow(_window);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	_program = glCreateProgram();
-	glAttachShader(_program, vertexshader);
-	glAttachShader(_program, fragshader);
-	glLinkProgram(_program);
+	_text_vertices.clear();
+}
 
-	glGetProgramiv(_program, GL_LINK_STATUS, &success);
-	if(!success)
-	{
-		glGetProgramInfoLog(_program, 4096, 0, infoLog);
-		std::cout << "error! glLinkProgram fails: \n" << infoLog << std::endl;
-	}
+void	Renderer::_init_main_renderer()
+{
+	_main_program = _build_program("raytracer_vertex.glsl", "raytracer_frag.glsl");
+	glUseProgram(_main_program);
 
-	glDeleteShader(vertexshader);
-	glDeleteShader(fragshader);
-	
-	glUseProgram(_program);
+	glBindFragDataLocation(_main_program, 0, "color");
 
-	glBindFragDataLocation(_program, 0, "color");
-	_cameraidx = glGetUniformBlockIndex(_program, "_camera");
-	std::cerr << "_cameraidx: " << _cameraidx << std::endl;
-	glUniformBlockBinding(_program, _cameraidx, 1);
+	_cameraidx = glGetUniformBlockIndex(_main_program, "_camera");
+	glUniformBlockBinding(_main_program, _cameraidx, 1);
 
-	_nodesidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_nodes");
-	std::cerr << "_nodesidx: " << _nodesidx << std::endl;
-	glShaderStorageBlockBinding(_program, _nodesidx, 2);
+	_nodesidx = glGetProgramResourceIndex(_main_program, GL_SHADER_STORAGE_BLOCK, "_nodes");
+	glShaderStorageBlockBinding(_main_program, _nodesidx, 2);
 
-	_materialsidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_materials");
-	std::cerr << "_materialsidx: " << _materialsidx << std::endl;
-	glShaderStorageBlockBinding(_program, _materialsidx, 3);
+	_materialsidx = glGetProgramResourceIndex(_main_program, GL_SHADER_STORAGE_BLOCK, "_materials");
+	glShaderStorageBlockBinding(_main_program, _materialsidx, 3);
 
-	_lightsnbridx = glGetUniformLocation(_program, "lights_number");
-	std::cerr << "_lightsnbridx: " << _lightsnbridx << std::endl;
+	_lightsnbridx = glGetUniformLocation(_main_program, "lights_number");
 
-	_lightsidx = glGetProgramResourceIndex(_program, GL_SHADER_STORAGE_BLOCK, "_lights");
-	std::cerr << "_lightsidx: " << _lightsidx << std::endl;
-	glShaderStorageBlockBinding(_program, _lightsidx, 5);
+	_lightsidx = glGetProgramResourceIndex(_main_program, GL_SHADER_STORAGE_BLOCK, "_lights");
+	glShaderStorageBlockBinding(_main_program, _lightsidx, 5);
 
-	//camera
 	glGenBuffers(1, &_camerabuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, _camerabuffer);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(Computedcamera), 0, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(Computedcamera), nullptr, GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, _camerabuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
@@ -212,9 +303,6 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, _lightsbuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-	//if (glGetError() != GL_NO_ERROR) exit(-1);
-
-	////////
 
 	float const	vertices[] =
 	{
@@ -226,62 +314,64 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
      	-1.0f,	-1.0f,	0.0f
 	};
 
-	glGenVertexArrays(1, &VAO); 
-	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &_main_vao);
+	glGenBuffers(1, &_main_vbo);
 
-    glBindVertexArray(VAO);
-    // 2. Copy our vertices array in a buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindVertexArray(_main_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, _main_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // 3. Then set our vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);  
-	//4. Unbind the VAO
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
 	glBindVertexArray(0);
+
+	check_error(__LINE__);
 }
 
-Renderer::~Renderer()
+void Renderer::_init_text_renderer()
 {
-	SDL_SetRelativeMouseMode(SDL_FALSE);
-	
-	glDeleteBuffers(1, &_nodesbuffer);
-	glDeleteBuffers(1, &_materialsbuffer);
-	glDeleteBuffers(1, &_lightsbuffer);
-	
-	glDeleteTextures(1, &_texture);
-	SDL_GL_DeleteContext(_glcontext);
-	SDL_DestroyWindow(_window);
-	SDL_Quit();
-}
+	_glyphstexture = _load_font("cousine-bold.ttf", _glyphs);
 
-void	Renderer::set_fullscreen(bool const fullscreen)
-{
-	SDL_SetWindowFullscreen(_window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-}
+	_text_program = _build_program("text_vertex.glsl", "text_frag.glsl");
+	glUseProgram(_text_program);
 
-void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
-{
-	width = w;
-	height = h;
+	glBindFragDataLocation(_text_program, 0, "color");
 
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	GLint texture_loc = glGetUniformLocation(_text_program, "_texture");
 
-	glBindTexture(GL_TEXTURE_2D, _texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
+	glUniform1i(texture_loc, 0);
+
+	glGenVertexArrays(1, &_text_vao);
+	glGenBuffers(1, &_text_vbo);
+
+	glBindVertexArray(_text_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, _text_vbo);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(4 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glBindVertexArray(0);
+
+	check_error(__LINE__);
 }
 
 void		Renderer::_set_buffer(Graphicengine const *ge)
 {
+	if (_text_mem_size < _text_vertices.size)
+	{
+		_text_mem_size = _text_vertices.size;
+		glBindBuffer(GL_ARRAY_BUFFER, _text_vbo);
+		glBufferData(GL_ARRAY_BUFFER, _text_mem_size * sizeof(CharVertex), nullptr, GL_DYNAMIC_DRAW);
+	}
 	if (_nodes_mem_size < ge->oatree._size)
 	{
 		_nodes_mem_size = ge->oatree._size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(OrderedAabbNode), 0, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(OrderedAabbNode), nullptr, GL_DYNAMIC_DRAW);
 	}
 	if (_materials_mem_size < ge->_materials_size)
 	{
@@ -293,44 +383,18 @@ void		Renderer::_set_buffer(Graphicengine const *ge)
 	{
 		_lights_mem_size = ge->_lights_size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, _lights_mem_size * sizeof(Light), 0, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, _lights_mem_size * sizeof(Light), nullptr, GL_DYNAMIC_DRAW);
 	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, _text_vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, _text_vertices.number * sizeof(CharVertex), (void *)_text_vertices.data);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodesbuffer);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->oatree._count * sizeof(OrderedAabbNode), (void *)ge->oatree._nodes);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lightsbuffer);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights);
 
-	glProgramUniform1ui(_program, _lightsnbridx, ge->_lights_count);
-}
+	glProgramUniform1ui(_main_program, _lightsnbridx, ge->_lights_count);
 
-void	Renderer::render(Graphicengine const *ge)
-{
-	Computedcamera	cm;
-
-	_compute_camera(ge->camera, cm);
-	glBindBuffer(GL_UNIFORM_BUFFER, _camerabuffer);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Computedcamera), (void *)&cm);
-	_set_buffer(ge);
-
-	//glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
-	//glBindTexture(GL_TEXTURE_2D, _texture);
-
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0); 
-
-	/*glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex3f(0.0, 0.0f, 0.0f);
-		glTexCoord2f(1.0f, 0.0f);	glVertex3f((float)width, 0.0f, 0.0f);
-		glTexCoord2f(1.0f, 1.0f);	glVertex3f((float)width, (float)height, 0.0f);
-		glTexCoord2f(0.0f, 1.0f);	glVertex3f(0.0, (float)height, 0.0f);
-	glEnd();*/
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glFinish();
-
-	SDL_GL_SwapWindow(_window);
-	glClear(GL_COLOR_BUFFER_BIT);
+	check_error(__LINE__);
 }

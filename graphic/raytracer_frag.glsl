@@ -28,9 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#version 430 core
+#version 450 core
 
-#define RAYSTACKSIZE 4
+#define MAXRAY 4
+#define RAYSTACKSIZE 2 //should be as low as possible
+#define SEARCHSTACKSIZE 24 //should be as low as possible
 
 const float INFINITY = 1.0f / 0.0f;
 const float FLT_EPSILON = 0.0001f;
@@ -119,65 +121,64 @@ layout (std430) readonly buffer _lights
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int	stack[24]; //should be as low as possible, it cost a lot
+int	stack[SEARCHSTACKSIZE];
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool			intersect_rayaabb(in const Ray ray, in const int aabbidx, out float tnear, out float tfar)
+bool			intersect_rayaabb(in const vec3 origin, in const vec3 direction, in const int aabbidx, out float tnear, out float tfar)
 {
-	const vec3	tbot = (nodes[aabbidx].bottom - ray.origin.xyz) * ray.direction.xyz;
-	const vec3	ttop = (nodes[aabbidx].top - ray.origin.xyz) * ray.direction.xyz;
+	const vec3	tbot = (nodes[aabbidx].bottom - origin) * direction;
+	const vec3	ttop = (nodes[aabbidx].top - origin) * direction;
 	const vec3	tmin = min(tbot, ttop);
 	const vec3 	tmax = max(tbot, ttop);
 
 	tnear = max(max(tmin.x, tmin.y), tmin.z);
 	tfar = min(min(tmax.x, tmax.y), tmax.z);
 
-	return (tfar >= 0.0f && tnear <= tfar);
+	return (tfar > 0.0f && tnear <= tfar);
 }
 
-bool			compute_rayaabb_normal(in const Ray ray, in const int aabbidx, out vec4 normal)
+bool			compute_rayaabb_normal(in const vec3 origin, in const vec3 direction, in const int aabbidx, out vec4 normal)
 {
-	const vec3 	tbot = (nodes[aabbidx].bottom - ray.origin.xyz) * ray.direction.xyz;
-	const vec3	ttop = (nodes[aabbidx].top - ray.origin.xyz) * ray.direction.xyz;
+	const vec3 	tbot = (nodes[aabbidx].bottom - origin) * direction;
+	const vec3	ttop = (nodes[aabbidx].top - origin) * direction;
 	const vec3 	tmin = min(tbot, ttop);
 
 	if (tmin.x > tmin.y)
 	{
 		if (tmin.x > tmin.z)
-			normal = vec4(ray.direction.x >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f, 0.0f);
+			normal = vec4(direction.x >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f, 0.0f);
 		else
-			normal = vec4(0.0f, 0.0f, ray.direction.z >= 0.0f ? -1.0f : 1.0f, 0.0f);
+			normal = vec4(0.0f, 0.0f, direction.z >= 0.0f ? -1.0f : 1.0f, 0.0f);
 	}
 	else
 	{
 		if (tmin.y > tmin.z)
-			normal = vec4(0.0f, ray.direction.y >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f);
+			normal = vec4(0.0f, direction.y >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f);
 		else
-			normal = vec4(0.0f, 0.0f, ray.direction.z >= 0.0f ? -1.0f : 1.0f, 0.0f);
+			normal = vec4(0.0f, 0.0f, direction.z >= 0.0f ? -1.0f : 1.0f, 0.0f);
 	}
 	return (true);
 }
 
-bool			find_closest(in const Ray ray, inout Impact data)
+bool			find_closest(in const vec3 origin, in const vec3 direction, inout Impact data)
 {
+	const vec3	invdirection = 1.0f / direction;
 	const int	idx = data.index;
-	const Ray	invray = { ray.origin, 1.0f / ray.direction };
-	int			top = 0;
+	int			top = 1;
+	int			index = 0;
 
-	stack[top] = 0;
+	stack[0] = -1;
 	do
 	{
-		const int	index = stack[top];
-
 		float	lnear;
 		float	rnear;
 		float	far;
 
 		const int	left = nodes[index].children;
 		const int	right = nodes[index].children + 1;
-		bool		ltrue = intersect_rayaabb(invray, left, lnear, far) && lnear < data.near;
-		bool		rtrue = intersect_rayaabb(invray, right, rnear, far) && rnear < data.near;
+		bool		ltrue = intersect_rayaabb(origin, invdirection, left, lnear, far) && lnear < data.near;
+		bool		rtrue = intersect_rayaabb(origin, invdirection, right, rnear, far) && rnear < data.near;
 
 		if (ltrue && nodes[left].children == -1)
 		{
@@ -199,29 +200,34 @@ bool			find_closest(in const Ray ray, inout Impact data)
 			rtrue = false;
 		}
 
-		if (lnear > rnear)
+		if (ltrue && rtrue)
 		{
-			if (ltrue)
+			if (lnear > rnear)
+			{
+				index = right;
 				stack[top++] = left;
-			if (rtrue)
+			}
+			else
+			{
+				index = left;
 				stack[top++] = right;
+			}
 		}
+		else if (ltrue)
+			index = left;
+		else if (rtrue)
+			index = right;
 		else
-		{
-			if (rtrue)
-				stack[top++] = right;
-			if (ltrue)
-				stack[top++] = left;
-		}
+			index = stack[--top];
 	}
-	while (--top >= 0);
+	while (index != -1);
 
-	return (data.index != -1 ? compute_rayaabb_normal(invray, data.index, data.normal) : false);
+	return (data.index != -1 ? compute_rayaabb_normal(origin, invdirection, data.index, data.normal) : false);
 }
 
-float			find_closest_s(in const Ray ray, in const int value, out int idx)
+float			find_closest_s(in const vec3 origin, in const vec3 direction, in const int value, out int idx)
 {
-	const Ray	invray = { ray.origin, 1.0f / ray.direction };
+	const vec3	invdirection = 1.0f / direction;
 	int			top = 0;
 	float		near = INFINITY;
 
@@ -237,8 +243,8 @@ float			find_closest_s(in const Ray ray, in const int value, out int idx)
 
 		const int	left = nodes[index].children;
 		const int	right = nodes[index].children + 1;
-		bool		ltrue = nodes[left].children == -1 && nodes[left].data == value ? false : (intersect_rayaabb(invray, left, lnear, far) && lnear < near);
-		bool		rtrue = nodes[right].children == -1 && nodes[right].data == value ? false : (intersect_rayaabb(invray, right, rnear, far) && rnear < near);
+		bool		ltrue = nodes[left].children == -1 && nodes[left].data == value ? false : (intersect_rayaabb(origin, invdirection, left, lnear, far) && lnear < near);
+		bool		rtrue = nodes[right].children == -1 && nodes[right].data == value ? false : (intersect_rayaabb(origin, invdirection, right, rnear, far) && rnear < near);
 
 		if (ltrue && nodes[left].children == -1)
 		{	
@@ -280,14 +286,14 @@ float			find_closest_s(in const Ray ray, in const int value, out int idx)
 	if (idx == -1)
 	{
 		float	far;
-		intersect_rayaabb(invray, 0, far, near);
+		intersect_rayaabb(origin, invdirection, 0, far, near);
 	}
 	return (near);
 }
 
-bool			compute_shadow(in const Ray ray, in const float distance, in const int idx, inout vec4 color)
+bool			compute_shadow(in const vec3 origin, in const vec3 direction, in const float distance, in const int idx, inout vec4 color)
 {
-	const Ray	invray = { ray.origin, 1.0f / ray.direction };
+	const vec3	invdirection = 1.0f / direction;
 	int			top = 0;
 
 	stack[top] = 0;
@@ -302,8 +308,8 @@ bool			compute_shadow(in const Ray ray, in const float distance, in const int id
 
 		const int	left = nodes[index].children;
 		const int	right = nodes[index].children + 1;
-		bool		ltrue = intersect_rayaabb(invray, left, lnear, lfar) && lnear < distance;
-		bool		rtrue = intersect_rayaabb(invray, right, rnear, rfar) && rnear < distance;
+		bool		ltrue = intersect_rayaabb(origin, invdirection, left, lnear, lfar) && lnear < distance;
+		bool		rtrue = intersect_rayaabb(origin, invdirection, right, rnear, rfar) && rnear < distance;
 
 		if (ltrue && nodes[left].children == -1)
 		{
@@ -393,11 +399,11 @@ float		compute_aocclusion(in const vec4 origin, in const vec4 normal)
 
 void		main()
 {
-	float	coefstack[RAYSTACKSIZE];
 	Ray		raystack[RAYSTACKSIZE];
+	float	coefstack[RAYSTACKSIZE];
 	int		avoidstack[RAYSTACKSIZE];
 	int		top = 0;
-	int		maxray = RAYSTACKSIZE;
+	int		maxray = MAXRAY;
 
 	color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	
@@ -408,34 +414,34 @@ void		main()
 
 	do
 	{
-		const Ray	ray = raystack[top];
-		Impact		impact;
+		vec4	origin = raystack[top].origin;
+		vec4	direction = raystack[top].direction;
+		Impact	impact;
 
 		impact.index = avoidstack[top];
 		impact.near = INFINITY;
-		if (find_closest(ray, impact))
+		if (find_closest(origin.xyz, direction.xyz, impact))
 		{
 			vec4	accumulated_color = vec4(0.4f, 0.4f, 0.5f, 0.25f);
-			Ray		shadowray;
 
-			shadowray.origin = ray.origin + ray.direction * impact.near;
+			origin += direction * impact.near;
 
 			for (uint i = 0; i < lights_number; ++i)
 			{
-				shadowray.direction = lights[i].position - shadowray.origin;
-				const float	distance = length(shadowray.direction);
-				shadowray.direction /= distance;
+				vec4 ligth_direction = lights[i].position - origin;
+				const float	distance = length(ligth_direction);
+				ligth_direction /= distance;
 
-				const float	received_power = dot(impact.normal, shadowray.direction) * (lights[i].color.w / distance);
+				const float	received_power = dot(impact.normal, ligth_direction) * (lights[i].color.w / distance);
 				vec4		tcolor = lights[i].color;
-				if (received_power > FLT_EPSILON && compute_shadow(shadowray, distance, impact.index, tcolor))
+				if (received_power > FLT_EPSILON && compute_shadow(origin.xyz, ligth_direction.xyz, distance, impact.index, tcolor))
 				{
 					accumulated_color.xyz += tcolor.xyz * received_power;
 					accumulated_color.w += received_power;
 				}
 			}
 
-			const float aocclusion = compute_aocclusion(shadowray.origin, impact.normal);
+			const float aocclusion = compute_aocclusion(origin, impact.normal);
 			const int	mtlindex = nodes[impact.index].data;
 			const float	coef = coefstack[top];
 
@@ -444,42 +450,44 @@ void		main()
 			if ((coefstack[top] = coef * materials[mtlindex].reflection) > FLT_EPSILON && maxray != 0)
 			{
 				--maxray;
-				raystack[top].origin = shadowray.origin;
-				raystack[top].direction = ray.direction - impact.normal * dot(ray.direction, impact.normal) * 2.0f;
+				raystack[top].origin = origin;
+				raystack[top].direction = direction - impact.normal * dot(direction, impact.normal) * 2.0f;
 				avoidstack[top++] = impact.index;
 			}
 
 			if ((coefstack[top] = coef * materials[mtlindex].color.w) > FLT_EPSILON && maxray != 0)
 			{
 				const float	n = 1.0f / materials[mtlindex].refraction;
-				const float c = -dot(impact.normal, ray.direction);
+				const float c = -dot(impact.normal, direction);
 				const float s = 1.0f - n * n * (1.0f - c * c);
 
 				if (s > 0.0f)
 				{
-					Ray	refractionray;
-					refractionray.origin = shadowray.origin;
-					refractionray.direction = ray.direction * n + impact.normal * (n * c - s);
-					int	idx;
-					refractionray.origin += refractionray.direction * find_closest_s(refractionray, mtlindex, idx);
-					refractionray.direction = -refractionray.direction;
+					direction = direction * n + impact.normal * (n * c - s);
+					origin += direction * find_closest_s(origin.xyz, direction.xyz, mtlindex, impact.index);
+					direction = -direction;
 					impact.near = INFINITY;
-					impact.index = idx;
-					find_closest(refractionray, impact);
+					find_closest(origin.xyz, direction.xyz, impact);
 					
 					const float	no = materials[mtlindex].refraction;
-					const float co = -dot(impact.normal, -refractionray.direction);
+					const float co = -dot(impact.normal, -direction);
 					const float so = 1.0f - no * no * (1.0f - co * co);
 					if (s > 0.0f)
 					{
 						--maxray;
-						raystack[top].origin = refractionray.origin + refractionray.direction * impact.near;
-						raystack[top].direction = -refractionray.direction * no + -impact.normal * (no * co - so);
+						raystack[top].origin = origin + direction * impact.near;
+						raystack[top].direction = -direction * no + -impact.normal * (no * co - so);
 						avoidstack[top++] = impact.index;
 					}
 					//else inner reflection
 				}
-				//else outter reflection
+				else
+				{
+					--maxray;
+					raystack[top].origin = origin;
+					raystack[top].direction = direction - impact.normal * dot(direction, impact.normal) * 2.0f;
+					avoidstack[top++] = impact.index;
+				}
 			}
 		}
 	}

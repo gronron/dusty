@@ -51,6 +51,17 @@ struct	vec<float, 4>
 	float		&operator[](unsigned int const x);
 	float const	&operator[](unsigned int const x) const;
 
+	template<unsigned int V>
+	vec	&operator=(vec<float, V> const &);
+	template<unsigned int V>
+	vec	&operator+=(vec<float, V> const &);
+	template<unsigned int V>
+	vec	&operator-=(vec<float, V> const &);
+	template<unsigned int V>
+	vec	&operator*=(vec<float, V> const &);
+	template<unsigned int V>
+	vec	&operator/=(vec<float, V> const &);
+
 	vec	&operator=(vec<float, 4> const &x);
 	vec	&operator+=(vec<float, 4> const &x);
 	vec	&operator-=(vec<float, 4> const &x);
@@ -93,6 +104,49 @@ inline float	&vec<float, 4>::operator[](unsigned int const x)
 inline float const	&vec<float, 4>::operator[](unsigned int const x) const
 {
 	return (ar[x]);
+}
+
+
+///////////////////////////////////////
+
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator=(vec<float, V> const &x)
+{
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
+		ar[i] = x.ar[i];
+	return (*this);
+}
+
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator+=(vec<float, V> const &x)
+{
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
+		ar[i] += x.ar[i];
+	return (*this);
+}
+
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator-=(vec<float, V> const &x)
+{
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
+		ar[i] -= x.ar[i];
+	return (*this);
+}
+
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator*=(vec<float, V> const &x)
+{
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
+		ar[i] *= x.ar[i];
+	return (*this);
+}
+
+template<unsigned int V>
+inline vec<float, 4>	&vec<float, 4>::operator/=(vec<float, V> const &x)
+{
+	for (unsigned int i = 0; i < (4 > V ? V : 4); ++i)
+		ar[i] /= x.ar[i];
+	return (*this);
 }
 
 ///////////////////////////////////////

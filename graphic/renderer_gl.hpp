@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #include <GL/gl.h>
 #include <SDL/SDL.h>
+#include "array.hpp"
 #include "math/vec.hpp"
 
 class	Graphicengine;
@@ -46,11 +47,12 @@ struct	Glyph
 	vec<float, 2>	center;
 };
 
-struct	DChar
+struct	CharVertex
 {
 	vec<float, 4>	position;
 	vec<float, 4>	color;
 	vec<float, 2>	coord;
+	float			padding[2];
 };
 
 class	Renderer
@@ -63,34 +65,35 @@ public:
 	SDL_Window		*_window;
 	SDL_GLContext	_glcontext;
 
-	GLuint VBO;
-	GLuint VAO;
-	
-	GLuint			_program;
-	
+	GLuint			_main_program;
+	GLuint			_text_program;
+
+	GLuint			_main_vao;
+	GLuint 			_main_vbo;
+
+	GLuint 			_text_vao;
+	GLuint 			_text_vbo;
+
 	GLint			_cameraidx;
 	GLint			_nodesidx;
 	GLint			_materialsidx;
 	GLint			_lightsnbridx;
 	GLint			_lightsidx;
-	
+
 	GLuint			_camerabuffer;
 	GLuint			_nodesbuffer;
 	GLuint			_materialsbuffer;
 	GLuint			_lightsbuffer;
-	
+
+	unsigned int	_text_mem_size;
 	unsigned int	_nodes_mem_size;
 	unsigned int	_materials_mem_size;
 	unsigned int	_lights_mem_size;
 
-	GLuint			_texture;
-
 	GLuint			_glyphstexture;
 	Glyph			_glyphs[128];
 
-	unsigned int	_vertices_size;
-	unsigned int	_vertices_count;
-	float			*_text_vertices;
+	Array<CharVertex>	_text_vertices;
 
 
 	Renderer(unsigned int const, unsigned int const, bool const);
@@ -98,12 +101,14 @@ public:
 
 	void			set_fullscreen(bool const);
 	void			set_resolution(unsigned int const, unsigned int const);
-	void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
-	void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &) const;
+	void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &);
+	void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &);
 	unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
 
 	void			render(Graphicengine const *);
 
-	void			_draw_glyph(vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &, const unsigned int);
+	void			_init_main_renderer();
+	void			_init_text_renderer();
+
 	void			_set_buffer(Graphicengine const *);
 };

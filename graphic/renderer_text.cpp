@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include FT_FREETYPE_H
 #include "renderer_gl.hpp"
 
+#define CHAR_PIXEL_SIZE 128
+
 inline int	next_p2(int const x)
 {
     int		a;
@@ -56,7 +58,7 @@ unsigned int	_load_font(char const *filename, Glyph *glyphs)
 		std::cerr << "error! FT_New_Face() fails to open: " << filename << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	if (FT_Set_Pixel_Sizes(face, 64, 64))
+	if (FT_Set_Pixel_Sizes(face, CHAR_PIXEL_SIZE, CHAR_PIXEL_SIZE))
 	{
 		std::cerr << "error! FT_Set_Char_Size()" << std::endl;
 		exit(EXIT_FAILURE);
@@ -95,7 +97,7 @@ unsigned int	_load_font(char const *filename, Glyph *glyphs)
 
 			unsigned int const offset = cursor;
 			glyphs[c].topleft[0] = (float)cursor / size[0];
-			glyphs[c].topleft[1] = 0;
+			glyphs[c].topleft[1] = 0.0f;
 			cursor += bitmap->width;
 			glyphs[c].bottomright[0] = (float)cursor++ / size[0];
 			glyphs[c].bottomright[1] = (float)bitmap->rows / size[1];
@@ -116,7 +118,7 @@ unsigned int	_load_font(char const *filename, Glyph *glyphs)
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, size[0], size[1], 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, size[0], size[1], 0, GL_RED, GL_UNSIGNED_BYTE, data);
 
 	delete [] data;
 
@@ -125,104 +127,107 @@ unsigned int	_load_font(char const *filename, Glyph *glyphs)
 	return (texture);
 }
 
-void	Renderer::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
+void	Renderer::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color)
 {
-	vec<float, 2>	a = position;
+	vec<float, 2>	a = position * 2.0f - 1.0f;
 	vec<float, 2>	b;
-	
-	a[1] += 64.0f * scale[1];
 
-	glBindTexture(GL_TEXTURE_2D, _glyphstexture);
-	glColor4fv(color.ar);
+	a[1] = -a[1];
 
 	for (unsigned int i = 0; text[i]; ++i)
 	{
 		unsigned char const	c = text[i];
 
 		b = a;
-		b[1] -= _glyphs[c].center[1] * scale[1];
+		b[1] += _glyphs[c].center[1] * scale[1];
 		a[0] += _glyphs[c].step[0] * scale[0];
-		
-		vec<float, 2> const	tc[4] =
+
+		vec<float, 2> const	tc[6] =
 		{
 			{ { _glyphs[c].topleft[0], _glyphs[c].topleft[1] } },
 			{ { _glyphs[c].bottomright[0], _glyphs[c].topleft[1] } },
 			{ { _glyphs[c].bottomright[0], _glyphs[c].bottomright[1] } },
+
+			{ { _glyphs[c].bottomright[0], _glyphs[c].bottomright[1] } },
 			{ { _glyphs[c].topleft[0], _glyphs[c].bottomright[1] } },
+			{ { _glyphs[c].topleft[0], _glyphs[c].topleft[1] } },
 		};
 
-		vec<float, 2>	v[4] =
+		vec<float, 4>	v[6] =
 		{
-			{{0.0f, 0.0f}},
-			{{1.0f, 0.0f}},
-			{{1.0f, 1.0f}},
-			{{0.0f, 1.0f}},
+			{{0.0f, 0.0f, 0.0f, 0.0f}},
+			{{1.0f, 0.0f, 0.0f, 0.0f}},
+			{{1.0f, -1.0f, 0.0f, 0.0f}},
+
+			{{1.0f, -1.0f, 0.0f, 0.0f}},
+			{{0.0f, -1.0f, 0.0f, 0.0f}},
+			{{0.0f, 0.0f, 0.0f, 0.0f}},
 		};
+
 		vec<float, 2> const	s = _glyphs[c].size * scale;
 
-		for (unsigned int i = 0; i < 4; ++i)
+		for (unsigned int i = 0; i < 6; ++i)
 			v[i] = v[i] * s + b;
 
-		if (v[2][0] > 0.0f && v[2][1] > 0.0f && v[0][0] < width && v[0][1] < height)
+		for (unsigned int i = 0; i < 6; ++i)
 		{
-			glBegin(GL_QUADS);
-			for (unsigned int i = 0; i < 4; ++i)
-			{
-				glTexCoord2fv(tc[i].ar);
-				glVertex2fv(v[i].ar);
-			}
-			glEnd();
+			CharVertex	&char_vertex = _text_vertices.allocate();
+
+			char_vertex.position = v[i];
+			char_vertex.color = color;
+			char_vertex.coord = tc[i];
 		}
 	}
 }
 
-void	Renderer::draw_text(unsigned int const size, char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color) const
+void	Renderer::draw_text(unsigned int const size, char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color)
 {
-	vec<float, 2>	a = position;
+	vec<float, 2>	a = position * 2.0f - 1.0f;
 	vec<float, 2>	b;
-	
-	a[1] += 64.0f * scale[1];
 
-	glBindTexture(GL_TEXTURE_2D, _glyphstexture);
-	glColor4fv(color.ar);
+	a[1] = -a[1];
 
 	for (unsigned int i = 0; i < size; ++i)
 	{
 		unsigned char const	c = text[i];
 
 		b = a;
-		b[1] -= _glyphs[c].center[1] * scale[1];
+		b[1] += _glyphs[c].center[1] * scale[1];
 		a[0] += _glyphs[c].step[0] * scale[0];
-		
-		vec<float, 2> const	tc[4] =
+
+		vec<float, 2> const	tc[6] =
 		{
 			{ { _glyphs[c].topleft[0], _glyphs[c].topleft[1] } },
 			{ { _glyphs[c].bottomright[0], _glyphs[c].topleft[1] } },
 			{ { _glyphs[c].bottomright[0], _glyphs[c].bottomright[1] } },
+
+			{ { _glyphs[c].bottomright[0], _glyphs[c].bottomright[1] } },
 			{ { _glyphs[c].topleft[0], _glyphs[c].bottomright[1] } },
+			{ { _glyphs[c].topleft[0], _glyphs[c].topleft[1] } },
 		};
 
-		vec<float, 2>	v[4] =
+		vec<float, 4>	v[6] =
 		{
-			{{0.0f, 0.0f}},
-			{{1.0f, 0.0f}},
-			{{1.0f, 1.0f}},
-			{{0.0f, 1.0f}},
+			{{0.0f, 0.0f, 0.0f, 0.0f}},
+			{{1.0f, 0.0f, 0.0f, 0.0f}},
+			{{1.0f, -1.0f, 0.0f, 0.0f}},
+
+			{{1.0f, -1.0f, 0.0f, 0.0f}},
+			{{0.0f, -1.0f, 0.0f, 0.0f}},
+			{{0.0f, 0.0f, 0.0f, 0.0f}},
 		};
 		vec<float, 2> const	s = _glyphs[c].size * scale;
 
-		for (unsigned int i = 0; i < 4; ++i)
+		for (unsigned int i = 0; i < 6; ++i)
 			v[i] = v[i] * s + b;
 
-		if (v[2][0] > 0.0f && v[2][1] > 0.0f && v[0][0] < width && v[0][1] < height)
+		for (unsigned int i = 0; i < 6; ++i)
 		{
-			glBegin(GL_QUADS);
-			for (unsigned int i = 0; i < 4; ++i)
-			{
-				glTexCoord2fv(tc[i].ar);
-				glVertex2fv(v[i].ar);
-			}
-			glEnd();
+			CharVertex	&char_vertex = _text_vertices.allocate();
+
+			char_vertex.position = v[i];
+			char_vertex.color = color;
+			char_vertex.coord = tc[i];
 		}
 	}
 }

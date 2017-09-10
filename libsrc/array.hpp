@@ -36,7 +36,7 @@ template<class T>
 class	Array
 {
 	public:
-	
+
 		unsigned int	number;
 		unsigned int	size;
 		T				*data;
@@ -44,12 +44,13 @@ class	Array
 
 		Array();
 		Array(unsigned int const);
-		Array(unsigned int const, unsigned int const, const T const *);
+		Array(unsigned int const, unsigned int const, T const * const);
 		Array(Array const &);
 		Array(Array &&);
 		~Array();
-		
-		void	operator()(unsigned int const, unsigned int const, const T const *);
+
+		void	operator()(unsigned int const);
+		void	operator()(unsigned int const, unsigned int const, T const * const);
 		void	operator()();
 		
 		Array	&operator=(Array const &);
@@ -61,8 +62,7 @@ class	Array
 		T		&allocate();
 		void	free(unsigned int const);
 		
-		void	add(T const &);
-		void	remove(T const &);
+		void	clear();
 };
 
 template<class T>
@@ -72,19 +72,19 @@ inline Array<T>::Array() : number(0), size(0), data(0)
 }
 
 template<class T>
-inline Array<T>::Array(unsigned int const s) : number(0), size(s), data(new T(size))
+inline Array<T>::Array(unsigned int const s) : number(0), size(s), data(new T[size])
 {
 
 }
 
 template<class T>
-inline Array<T>::Array(unsigned int const s, const T const *d) : number(s), size(s), data(new T(size))
+inline Array<T>::Array(unsigned int const n, unsigned int const s, T const * const d) : number(n), size(s), data(new T[size])
 {
 	memcpy(data, d, number);
 }
 
 template<class T>
-inline Array<T>::Array(Array const &x) : number(x.number), size(x.size), data(new T(size))
+inline Array<T>::Array(Array const &x) : number(x.number), size(x.size), data(new T[size])
 {
 	memcpy(data, x.data, number);
 }
@@ -102,25 +102,39 @@ inline Array<T>::~Array()
 }
 
 template<class T>
-void	Array<T>::operator()(unsigned int const, unsigned int const, const T const *)
+void	Array<T>::operator()(unsigned int const s)
 {
-	
+	number = 0;
+	size = s;
+	delete [] data;
+	data = new T[size];
+}
+
+template<class T>
+void	Array<T>::operator()(unsigned int const n, unsigned int const s, T const * const d)
+{
+	number = n;
+	size = s;
+	delete [] data;
+	data = new T[size];
+	memcpy(data, d, number);
 }
 
 template<class T>
 void	Array<T>::operator()()
 {
-	
+	number = 0;
+	size = 0;
+	delete [] data;
 }
 
 template<class T>
-inline Array	&Array<T>::operator=(Array const &x)
+inline Array<T>	&Array<T>::operator=(Array const &x)
 {
 	number = x.number;
 	if (size < x.size)
 	{
-		if (data)
-			delete [] data;
+		delete [] data;
 		data = new T[x.size];
 	}
 	size = x.size;
@@ -128,13 +142,13 @@ inline Array	&Array<T>::operator=(Array const &x)
 }
 
 template<class T>
-inline Array	&Array<T>::operator=(Array &&x)
+inline Array<T>	&Array<T>::operator=(Array &&x)
 {
 	number = x.number;
 	size = x.size;
-	if (data)
-		delete [] data;
+	delete [] data;
 	data = x.data;
+	x.data = 0;
 }
 
 template<class T>
@@ -150,7 +164,7 @@ inline T const	&Array<T>::operator[](unsigned int const x) const
 }
 
 template<class T>
-inline T		Array<T>::&allocate()
+inline T	&Array<T>::allocate()
 {
 	if (number >= size)
 	{
@@ -167,21 +181,7 @@ inline void	Array<T>::free(unsigned int const x)
 }
 
 template<class T>
-inline void	Array<T>::add(T const &x)
+inline void	Array<T>::clear()
 {
-	if (number >= size)
-	{
-		size <<= 1;
-		data = resize(data, number, size);
-	}
-	data[number++] = x;
-}
-
-template<class T>
-inline void	Array<T>::remove(T const &x)
-{
-	int	index;
-	for (index = number - 1; index >= 0 && data[index] != x; --index)
-		;
-	data[index] = data[--number];
+	number = 0;
 }
