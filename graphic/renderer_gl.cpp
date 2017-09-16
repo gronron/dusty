@@ -176,8 +176,8 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	_window = SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
-	_glcontext = SDL_GL_CreateContext(_window);
+	_window = (void *)SDL_CreateWindow("dusty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
+	_glcontext = (void *)SDL_GL_CreateContext((SDL_Window *)_window);
 	SDL_GL_SetSwapInterval(0);
 
 	glewExperimental = GL_TRUE;
@@ -188,7 +188,7 @@ Renderer::Renderer(unsigned int const w, unsigned int const h, bool const fullsc
 	}
 
 	SDL_VERSION(&info.version);
-	if (!SDL_GetWindowWMInfo(_window, &info))
+	if (!SDL_GetWindowWMInfo((SDL_Window *)_window, &info))
 	{
 		std::cerr << "error! SDL_GetWindowWMInfo()" << std::endl;
 		exit(EXIT_FAILURE);
@@ -214,14 +214,14 @@ Renderer::~Renderer()
 	glDeleteBuffers(1, &_lightsbuffer);
 
 	glDeleteTextures(1, &_glyphstexture);
-	SDL_GL_DeleteContext(_glcontext);
-	SDL_DestroyWindow(_window);
+	SDL_GL_DeleteContext((SDL_GLContext)_glcontext);
+	SDL_DestroyWindow((SDL_Window *)_window);
 	SDL_Quit();
 }
 
 void	Renderer::set_fullscreen(bool const fullscreen)
 {
-	SDL_SetWindowFullscreen(_window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+	SDL_SetWindowFullscreen((SDL_Window *)_window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 }
 
 void	Renderer::set_resolution(unsigned int const w, unsigned int const h)
@@ -256,7 +256,7 @@ void	Renderer::render(Graphicengine const *ge)
 
 	check_error(__LINE__);
 
-	SDL_GL_SwapWindow(_window);
+	SDL_GL_SwapWindow((SDL_Window *)_window);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	_text_vertices.clear();

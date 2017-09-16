@@ -111,10 +111,14 @@ void	Graphicengine::tick(float const delta)
 
 	char	str[16];
 	_itoa_s((int)(1.0f / delta), str, sizeof(str), 10);
-	_renderer.draw_text(str, {0.9f, 0.05f}, {0.0005f, 0.0005f}, {0.9f, 0.5f, 0.125f, 1.0f});
+	_renderer.draw_text(str, {0.9f, 0.05f}, {0.0004f, 0.0004f}, {0.9f, 0.5f, 0.125f, 1.0f});
 
 	aabbtree.attach_transient_tree();
 	oatree.construct_from(*(AabbTree *)&aabbtree);
+
+	_itoa_s((oatree._count >> 1) + 1, str, sizeof(str), 10);
+	_renderer.draw_text(str, {0.9f, 0.1f}, {0.0003f, 0.0003f}, {0.9f, 0.5f, 0.125f, 1.0f});
+
 	_renderer.render(this);
 	aabbtree.delete_transient_tree();
 }

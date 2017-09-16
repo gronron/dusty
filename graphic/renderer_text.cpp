@@ -28,10 +28,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
+#include "renderer_gl.hpp"
+
 #include <iostream>
+#define GLEW_STATIC
+#include <glew.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "renderer_gl.hpp"
 
 #define CHAR_PIXEL_SIZE 128
 

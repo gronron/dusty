@@ -28,12 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef EVENTMANAGER_H_
-#define EVENTMANAGER_H_
+#pragma once
 
 #include <map>
 #include <vector>
-#include <SDL/SDL.h>
+#include <SDL/SDL_events.h>
 #include "controller.hpp"
 
 class	Gameengine;
@@ -63,8 +62,8 @@ class	Eventmanager
 		Bind	_mousemove;
 		Bind	_mousebuttons[8];
 		Bind	_mousewheel;
-		
-		
+
+
 		Bind	_gamepadbuttons[32];
 		Bind	_gamepadmoves[8];
 
@@ -80,5 +79,3 @@ class	Eventmanager
 		void	_gamepadbutton(SDL_Event &, float);
 		void	_gamepadmove(SDL_Event &);
 };
-
-#endif

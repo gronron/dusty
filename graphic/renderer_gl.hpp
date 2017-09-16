@@ -30,9 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <windows.h>
-#include <GL/gl.h>
-#include <SDL/SDL.h>
 #include "array.hpp"
 #include "math/vec.hpp"
 
@@ -62,35 +59,35 @@ public:
 	unsigned int	width;
 	unsigned int	height;
 
-	SDL_Window		*_window;
-	SDL_GLContext	_glcontext;
+	void			*_window;
+	void			*_glcontext;
 
-	GLuint			_main_program;
-	GLuint			_text_program;
+	unsigned int	_main_program;
+	unsigned int	_text_program;
 
-	GLuint			_main_vao;
-	GLuint 			_main_vbo;
+	unsigned int	_main_vao;
+	unsigned int 	_main_vbo;
 
-	GLuint 			_text_vao;
-	GLuint 			_text_vbo;
+	unsigned int 	_text_vao;
+	unsigned int 	_text_vbo;
 
-	GLint			_cameraidx;
-	GLint			_nodesidx;
-	GLint			_materialsidx;
-	GLint			_lightsnbridx;
-	GLint			_lightsidx;
+	int				_cameraidx;
+	int				_nodesidx;
+	int				_materialsidx;
+	int				_lightsnbridx;
+	int				_lightsidx;
 
-	GLuint			_camerabuffer;
-	GLuint			_nodesbuffer;
-	GLuint			_materialsbuffer;
-	GLuint			_lightsbuffer;
+	unsigned int	_camerabuffer;
+	unsigned int	_nodesbuffer;
+	unsigned int	_materialsbuffer;
+	unsigned int	_lightsbuffer;
 
 	unsigned int	_text_mem_size;
 	unsigned int	_nodes_mem_size;
 	unsigned int	_materials_mem_size;
 	unsigned int	_lights_mem_size;
 
-	GLuint			_glyphstexture;
+	unsigned int	_glyphstexture;
 	Glyph			_glyphs[128];
 
 	Array<CharVertex>	_text_vertices;

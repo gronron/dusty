@@ -51,7 +51,7 @@ struct		Result : public Raycastcallback
 	int		aabbindex;
 	float	near;
 	float	far;
-	
+
 	Result(Body *bd) : body(bd), aabbindex(-1), near(INFINITY), far(INFINITY) { }
 
 	bool	report_encounter(Body *bd, int const aabbidx, float const nr, float const fr)
@@ -83,7 +83,7 @@ World::World(Gameengine *g, Replication *r, int const i, short int const t, Enti
 	end[1] = 64;
 	end[2] = 1;
 	fill(start, end, 1);
-	
+
 	if (engine->graphic)
 	{
 		engine->graphic->new_light(&light);
@@ -106,7 +106,7 @@ World::~World()
 void	World::tick(float const delta)
 {
 	float time;
-	
+
 	time = 1.0f;
 	light->position[1] = (float)sin(time) * 4000.0f;
 	light->position[2] = (float)cos(time) * 4000.0f;
@@ -115,7 +115,7 @@ void	World::tick(float const delta)
 bool					World::load(char const *filename)
 {
 	unsigned int const	length = strlen(filename);
-	
+
 	if (filename[length - 1] == 'w')
 		return (load_dstw(filename));
 	else
@@ -161,14 +161,14 @@ bool				World::load_vox(char const *filename)
 		_clear_world();
 		if (chunks)
 			delete_space(chunks);
-		
+
 		if (fsize < 36 || buffer[0] != 'V' || buffer[1] != 'O' || buffer[2] != 'X' || buffer[3] != ' ' || buffer[8] != 'M' || buffer[9] != 'A' || buffer[10] != 'I' || buffer[11] != 'N')
 		{
 			std::cerr << "error! load_vox() 165 fails to load: " << filename << std::endl;
 			delete [] buffer;
 			return (false);
 		}
-		
+
 		it += *(unsigned int *)(buffer + 12);
 
 		if (buffer[it] != 'S' || buffer[it + 1] != 'I' || buffer[it + 2] != 'Z' || buffer[it + 3] != 'E')
@@ -177,7 +177,7 @@ bool				World::load_vox(char const *filename)
 			delete [] buffer;
 			return (false);
 		}
-		
+
 		it += 12;
 		size = *(vec<unsigned int, 3> *)(buffer + it) / (unsigned int)CHUNK_SIZE + 1U;
 		it += 12;
@@ -193,8 +193,7 @@ bool				World::load_vox(char const *filename)
 		it += 12;
 
 		unsigned int const	voxelcount = *(unsigned int *)(buffer + it);
-		std::cout << voxelcount << std::endl;
-		
+
 		for (unsigned int i = 0; (it += 4) < fsize && i < voxelcount; ++i)
 		{
 			vec<unsigned char, 4> const	data = *(vec<unsigned char, 4> *)(buffer + it);
@@ -204,7 +203,7 @@ bool				World::load_vox(char const *filename)
 		}
 
 		_reduce_world();
-		
+
 		/*if ((fsize - it) >= 1036 && buffer[it] == 'R' && buffer[it + 1] == 'G' && buffer[it + 2] == 'B' && buffer[it + 3] == 'A')
 		{
 			it += 12;
@@ -221,7 +220,7 @@ bool				World::load_vox(char const *filename)
 		}*/
 
 		delete [] buffer;
-		
+
 		return (true);
 	}
 	else
@@ -257,7 +256,7 @@ void					World::fill(vec<int, 4> const &start, vec<int, 4> const &end, char cons
 {
 	vec<int, 4> const	bottom = vmin(start, end);
 	vec<int, 4> const	top = vmax(start, end);
-	
+
 	for (int k = bottom[0]; k < top[0]; ++k)
 	{
 		int const	ck = k / CHUNK_SIZE;
@@ -285,7 +284,7 @@ bool	World::create_block(Ray const &ray, char const value)
 	{
 		vec<float, 4>	normal;
 		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
-		
+
 		vec<float, 4> const	position = ray.origin + ray.direction * (result.near - FLT_EPSILON) + normal * 0.5f;
 		vec<int, 3> const	wp = (vec<int, 3>)vfloor(position / (float)CHUNK_SIZE);
 		vec<int, 3> const	cp = (vec<int, 3>)vfloor(position - (vec<float, 4>)(wp * CHUNK_SIZE));
@@ -312,7 +311,7 @@ bool	World::destroy_block(Ray const &ray)
 	{
 		vec<float, 4>	normal;
 		intersect_rayaabb_n(ray, engine->physic->_statictree._nodes[result.aabbindex].aabb, result.near, result.far, normal);
-		
+
 		vec<float, 4> const	position = ray.origin + ray.direction * (result.near + FLT_EPSILON) - normal * 0.5f;
 		vec<int, 3> const	wp = (vec<int, 3>)vfloor(position / (float)CHUNK_SIZE);
 		vec<int, 3> const	cp = (vec<int, 3>)vfloor(position - (vec<float, 4>)(wp * CHUNK_SIZE));
