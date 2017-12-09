@@ -247,7 +247,7 @@ float			find_closest_s(in const vec3 origin, in const vec3 direction, in const i
 		bool		rtrue = nodes[right].children == -1 && nodes[right].data == value ? false : (intersect_rayaabb(origin, invdirection, right, rnear, far) && rnear < near);
 
 		if (ltrue && nodes[left].children == -1)
-		{	
+		{
 			if (lnear < near)
 			{
 				idx = left;
@@ -386,7 +386,7 @@ float		compute_aocclusion(in const vec4 origin, in const vec4 normal)
 			aocclusion -= a.x * a.y * a.z * (1.0f - materials[nodes[right].data].color.w);
 			rtrue = false;
 		}
-		
+
 		if (ltrue)
 			stack[top++] = left;
 		if (rtrue)
@@ -394,7 +394,7 @@ float		compute_aocclusion(in const vec4 origin, in const vec4 normal)
 	}
 	while (--top >= 0);
 
-	return (max(aocclusion / 8.0f, 0.0f) * 0.5f + 0.5f);
+	return (max(aocclusion * 0.125f, 0.0f) * 0.5f + 0.5f);
 }
 
 void		main()
@@ -406,7 +406,7 @@ void		main()
 	int		maxray = MAXRAY;
 
 	color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	
+
 	coefstack[top] = 1.0f;
 	raystack[top].origin = camera.position;
 	raystack[top].direction = normalize(camera.forward + camera.right * (gl_FragCoord.x - camera.half_resolution.x) + camera.up * (gl_FragCoord.y - camera.half_resolution.y));
@@ -430,9 +430,10 @@ void		main()
 			{
 				vec4 ligth_direction = lights[i].position - origin;
 				const float	distance = length(ligth_direction);
-				ligth_direction /= distance;
+				const float inv_distance = 1.0f / distance;
+				ligth_direction *= inv_distance
 
-				const float	received_power = dot(impact.normal, ligth_direction) * (lights[i].color.w / distance);
+				const float	received_power = dot(impact.normal, ligth_direction) * (lights[i].color.w * inv_distance);
 				vec4		tcolor = lights[i].color;
 				if (received_power > FLT_EPSILON && compute_shadow(origin.xyz, ligth_direction.xyz, distance, impact.index, tcolor))
 				{
@@ -446,7 +447,7 @@ void		main()
 			const float	coef = coefstack[top];
 
 			color += materials[mtlindex].color * accumulated_color * (1.0f - materials[mtlindex].reflection) * (1.0f - materials[mtlindex].color.w) * aocclusion * coefstack[top];
-		
+
 			if ((coefstack[top] = coef * materials[mtlindex].reflection) > FLT_EPSILON && maxray != 0)
 			{
 				--maxray;
@@ -468,7 +469,7 @@ void		main()
 					direction = -direction;
 					impact.near = INFINITY;
 					find_closest(origin.xyz, direction.xyz, impact);
-					
+
 					const float	no = materials[mtlindex].refraction;
 					const float co = -dot(impact.normal, -direction);
 					const float so = 1.0f - no * no * (1.0f - co * co);

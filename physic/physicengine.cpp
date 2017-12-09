@@ -68,7 +68,7 @@ void		Physicengine::new_body(Body **link, Shape *shape, Collider *collider)
 	body->shape = shape;
 	body->collider = collider;
 	body->index = -1;
-	
+
 	body->velocity = 0.0f;
 	body->acceleration = 0.0f;
 	body->mass = 0.0f;
@@ -94,7 +94,7 @@ void	Physicengine::move(Body *body, vec<float, 4> const &position)
 {
 
 	//_statictree.move_aabb(index, aabb);
-}	
+}
 */
 void	Physicengine::delete_body(Body *body)
 {
@@ -111,6 +111,7 @@ void	Physicengine::delete_body(Body *body)
 	}
 	else if (!body->dynamic)
 		_statictree.remove_aabbs((unsigned int)(body - _bodies));
+	body->link = nullptr;
 	body->next = _bdfree;
 	_bdfree = (int)(body - _bodies);
 }
@@ -205,7 +206,7 @@ void	Physicengine::tick(float const delta)
 
 		bool const	areaction = _bodies[a].collider->collide(_bodies[b].collider);
 		bool const	breaction = _bodies[b].collider->collide(_bodies[a].collider);
-		
+
 		_solve(_bodies + a, _bodies + b, _pairs[i].normal);
 
 		if (areaction && _bodies[a].mass != INFINITY)
@@ -244,7 +245,8 @@ void	Physicengine::tick(float const delta)
 			}
 			else if (!_bodies[i].dynamic)
 				_statictree.update_aabbsdata(_bdcount, i);
-			*_bodies[i].link = _bodies + i;
+			if (_bodies[i].link != nullptr)
+				*_bodies[i].link = _bodies + i;
 		}
 	}
 	_bdfree = -1;
@@ -338,11 +340,11 @@ void		Physicengine::_solve(Body *x, Body *y, vec<float, 4> const &normal)
 	vec<float, 4> const	vx = x->velocity * normal;
 	vec<float, 4> const	vy = y->velocity * normal;
 	vec<float, 4> const	mv = mx * vx + my * vy;
-	float const	mm = mx + my;
+	float const	mm = 1.0f / (mx + my);
 	float const ee = x->elasticity * y->elasticity;
 
 	if (x->mass != INFINITY)
-		x->velocity += (ee * my * (vy - vx) + mv) / mm - vx;
+		x->velocity += (ee * my * (vy - vx) + mv) * mm - vx;
 	if (y->mass != INFINITY)
-		y->velocity += (ee * mx * (vx - vy) + mv) / mm - vy;
+		y->velocity += (ee * mx * (vx - vy) + mv) * mm - vy;
 }

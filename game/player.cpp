@@ -8,13 +8,13 @@
 
 FACTORYREG(Player);
 
-Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o), damage(1.0f), firerate(2.0f), score(0.0f), loadingtime(0.0f)
+Player::Player(Gameengine *g, Replication *r, int const i, short int const t, Entity const *o) : Entity(g, r, i, t, o), damage(1.0f), firerate(20.0f), score(0.0f), loadingtime(0.0f)
 {
 	shape.size = 1.0f;
 	engine->physic->new_body(&body, &shape, this);
 	body->dynamic = true;
 	body->position = 5.0f;
-	
+
 	firing = true;
 	loadingfire = false;
 }

@@ -53,7 +53,7 @@ inline float			merged_surfacearea(Aabb const &x, Aabb const &y)
 AabbTree::AabbTree() : _size(1024), _nodes(nullptr), _root(-1), _free(0)
 {
 	_nodes = new AabbNode[_size];
-	
+
 	for (unsigned int i = 0; i < _size - 1; ++i)
 	{
 		_nodes[i].next = i + 1;
@@ -84,7 +84,7 @@ void	AabbTree::reset()
 int				AabbTree::add_aabb(Aabb const &aabb, int const data)
 {
 	int const	index = _allocate_node();
-	
+
 	_nodes[index].left = -1;
 	_nodes[index].right = -1;
 	_nodes[index].height = 0;
@@ -142,7 +142,7 @@ bool					AabbTree::move_aabb(int const index, Aabb const &aabb, vec<float, 4> co
 		else
 			a.top[i] += b[i];
 	}
-	
+
 	if (_nodes[index].aabb.is_containing(a))
 		return (false);
 
@@ -227,7 +227,7 @@ void	AabbTree::_insert_leaf(int const index)
 
 		float left_cost = merged_surfacearea(_nodes[left].aabb, leafaabb);
 		float right_cost = merged_surfacearea(_nodes[right].aabb, leafaabb);
-		
+
 		if (_nodes[left].right != -1)
 			left_cost -= surfacearea(_nodes[left].aabb);
 		if (_nodes[right].right != -1)
@@ -235,7 +235,7 @@ void	AabbTree::_insert_leaf(int const index)
 
 		i = left_cost < right_cost ? left : right;
 	}
-	
+
 	int const	oldparent = _nodes[i].parent;
 	int const	newparent = _allocate_node();
 
@@ -297,19 +297,19 @@ void	AabbTree::_balance(int const index)
 			int const	left = _nodes[i].left;
 			int const	right = _nodes[i].right;
 			int const	balance = _nodes[left].height - _nodes[right].height;
-		
+
 			if (balance > 1)
 			{
 				_rotate(i, left, right);
 				i = left;
-			}	
+			}
 			else if (balance < -1)
 			{
 				_rotate(i, right, left);
 				i = right;
 			}
 		}
-		
+
 		int const	left = _nodes[i].left;
 		int const	right = _nodes[i].right;
 
@@ -345,10 +345,10 @@ void			AabbTree::_rotate(int const up, int const down, int const sibling)
 		else
 			_nodes[up].right = right;
 		_nodes[right].parent = up;
-		
+
 		_nodes[up].height = (_nodes[sibling].height > _nodes[right].height ? _nodes[sibling].height : _nodes[right].height) + 1;
 		_nodes[down].height = (_nodes[up].height > _nodes[left].height ? _nodes[up].height : _nodes[left].height) + 1;
-		
+
 		_nodes[up].aabb.merge(_nodes[sibling].aabb, _nodes[right].aabb);
 		_nodes[down].aabb.merge(_nodes[up].aabb, _nodes[left].aabb);
 	}
@@ -426,38 +426,83 @@ void	OrderedAabbTree::construct_from(const AabbTree &aabbtree)
 		}
 	}
 }
-/*
-void	build_from(unsigned int const size, AabbWithData const *aabbs)
+
+#ifdef SECONDI
+
+struct	Split
 {
-	struct				CenterWithIndex
+	float score;
+	int	  index;
+};
+
+Split	search_split(OrderedAabbNode const * const aabbs, Center const * const centers, unsigned int begin, unsigned int end, float * const score)
+{
+	Split	best_split = { FLT_MAX, 0 };
+	Aabb	aabb;
+
+	aabb = aabbs[centers[begin].index].aabb;
+	for (unsigned int i = begin + 1; i < end; ++i)
+	{
+		aabb.merge(aabbs[centers[i].index].aabb);
+
+		score[i] = surfacearea(aabb);
+	}
+
+	aabb = aabbs[centers[end - 1].index].aabb;
+	for (unsigned int i = end - 1; i >= begin; --i)
+	{
+		aabb.merge(aabbs[centers[i].index].aabb);
+		score[i] += surfacearea(aabb);
+
+		if (score[i] < best_split.score)
+		{
+			best_split.score = score[i];
+			best_split.index = i;
+		}
+	}
+
+	return (best_split);
+}
+
+void	construct_from(unsigned int const size, OrderedAabbNode const * const aabbs)
+{
+	struct				Center
 	{
 		float			center;
-		float			size;
 		unsigned int	index;
+	}
+
+	struct				Range
+	{
+		unsigned int	begin;
+		unsigned int	end;
 	};
 
-	CenterWithIndex *indexs[3];
+	Center * const		centers[3];
+	bool * const		flags = new bool[size];
+	float * const		scores_buffer = new float[size];
 
-	indexs[0] = new CenterWithIndex[size * 3];
-	indexs[1] = indexs[0] + size;
-	indexs[2] = indexs[1] + size;
+	Range				stack[32];
+	unsigned int		top = 1;
+
+	stack[0] = { 0, size };
+
+	centers[0] = new Center[size * 3];
+	centers[1] = centers[0] + size;
+	centers[2] = centers[1] + size;
 
 	for (unsigned int i = 0; i < size; ++i)
 	{
 		vec<float, 4> const center = (aabbs[i].bottom + aabbs[i].top) * 0.5f;
-		vec<float, 4> const size = aabbs[i].top - aabbs[i].bottom;
 
-		indexs[0][i].index = i;
-		indexs[0][i].center = center[0];
-		indexs[0][i].size = size[0];
+		centers[0][i].center = center[0];
+		indices[0][i].index = i;
 
-		indexs[1][i].index = i;
-		indexs[1][i].center = center[1];
-		indexs[1][i].size = size[1];
+		centers[1][i].center = center[1];
+		indices[1][i].index = i;
 
-		indexs[2][i].index = i;
-		indexs[2][i].center = center[2];
-		indexs[2][i].size = size[2];
+		centers[2][i].center = center[2];
+		indices[2][i].index = i;
 	}
 
 	//threadpooling
@@ -466,14 +511,43 @@ void	build_from(unsigned int const size, AabbWithData const *aabbs)
 	std::sort(indexs[1], indexs[1] + size, cmp);
 	std::sort(indexs[2], indexs[2] + size, cmp);
 
-	while (notyet)
+	while (top)
 	{
+		Split split[3];
+
+		splits[0] = search_split(aabbs, centers[0], Range[].begin, Range[].end, scores_buffer);
+
+		unsigned int const splitaxis = 0;
+		unsigned int const second = (splitaxis + 1) % 3;
+		unsigned int const third = (splitaxis + 1) % 3;
+
+		for (unsigned int i = Range[].begin; i < Range[].end; ++i)
+		{
+			flags[centers[axis][i]] = i <= split[axis].index;
+		}
+
+		for (unsigned int i = Range[].begin; i < Range[].end; ++i)
+		{
+
+		}
+
+		//recopy on other axis
+		//split
+		//rearange
+	}
+
+	delete [] scores_buffer;
+	delete [] flags;
+	delete [] centers[0];
+}
+
+/*
 		vec<float, 3> axis_score = {0.0f, 0.0f, 0.0f};
 		vec<float, 3> axis_size;
 
 		axis_size[0] = indexs[0][0].size;
 		axis_size[1] = indexs[1][0].size;
-		axis_size[2] = indexs[2][0].size; 
+		axis_size[2] = indexs[2][0].size;
 
 		for (unsigned int i = 1; i < size; ++i)
 		{
@@ -502,10 +576,6 @@ void	build_from(unsigned int const size, AabbWithData const *aabbs)
 			else
 				best_axis = 2;
 		}
+*/
 
-		//split
-		//rearange
-	}
-
-	delete [] indexs[0];
-}*/
+#endif

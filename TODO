@@ -6,9 +6,6 @@ warning! function_name: what happned
 
 ///////////////////////////////////////
 
-start tremulous or lethargy:
-	GO GO GO GO TREmulous: armageddon 1
-
 general:
 	switch to 0.5m per block 1
 	block visibility when targeted for creation or destruction 0
@@ -18,6 +15,7 @@ console:
 	handle typing screen depassement with <= => shift
 	handle multi line
 	text input history
+
 interpreter:
 	handle buffer overflow read_number
 
@@ -32,7 +30,8 @@ physic engine:
 	-think about continuous collision detection of rotating object 0
 
 graphic engine:
-	-switch from opencl to opengl
+	-bonzai -1
+	-pipeline 0
 	-light material in df 0
 	-oriented box rendering 1
 	-emissive block 1

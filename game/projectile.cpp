@@ -8,7 +8,7 @@ Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int con
 {
 	shape.size = 0.01f;
 	engine->physic->new_body(&body, &shape, this);
-	
+
 	body->dynamic = true;
 	body->elasticity = 0.8f;
 	damage = 1.0f;
@@ -16,7 +16,6 @@ Projectile::Projectile(Gameengine *g, Replication *r, int const i, short int con
 
 Projectile::~Projectile()
 {
-	engine->physic->delete_body(body);
 	engine->graphic->remove_animation(ps);
 	delete ps;
 }
@@ -30,12 +29,13 @@ void	Projectile::postinstanciation()
 		ps = new Particlesystem(engine->graphic, "projectile", &body);
 		engine->graphic->add_animation(ps);
 	}
-	engine->callback->start_callback(4, this, (bool (Entity::*)())&Projectile::selfdestroy, 16.0f, false);
+	engine->callback->start_callback(4, this, (bool (Entity::*)())&Projectile::selfdestroy, 4.0f, false);
 }
 
 void	Projectile::destroy()
 {
 	Entity::destroy();
+	engine->physic->delete_body(body);
 	if (engine->graphic)
 		ps->stop();
 }

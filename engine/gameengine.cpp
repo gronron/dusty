@@ -43,14 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "interpreter.hpp"
 #include "gameengine.hpp"
 
-#include <iostream>
-
 Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), rootid(-1), ctrlid(-1), _entsize(1024), _entities(0), callback(0), physic(0), network(0), console(0), event(0), graphic(0), controllerclass()
 {
 	_entities = new Entity*[_entsize];
 	for (unsigned int i = 0; i < _entsize; ++i)
 		_entities[i] = 0;
-	
+
 	callback = new Callbackmanager();
 	physic = new Physicengine();
 	interpreter = new Interpreter(this);
@@ -93,8 +91,8 @@ Gameengine::~Gameengine()
 
 	if (network)
 		delete network;
-	
-	
+
+
 	if (graphic)
 	{
 		delete event;
@@ -164,20 +162,15 @@ void			Gameengine::control(int const id)
 
 void	Gameengine::tick(float const delta)
 {
-	//std::cout << "em" << std::endl;
 	if (event)
 		event->event();
-	//std::cout << "cl" << std::endl;
 	if (console)
 		console->tick(delta);
-	//std::cout << "ne" << std::endl;
 	if (network)
 		network->tick(delta);
-	//std::cout << "pe" << std::endl;
 	physic->tick(delta);
-	//std::cout << "cb" << std::endl;
 	callback->tick(delta);
-	//std::cout << "ac" << std::endl;
+
 	for (unsigned int i = 0; i < _entsize; ++i)
 	{
 		if (_entities[i])
@@ -193,13 +186,12 @@ void	Gameengine::tick(float const delta)
 					delete _entities[i];
 					_entities[i] = 0;
 					break;
-			};
+			}
 		}
 	}
-	//std::cout << "ge" << std::endl;
+
 	if (console)
 		console->draw();
 	if (graphic)
 		graphic->tick(delta);
-	//std::cout << "end" << std::endl;
 }

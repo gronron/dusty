@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include "../file/file.hpp"
 #include "df_parser.hpp"
 

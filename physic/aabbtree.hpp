@@ -81,7 +81,7 @@ public:
 
 	AabbTree();
 	~AabbTree();
-	
+
 	void	reset();
 	void	order_nodes();
 
@@ -125,7 +125,8 @@ class	OrderedAabbTree
 		OrderedAabbTree();
 		~OrderedAabbTree();
 
-	void	construct_from(const AabbTree &);
+	void	construct_from(AabbTree const &);
+	void	construct_from(unsigned int const size, OrderedAabbTree const * const);
 };
 
 ///////////////////////////////////////
@@ -173,7 +174,7 @@ void	AabbTree::raycast_through(Ray const &ray, T* object, bool (T::*callback)(in
 			int const	index = stack[top];
 			float		near;
 			float		far;
-			
+
 			if (intersect_invrayaabb(invray, _nodes[index].aabb, near, far))
 			{
 				if (_nodes[index].right == -1)
@@ -201,7 +202,7 @@ void	AabbTree::raycast(Ray const &ray, T* object, bool (T::*callback)(int const,
 		float		near = INFINITY;
 
 		stack[top] = _root;
-		near_stack[top] = 0.0f;		
+		near_stack[top] = 0.0f;
 		do
 		{
 			if (near_stack[top] < near)
