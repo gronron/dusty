@@ -69,9 +69,6 @@
     <ClCompile Include="..\..\..\libsrc\endian\packet.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp">
-      <Filter>Source Files\libsrc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
@@ -183,9 +180,6 @@
     <ClCompile Include="..\..\..\graphic\haabbtree.cpp">
       <Filter>Source Files\graphic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\graphic\renderer_text.cpp">
-      <Filter>Source Files\graphic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libsrc\hash\crc.cpp">
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
@@ -199,6 +193,15 @@
       <Filter>Source Files\libsrc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\graphic\renderer_gl.cpp">
+      <Filter>Source Files\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\renderer_gl_flat.cpp">
+      <Filter>Source Files\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\renderer_gl_rt.cpp">
+      <Filter>Source Files\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graphic\renderer_gl_text.cpp">
       <Filter>Source Files\graphic</Filter>
     </ClCompile>
   </ItemGroup>
@@ -228,9 +231,6 @@
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\endian\packet.hpp">
-      <Filter>Header Files\libsrc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp">
       <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\endian\endian.hpp">
@@ -277,9 +277,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\network\client.hpp">
       <Filter>Header Files\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool_util.hpp">
-      <Filter>Header Files\libsrc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libsrc\new.hpp">
       <Filter>Header Files\libsrc</Filter>
@@ -365,5 +362,8 @@
     <ClInclude Include="..\..\..\graphic\renderer_gl.hpp">
       <Filter>Header Files\graphic</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
 </Project>

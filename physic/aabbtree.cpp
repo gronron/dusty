@@ -452,11 +452,11 @@ Split	search_split(OrderedAabbNode const * const aabbs, Center const * const cen
 	for (unsigned int i = end - 1; i >= begin; --i)
 	{
 		aabb.merge(aabbs[centers[i].index].aabb);
-		score[i] += surfacearea(aabb);
+		float const s = score[i] + surfacearea(aabb);
 
-		if (score[i] < best_split.score)
+		if (s < best_split.score)
 		{
-			best_split.score = score[i];
+			best_split.score = s;
 			best_split.index = i;
 		}
 	}
@@ -464,7 +464,7 @@ Split	search_split(OrderedAabbNode const * const aabbs, Center const * const cen
 	return (best_split);
 }
 
-void	construct_from(unsigned int const size, OrderedAabbNode const * const aabbs)
+void	sweep_construct(unsigned int const size, OrderedAabbNode const * const aabbs)
 {
 	struct				Center
 	{
@@ -478,12 +478,12 @@ void	construct_from(unsigned int const size, OrderedAabbNode const * const aabbs
 		unsigned int	end;
 	};
 
-	Center * const		centers[3];
+	Center *			centers[3];
 	bool * const		flags = new bool[size];
 	float * const		scores_buffer = new float[size];
 
 	Range				stack[32];
-	unsigned int		top = 1;
+	int					top = 0;
 
 	stack[0] = { 0, size };
 
@@ -511,22 +511,24 @@ void	construct_from(unsigned int const size, OrderedAabbNode const * const aabbs
 	std::sort(indexs[1], indexs[1] + size, cmp);
 	std::sort(indexs[2], indexs[2] + size, cmp);
 
-	while (top)
+	do
 	{
+		Range const range = stack[top];
+
 		Split split[3];
 
-		splits[0] = search_split(aabbs, centers[0], Range[].begin, Range[].end, scores_buffer);
+		splits[0] = search_split(aabbs, centers[0], range.begin, range.end, scores_buffer);
 
 		unsigned int const splitaxis = 0;
 		unsigned int const second = (splitaxis + 1) % 3;
 		unsigned int const third = (splitaxis + 1) % 3;
 
-		for (unsigned int i = Range[].begin; i < Range[].end; ++i)
+		for (unsigned int i = Range[top].begin; i < Range[top].end; ++i)
 		{
 			flags[centers[axis][i]] = i <= split[axis].index;
 		}
 
-		for (unsigned int i = Range[].begin; i < Range[].end; ++i)
+		for (unsigned int i = Range[top].begin; i < Range[top].end; ++i)
 		{
 
 		}
@@ -534,7 +536,13 @@ void	construct_from(unsigned int const size, OrderedAabbNode const * const aabbs
 		//recopy on other axis
 		//split
 		//rearange
+
+		if ((split - begin) > 1)
+			tack[top++] = {begin, split};
+		if ((split - begin) > 1)
+			stack[top++] = {split, end};
 	}
+	while (--top >= 0);
 
 	delete [] scores_buffer;
 	delete [] flags;

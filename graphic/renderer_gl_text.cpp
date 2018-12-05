@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "renderer_gl.hpp"
 
 #include <iostream>
+#include <cstdlib>
+
 #define GLEW_STATIC
 #include <glew.h>
 #include <ft2build.h>
@@ -38,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define CHAR_PIXEL_SIZE 128
 
-inline int	next_p2(int const x)
+static inline int	next_p2(int const x)
 {
     int		a;
 
@@ -46,7 +48,7 @@ inline int	next_p2(int const x)
     return (a);
 }
 
-unsigned int	_load_font(char const *filename, Glyph *glyphs)
+static unsigned int	_load_font(char const *filename, Glyph *glyphs)
 {
 	FT_Library	library;
 	FT_Face		face;
@@ -130,7 +132,76 @@ unsigned int	_load_font(char const *filename, Glyph *glyphs)
 	return (texture);
 }
 
-void	Renderer::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color)
+TextRenderer::TextRenderer() : _vertices(8192)
+{
+
+}
+
+TextRenderer::~TextRenderer()
+{
+	glDeleteTextures(1, &_glyphstexture);
+}
+
+void TextRenderer::_init()
+{
+	_glyphstexture = _load_font("cousine-bold.ttf", _glyphs);
+
+	_program = _build_program("text_vertex.glsl", "text_frag.glsl");
+	glUseProgram(_program);
+
+	glBindFragDataLocation(_program, 0, "color");
+
+	GLint texture_loc = glGetUniformLocation(_program, "_texture");
+
+	glUniform1i(texture_loc, 0);
+
+	glGenVertexArrays(1, &_vao);
+	glGenBuffers(1, &_vbo);
+
+	glBindVertexArray(_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(4 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glBindVertexArray(0);
+
+	_check_error(__LINE__);
+}
+
+void	TextRenderer::_set_buffer(Graphicengine const *ge)
+{
+	if (_mem_size < _vertices.size)
+	{
+		_mem_size = _vertices.size;
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glBufferData(GL_ARRAY_BUFFER, _mem_size * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, _vertices.number * sizeof(Vertex), (void *)_vertices.data);
+
+	_check_error(__LINE__);
+}
+
+void	TextRenderer::_render()
+{
+	glUseProgram(_program);
+	glBindVertexArray(_vao);
+	glBindTexture(GL_TEXTURE_2D, _glyphstexture);
+	glDrawArrays(GL_TRIANGLES, 0, _vertices.number);
+	glBindVertexArray(0);
+
+	_check_error(__LINE__);
+
+	_vertices.clear();
+}
+
+
+void				TextRenderer::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color)
 {
 	vec<float, 2>	a = position * 2.0f - 1.0f;
 	vec<float, 2>	b;
@@ -174,16 +245,16 @@ void	Renderer::draw_text(char const *text, vec<float, 2> const &position, vec<fl
 
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			CharVertex	&char_vertex = _text_vertices.allocate();
+			Vertex	&vertex = _vertices.allocate();
 
-			char_vertex.position = v[i];
-			char_vertex.color = color;
-			char_vertex.coord = tc[i];
+			vertex.position = v[i];
+			vertex.color = color;
+			vertex.coord = tc[i];
 		}
 	}
 }
 
-void	Renderer::draw_text(unsigned int const size, char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color)
+void				TextRenderer::draw_text(unsigned int const size, char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color)
 {
 	vec<float, 2>	a = position * 2.0f - 1.0f;
 	vec<float, 2>	b;
@@ -226,16 +297,16 @@ void	Renderer::draw_text(unsigned int const size, char const *text, vec<float, 2
 
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			CharVertex	&char_vertex = _text_vertices.allocate();
+			Vertex	&vertex = _vertices.allocate();
 
-			char_vertex.position = v[i];
-			char_vertex.color = color;
-			char_vertex.coord = tc[i];
+			vertex.position = v[i];
+			vertex.color = color;
+			vertex.coord = tc[i];
 		}
 	}
 }
 
-unsigned int		Renderer::cut_line(char const *text, vec<float, 2> const &scale, float const width) const
+unsigned int		TextRenderer::cut_line(char const *text, vec<float, 2> const &scale, float const width) const
 {
 	unsigned int	i;
 	float			a = 0.0f;

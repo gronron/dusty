@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
@@ -9,10 +13,17 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9B587A27-35EC-414E-84EA-A0D8CCE51075}</ProjectGuid>
     <RootNamespace>dusty_engine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -25,20 +36,54 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LibraryPath>$(SolutionDir)..\..\lib\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>$(SolutionDir)..\..\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\glew;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game;$(SolutionDir)..\..\game\animations</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>
       </EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;ws2_32.lib;SDL2.lib;SDL2main.lib;glew32s.lib;freetype.lib;opengl32.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <OutputFile>$(SolutionDir)..\..\bin\x64\$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\SDL;$(SolutionDir)..\..\include\glew;$(SolutionDir)..\..\include\freetype;$(SolutionDir)..\..\libsrc;$(SolutionDir)..\..\engine;$(SolutionDir)..\..\graphic;$(SolutionDir)..\..\network;$(SolutionDir)..\..\physic;$(SolutionDir)..\..\ui;$(SolutionDir)..\..\game;$(SolutionDir)..\..\game\animations</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>
+      </EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -70,7 +115,9 @@
     <ClCompile Include="..\..\..\graphic\particle\particleeffect.cpp" />
     <ClCompile Include="..\..\..\graphic\particle\particlesystem.cpp" />
     <ClCompile Include="..\..\..\graphic\renderer_gl.cpp" />
-    <ClCompile Include="..\..\..\graphic\renderer_text.cpp" />
+    <ClCompile Include="..\..\..\graphic\renderer_gl_flat.cpp" />
+    <ClCompile Include="..\..\..\graphic\renderer_gl_rt.cpp" />
+    <ClCompile Include="..\..\..\graphic\renderer_gl_text.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_node.cpp" />
     <ClCompile Include="..\..\..\libsrc\df\df_parser.cpp" />
     <ClCompile Include="..\..\..\libsrc\endian\packet.cpp" />
@@ -82,7 +129,6 @@
     <ClCompile Include="..\..\..\libsrc\socket\tcpsocket.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\udpsocket.cpp" />
     <ClCompile Include="..\..\..\libsrc\socket\winsock_init.cpp" />
-    <ClCompile Include="..\..\..\libsrc\thread\lightthreadpool.cpp" />
     <ClCompile Include="..\..\..\libsrc\thread\thread.cpp" />
     <ClCompile Include="..\..\..\libsrc\time\time.cpp" />
     <ClCompile Include="..\..\..\main.cpp" />
@@ -139,8 +185,6 @@
     <ClInclude Include="..\..\..\libsrc\socket\tcpsocket.hpp" />
     <ClInclude Include="..\..\..\libsrc\socket\udpsocket.hpp" />
     <ClInclude Include="..\..\..\libsrc\stream\socket.hpp" />
-    <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool.hpp" />
-    <ClInclude Include="..\..\..\libsrc\thread\lightthreadpool_util.hpp" />
     <ClInclude Include="..\..\..\libsrc\thread\thread.hpp" />
     <ClInclude Include="..\..\..\libsrc\time\time.hpp" />
     <ClInclude Include="..\..\..\network\client.hpp" />
@@ -158,6 +202,9 @@
     <ClInclude Include="..\..\..\ui\console.hpp" />
     <ClInclude Include="..\..\..\ui\eventmanager.hpp" />
     <ClInclude Include="..\..\..\ui\interpreter.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

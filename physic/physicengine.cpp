@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cfloat>
 #include "new.hpp"
 #include "math/vec_util.hpp"
-#include "thread/lightthreadpool.hpp"
-#include "thread/lightthreadpool_util.hpp"
 #include "shape.hpp"
 #include "collider.hpp"
 #include "narrowphase.hpp"

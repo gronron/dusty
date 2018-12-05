@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math/vec.hpp"
 #include "aabb.hpp"
 
+#undef near
+#undef far
+
 struct		AabbNode
 {
 	Aabb	aabb;

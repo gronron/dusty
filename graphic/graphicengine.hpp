@@ -88,10 +88,6 @@ public:
 	unsigned int	_materials_size;
 	unsigned int	_materials_count;
 	Material		*_materials;
-	
-	vec<float, 4>	*_vertices;
-	vec<float, 2>	*_texcoord;
-	vec<float, 4>   *_color;
 
 	Haabbtree		aabbtree;
 	OrderedAabbTree	oatree;
@@ -113,7 +109,7 @@ public:
 
 	void	new_light(Light **);
 	void	delete_light(Light *);
-	
+
 	void			draw_text(char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &);
 	void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &);
 	unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
