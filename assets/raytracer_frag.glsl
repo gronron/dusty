@@ -39,18 +39,12 @@ const float FLT_EPSILON = 0.0001f;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct		Aabb
-{
-	vec4	bottom;
-	vec4	top;
-};
-
 struct		AabbNode
 {
 	vec3	bottom;
-	int		data;
-	vec3	top;
 	int		children;
+	vec3	top;
+	int		matrix;
 };
 
 struct		Camera
@@ -78,15 +72,21 @@ struct		Material
 
 ///////////////////////////////////////////////////////////////////////////////
 
+struct		Aabb
+{
+	vec3	bottom;
+	vec3	top;
+};
+
 struct		Ray
 {
-	vec4	origin;
-	vec4	direction;
+	vec3	origin;
+	vec3	direction;
 };
 
 struct		Impact
 {
-	vec4	normal;
+	vec3	normal;
 	float	near;
 	float	far;
 	int		index;
@@ -105,6 +105,11 @@ layout (std140) uniform _camera
 layout (std430) readonly buffer _nodes
 {
     AabbNode nodes[];
+};
+
+layout (std430) readonly buffer _matrices
+{
+    mat3 matrices[];
 };
 
 layout (std430) readonly buffer _materials
@@ -138,26 +143,48 @@ bool			intersect_rayaabb(in const vec3 origin, in const vec3 direction, in const
 	return (tfar > 0.0f && tnear <= tfar);
 }
 
-bool			compute_rayaabb_normal(in const vec3 origin, in const vec3 direction, in const int aabbidx, out vec4 normal)
+bool			intersect_rotated_rayaabb(in const vec3 origin, in const vec3 direction, in const int aabbidx, out float tnear, out float tfar)
 {
-	const vec3 	tbot = (nodes[aabbidx].bottom - origin) * direction;
-	const vec3	ttop = (nodes[aabbidx].top - origin) * direction;
+	const mat3  rotation = matrices[nodes[aabbidx].matrix];
+	const vec3  center = (nodes[aabbidx].bottom + nodes[aabbidx].top) * 0.5f;
+	const vec3	rori = (origin - center) * rotation + center;
+	const vec3	rdir = direction * transpose(rotation);
+	const vec3	tbot = (nodes[aabbidx].bottom - rori) * rdir;
+	const vec3	ttop = (nodes[aabbidx].top - rori) * rdir;
+	const vec3	tmin = min(tbot, ttop);
+	const vec3 	tmax = max(tbot, ttop);
+
+	tnear = max(max(tmin.x, tmin.y), tmin.z);
+	tfar = min(min(tmax.x, tmax.y), tmax.z);
+
+	return (tfar > 0.0f && tnear <= tfar);
+}
+
+bool			compute_rotated_rayaabb_normal(in const vec3 origin, in const vec3 direction, in const int aabbidx, out vec3 normal)
+{
+	const mat3  rotation = matrices[nodes[aabbidx].matrix];
+	const vec3  center = (nodes[aabbidx].bottom + nodes[aabbidx].top) * 0.5f;
+	const vec3	rori = (origin - center) * rotation + center;
+	const vec3	rdir = direction * transpose(rotation);
+	const vec3	tbot = (nodes[aabbidx].bottom - rori) * rdir;
+	const vec3	ttop = (nodes[aabbidx].top - rori) * rdir;
 	const vec3 	tmin = min(tbot, ttop);
 
 	if (tmin.x > tmin.y)
 	{
 		if (tmin.x > tmin.z)
-			normal = vec4(direction.x >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f, 0.0f);
+			normal = vec3(rdir.x >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f);
 		else
-			normal = vec4(0.0f, 0.0f, direction.z >= 0.0f ? -1.0f : 1.0f, 0.0f);
+			normal = vec3(0.0f, 0.0f, rdir.z >= 0.0f ? -1.0f : 1.0f);
 	}
 	else
 	{
 		if (tmin.y > tmin.z)
-			normal = vec4(0.0f, direction.y >= 0.0f ? -1.0f : 1.0f, 0.0f, 0.0f);
+			normal = vec3(0.0f, rdir.y >= 0.0f ? -1.0f : 1.0f, 0.0f);
 		else
-			normal = vec4(0.0f, 0.0f, direction.z >= 0.0f ? -1.0f : 1.0f, 0.0f);
+			normal = vec3(0.0f, 0.0f, rdir.z >= 0.0f ? -1.0f : 1.0f);
 	}
+	normal = normal * rotation;
 	return (true);
 }
 
@@ -180,9 +207,9 @@ bool			find_closest(in const vec3 origin, in const vec3 direction, inout Impact 
 		bool		ltrue = intersect_rayaabb(origin, invdirection, left, lnear, far) && lnear < data.near;
 		bool		rtrue = intersect_rayaabb(origin, invdirection, right, rnear, far) && rnear < data.near;
 
-		if (ltrue && nodes[left].children == -1)
+		if (nodes[left].children < 0)
 		{
-			if (left != idx && lnear < data.near)
+			if (intersect_rotated_rayaabb(origin, invdirection, left, lnear, far) && left != idx && lnear < data.near)
 			{
 				data.index = left;
 				data.near = lnear;
@@ -190,9 +217,9 @@ bool			find_closest(in const vec3 origin, in const vec3 direction, inout Impact 
 			ltrue = false;
 		}
 
-		if (rtrue && nodes[right].children == -1)
+		if (nodes[right].children < 0)
 		{
-			if (right != idx && rnear < data.near)
+			if (intersect_rotated_rayaabb(origin, invdirection, right, rnear, far) && right != idx && rnear < data.near)
 			{
 				data.index = right;
 				data.near = rnear;
@@ -222,7 +249,7 @@ bool			find_closest(in const vec3 origin, in const vec3 direction, inout Impact 
 	}
 	while (index != -1);
 
-	return (data.index != -1 ? compute_rayaabb_normal(origin, invdirection, data.index, data.normal) : false);
+	return (data.index != -1 ? compute_rotated_rayaabb_normal(origin, invdirection, data.index, data.normal) : false);
 }
 
 float			find_closest_s(in const vec3 origin, in const vec3 direction, in const int value, out int idx)
@@ -243,12 +270,12 @@ float			find_closest_s(in const vec3 origin, in const vec3 direction, in const i
 
 		const int	left = nodes[index].children;
 		const int	right = nodes[index].children + 1;
-		bool		ltrue = nodes[left].children == -1 && nodes[left].data == value ? false : (intersect_rayaabb(origin, invdirection, left, lnear, far) && lnear < near);
-		bool		rtrue = nodes[right].children == -1 && nodes[right].data == value ? false : (intersect_rayaabb(origin, invdirection, right, rnear, far) && rnear < near);
+		bool		ltrue = (0 - nodes[left].children) == value ? false : (intersect_rayaabb(origin, invdirection, left, lnear, far) && lnear < near);
+		bool		rtrue = (0 - nodes[right].children) == value ? false : (intersect_rayaabb(origin, invdirection, right, rnear, far) && rnear < near);
 
-		if (ltrue && nodes[left].children == -1)
+		if (nodes[left].children < 0)
 		{
-			if (lnear < near)
+			if ((0 - nodes[left].children) != value && intersect_rotated_rayaabb(origin, invdirection, left, lnear, far) && lnear < near)
 			{
 				idx = left;
 				near = lnear;
@@ -256,9 +283,9 @@ float			find_closest_s(in const vec3 origin, in const vec3 direction, in const i
 			ltrue = false;
 		}
 
-		if (rtrue && nodes[right].children == -1)
+		if (nodes[right].children < 0)
 		{
-			if (rnear < near)
+			if ((0 - nodes[right].children) != value && intersect_rotated_rayaabb(origin, invdirection, right, rnear, far) && rnear < near)
 			{
 				idx = right;
 				near = rnear;
@@ -286,7 +313,7 @@ float			find_closest_s(in const vec3 origin, in const vec3 direction, in const i
 	if (idx == -1)
 	{
 		float	far;
-		intersect_rayaabb(origin, invdirection, 0, far, near);
+		intersect_rotated_rayaabb(origin, invdirection, 0, far, near);
 	}
 	return (near);
 }
@@ -311,11 +338,11 @@ bool			compute_shadow(in const vec3 origin, in const vec3 direction, in const fl
 		bool		ltrue = intersect_rayaabb(origin, invdirection, left, lnear, lfar) && lnear < distance;
 		bool		rtrue = intersect_rayaabb(origin, invdirection, right, rnear, rfar) && rnear < distance;
 
-		if (ltrue && nodes[left].children == -1)
+		if (nodes[left].children < 0)
 		{
-			if (left != idx)
+			if (intersect_rotated_rayaabb(origin, invdirection, left, lnear, lfar) && left != idx)
 			{
-				const int	mtlindex = nodes[left].data;
+				const int	mtlindex = 0 - nodes[left].children;
 				if (materials[mtlindex].color.w != 0.0f)
 				{
 					const float coef = materials[mtlindex].color.w * (1.0f - (lfar - lnear));
@@ -326,11 +353,12 @@ bool			compute_shadow(in const vec3 origin, in const vec3 direction, in const fl
 			}
 			ltrue = false;
 		}
-		if (rtrue && nodes[right].children == -1)
+
+		if (nodes[right].children < 0)
 		{
-			if (right != idx)
+			if (intersect_rotated_rayaabb(origin, invdirection, right, rnear, rfar) && right != idx)
 			{
-				const int	mtlindex = nodes[right].data;
+				const int	mtlindex = 0 - nodes[right].children;
 				if (materials[mtlindex].color.w != 0.0f)
 				{
 					const float coef = materials[mtlindex].color.w * (1.0f - (rfar - rnear));
@@ -352,14 +380,14 @@ bool			compute_shadow(in const vec3 origin, in const vec3 direction, in const fl
 	return (true);
 }
 
-float		compute_aocclusion(in const vec4 origin, in const vec4 normal)
+float		compute_aocclusion(in const vec3 origin, in const vec3 normal)
 {
 	Aabb	aabb;
 	float	aocclusion = 8.0f;
 	int		top = 0;
 
-	aabb.bottom = (origin - vec4(1.0f, 1.0f, 1.0f, 0.0f)) + normal * (1.0f + FLT_EPSILON);
-	aabb.top = aabb.bottom + vec4(2.0f, 2.0f, 2.0f, 0.0f);
+	aabb.bottom = (origin - vec3(1.0f, 1.0f, 1.0f)) + normal * (1.0f + FLT_EPSILON);
+	aabb.top = aabb.bottom + vec3(2.0f, 2.0f, 2.0f);
 
 	stack[top] = 0;
 	do
@@ -374,16 +402,16 @@ float		compute_aocclusion(in const vec4 origin, in const vec4 normal)
 		bool 		rtrue = nodes[right].bottom.x < aabb.top.x && nodes[right].bottom.y < aabb.top.y && nodes[right].bottom.z < aabb.top.z &&
 							nodes[right].top.x > aabb.bottom.x && nodes[right].top.y > aabb.bottom.y && nodes[right].top.z > aabb.bottom.z;
 
-		if (ltrue && nodes[left].children == -1)
+		if (ltrue && nodes[left].children < 0)
 		{
-			const vec3	a = min(nodes[left].top, aabb.top.xyz) - max(nodes[left].bottom, aabb.bottom.xyz);
-			aocclusion -= a.x * a.y * a.z * (1.0f - materials[nodes[left].data].color.w);
+			const vec3	a = min(nodes[left].top, aabb.top) - max(nodes[left].bottom, aabb.bottom);
+			aocclusion -= a.x * a.y * a.z * (1.0f - materials[0 - nodes[left].children].color.w);
 			ltrue = false;
 		}
-		if (rtrue && nodes[right].children == -1)
+		if (rtrue && nodes[right].children < 0)
 		{
-			const vec3	a = min(nodes[right].top, aabb.top.xyz) - max(nodes[right].bottom, aabb.bottom.xyz);
-			aocclusion -= a.x * a.y * a.z * (1.0f - materials[nodes[right].data].color.w);
+			const vec3	a = min(nodes[right].top, aabb.top) - max(nodes[right].bottom, aabb.bottom);
+			aocclusion -= a.x * a.y * a.z * (1.0f - materials[0 - nodes[right].children].color.w);
 			rtrue = false;
 		}
 
@@ -408,14 +436,14 @@ void		main()
 	color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	coefstack[top] = 1.0f;
-	raystack[top].origin = camera.position;
-	raystack[top].direction = normalize(camera.forward + camera.right * (gl_FragCoord.x - camera.half_resolution.x) + camera.up * (gl_FragCoord.y - camera.half_resolution.y));
+	raystack[top].origin = camera.position.xyz;
+	raystack[top].direction = normalize(camera.forward + camera.right * (gl_FragCoord.x - camera.half_resolution.x) + camera.up * (gl_FragCoord.y - camera.half_resolution.y)).xyz;
 	avoidstack[top] = -1;
 
 	do
 	{
-		vec4	origin = raystack[top].origin;
-		vec4	direction = raystack[top].direction;
+		vec3	origin = raystack[top].origin;
+		vec3	direction = raystack[top].direction;
 		Impact	impact;
 
 		impact.index = avoidstack[top];
@@ -428,10 +456,10 @@ void		main()
 
 			for (uint i = 0; i < lights_number; ++i)
 			{
-				vec4 ligth_direction = lights[i].position - origin;
+				vec3 ligth_direction = lights[i].position.xyz - origin;
 				const float	distance = length(ligth_direction);
 				const float inv_distance = 1.0f / distance;
-				ligth_direction *= inv_distance
+				ligth_direction *= inv_distance;
 
 				const float	received_power = dot(impact.normal, ligth_direction) * (lights[i].color.w * inv_distance);
 				vec4		tcolor = lights[i].color;
@@ -443,10 +471,10 @@ void		main()
 			}
 
 			const float aocclusion = compute_aocclusion(origin, impact.normal);
-			const int	mtlindex = nodes[impact.index].data;
+			const int	mtlindex = 0 - nodes[impact.index].children;
 			const float	coef = coefstack[top];
 
-			color += materials[mtlindex].color * accumulated_color * (1.0f - materials[mtlindex].reflection) * (1.0f - materials[mtlindex].color.w) * aocclusion * coefstack[top];
+			color += materials[mtlindex].color * accumulated_color * (1.0f - materials[mtlindex].reflection) * (1.0f - materials[mtlindex].color.w) * aocclusion * coef;
 
 			if ((coefstack[top] = coef * materials[mtlindex].reflection) > FLT_EPSILON && maxray != 0)
 			{
@@ -493,7 +521,7 @@ void		main()
 		}
 	}
 	while (--top >= 0);
-	//float	l = dot(color.xyz, (float3)(0.2126f, 0.7152f, 0.0722f));
+	//float	l = dot(color.xyz, vec3(0.2126f, 0.7152f, 0.0722f));
 	//l = l / (l + 0.1f);
 	//color *= l;
 	color.w = 1.0f;

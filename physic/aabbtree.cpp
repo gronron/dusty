@@ -414,15 +414,15 @@ void	OrderedAabbTree::construct_from(const AabbTree &aabbtree)
 
 		if (aabbtree._nodes[index].right != -1)
 		{
-			_nodes[i].data = -1;
 			_nodes[i].children = _count;
+			_nodes[i].data = 0;
 			_indexes[_count++] = aabbtree._nodes[index].left;
 			_indexes[_count++] = aabbtree._nodes[index].right;
 		}
 		else
 		{
-			_nodes[i].data = aabbtree._nodes[index].data;
 			_nodes[i].children = -1;
+			_nodes[i].data = aabbtree._nodes[index].data;
 		}
 	}
 }

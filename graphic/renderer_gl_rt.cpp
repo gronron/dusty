@@ -167,11 +167,17 @@ void	RTRenderer::_set_buffer(Graphicengine const *ge)
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodes_buffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, _nodes_mem_size * sizeof(OrderedAabbNode), nullptr, GL_DYNAMIC_DRAW);
 	}
-	if (_materials_mem_size < ge->_materials_size)
+	if (_matrices_mem_size < ge->_matrices.size)
 	{
-		_materials_mem_size = ge->_materials_size;
+		_matrices_mem_size = ge->_matrices.size;
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _matrices_buffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, _matrices_mem_size * sizeof(mat3), nullptr, GL_DYNAMIC_DRAW);
+	}
+	if (_materials_mem_size < ge->_materials.size)
+	{
+		_materials_mem_size = ge->_materials.size;
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, _materials_buffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, _materials_mem_size * sizeof(Material), (void *)ge->_materials, GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, _materials_mem_size * sizeof(Material), (void *)ge->_materials.data, GL_STATIC_DRAW);
 	}
 	if (_lights_mem_size < ge->_lights_size)
 	{
@@ -182,6 +188,10 @@ void	RTRenderer::_set_buffer(Graphicengine const *ge)
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _nodes_buffer);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->oatree._count * sizeof(OrderedAabbNode), (void *)ge->oatree._nodes);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _matrices_buffer);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->_matrices.number * sizeof(mat3), (void *)ge->_matrices.data);
+
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, _lights_buffer);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, ge->_lights_count * sizeof(Light), (void *)ge->_lights);
 

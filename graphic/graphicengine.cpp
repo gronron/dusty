@@ -34,17 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graphicengine.hpp"
 
 Graphicengine::Graphicengine()
-	: _animations_size(4096)
-	, _animations_count(0)
-	, _animations(0)
-	, _lights_size(4096)
-	, _lights_count(0)
-	, _lights(0)
-	, _lights_links(0)
-	, _materials_size(0)
-	, _materials_count(0)
-	, _materials(0),
-	_renderer(1440, 900, false)
+	: _renderer(1440, 900, false)
+	, _matrices(1024)
 {
 	camera.position = 0.0f;
 	camera.direction = 0.0f;
@@ -59,6 +50,12 @@ Graphicengine::Graphicengine()
 	_lights_links = new Light**[_lights_size];
 
 	_load_materials("materials.df");
+
+	_matrices.number = 2;
+	for (unsigned int i = 0; i < _matrices.size; ++i)
+	{
+		_matrices[i] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+	}
 }
 
 Graphicengine::~Graphicengine()
@@ -67,8 +64,6 @@ Graphicengine::~Graphicengine()
 
 	delete [] _lights;
 	delete [] _lights_links;
-
-	delete [] _materials;
 }
 
 void	Graphicengine::set_fullscreen(bool const fullscreen)
@@ -116,6 +111,26 @@ void	Graphicengine::tick(float const delta)
 	aabbtree.attach_transient_tree();
 	oatree.construct_from(*(AabbTree *)&aabbtree);
 
+	for (unsigned int i = 0; i < oatree._count; ++i)
+	{
+		if (oatree._nodes[i].children < 0)
+		{
+			if (oatree._nodes[i].data > 0)
+			{
+				oatree._nodes[i].children = -oatree._nodes[i].data;
+				oatree._nodes[i].data = 0;
+			}
+			else
+			{
+				int const infos_index = -oatree._nodes[i].data;
+				oatree._nodes[i].aabb = _rotated_aabbs_infos[infos_index].aabb;
+				oatree._nodes[i].children = -(int)_rotated_aabbs_infos[infos_index].material_index;
+				oatree._nodes[i].data = (int)_rotated_aabbs_infos[infos_index].rotation_index;
+			}
+
+		}
+	}
+
 	_itoa_s((oatree._count >> 1) + 1, str, sizeof(str), 10);
 	_renderer.draw_text(str, {0.9f, 0.1f}, {0.0003f, 0.0003f}, {0.9f, 0.5f, 0.125f, 1.0f});
 
@@ -140,6 +155,70 @@ void	Graphicengine::remove_animation(Animation *animation)
 		;
 	if (index >= 0)
 		_animations[index] = _animations[--_animations_count];
+}
+
+int		Graphicengine::add_static_block(Aabb const & aabb, unsigned int const material)
+{
+
+}
+
+void	Graphicengine::remove_static_block(unsigned int const)
+{
+
+}
+
+unsigned int	Graphicengine::add_rotation(Quatermion<float> const & quatermion)
+{
+
+}
+
+void			Graphicengine::add_dynamic_block(Aabb const & aabb, unsigned int const rotation, unsigned int const material)
+{
+	vec<vec<float, 4>, 8>	rotated_points =
+	{
+		aabb.bottom[0]	, aabb.bottom[1]	, aabb.bottom[2]	, 0.0f ,
+		aabb.bottom[0]	, aabb.bottom[1]	, aabb.top[2]		, 0.0f ,
+		aabb.bottom[0]	, aabb.top[1]		, aabb.bottom[2]	, 0.0f ,
+		aabb.bottom[0]	, aabb.top[1]		, aabb.top[2]		, 0.0f ,
+		aabb.top[0]		, aabb.bottom[1]	, aabb.bottom[2]	, 0.0f ,
+		aabb.top[0]		, aabb.bottom[1]	, aabb.top[2]		, 0.0f ,
+		aabb.top[0]		, aabb.top[1]		, aabb.bottom[2]	, 0.0f ,
+		aabb.top[0]		, aabb.top[1]		, aabb.top[2]		, 0.0f
+	};
+
+	rotated_points[0] = _matrices[rotation] * rotated_points[0];
+	rotated_points[1] = _matrices[rotation] * rotated_points[1];
+	rotated_points[2] = _matrices[rotation] * rotated_points[2];
+	rotated_points[3] = _matrices[rotation] * rotated_points[3];
+	rotated_points[4] = _matrices[rotation] * rotated_points[4];
+	rotated_points[5] = _matrices[rotation] * rotated_points[5];
+	rotated_points[6] = _matrices[rotation] * rotated_points[6];
+	rotated_points[7] = _matrices[rotation] * rotated_points[7];
+
+	Aabb	rotated_aabb;
+
+	rotated_aabb.bottom = 	vmin(rotated_points[0],
+							vmin(rotated_points[1],
+							vmin(rotated_points[2],
+							vmin(rotated_points[3],
+							vmin(rotated_points[4],
+							vmin(rotated_points[5],
+							vmin(rotated_points[6],
+							rotated_points[7])))))));
+
+	rotated_aabb.top = 		vmax(rotated_points[0],
+							vmax(rotated_points[1],
+							vmax(rotated_points[2],
+							vmax(rotated_points[3],
+							vmax(rotated_points[4],
+							vmax(rotated_points[5],
+							vmax(rotated_points[6],
+							rotated_points[7])))))));
+
+	int const	infos_index = -(int)_rotated_aabbs_infos.number;
+	_rotated_aabbs_infos.allocate() = { aabb, rotation, material };
+
+	aabbtree.add_transient_aabb(rotated_aabb, infos_index);
 }
 
 void	Graphicengine::new_light(Light **link)
@@ -172,8 +251,6 @@ void				Graphicengine::_load_materials(char const *filename)
 {
 	Df_node const	*nd = Configmanager::get_instance().get(filename);
 
-	_materials_count = nd->data_size / sizeof(Material);
-	_materials_size = nd->data_size / sizeof(Material);
-	_materials = new Material[256];
-	memcpy(_materials, nd->data_storage, nd->data_size);
+	unsigned int const	size = nd->data_size / sizeof(Material);
+	_materials.reset(size, size, (Material const * const)nd->data_storage);
 }

@@ -30,7 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
+#include "dynamic_array.hpp"
 #include "math/vec.hpp"
+#include "math/matrix.hpp"
+#include "math/quatermion.hpp"
 #include "haabbtree.hpp"
 #include "renderer_gl.hpp"
 #include "animation.hpp"
@@ -61,14 +64,14 @@ struct				Material
 	float			emissivity;
 };
 
-/*
-struct				Rotation
+struct				RotatedAabbInfos
 {
-	vec<float, 4>	center;
-	vec<float, 9>	matrix;
-	int				index;
+	Aabb			aabb;
+	unsigned int	rotation_index;
+	unsigned int	material_index;
 };
-*/
+
+using mat3 = Matrix<float, 4, 3>;
 
 class	Graphicengine
 {
@@ -76,18 +79,19 @@ public:
 
 	Camera			camera;
 
-	unsigned int	_animations_size;
-	unsigned int	_animations_count;
-	Animation		**_animations;
+	unsigned int	_animations_size = 4096;
+	unsigned int	_animations_count = 0;
+	Animation		**_animations = nullptr;
 
-	unsigned int	_lights_size;
-	unsigned int	_lights_count;
-	Light			*_lights;
-	Light			***_lights_links;
+	unsigned int	_lights_size= 64;
+	unsigned int	_lights_count = 0;
+	Light			*_lights = nullptr;
+	Light			***_lights_links = nullptr;
 
-	unsigned int	_materials_size;
-	unsigned int	_materials_count;
-	Material		*_materials;
+
+	DynamicArray<mat3>				_matrices;
+	DynamicArray<Material>			_materials;
+	DynamicArray<RotatedAabbInfos>	_rotated_aabbs_infos;
 
 	Haabbtree		aabbtree;
 	OrderedAabbTree	oatree;
@@ -106,6 +110,12 @@ public:
 
 	void	add_animation(Animation *);
 	void	remove_animation(Animation *);
+
+	int		add_static_block(Aabb const & aabb, unsigned int const material);
+	void	remove_static_block(unsigned int const);
+
+	unsigned int	add_rotation(Quatermion<float> const & quatermion);
+	void			add_dynamic_block(Aabb const & aabb, unsigned int const rotation, unsigned int const material);
 
 	void	new_light(Light **);
 	void	delete_light(Light *);

@@ -63,9 +63,9 @@ union			OrderedAabbNode
 	struct
 	{
 		float	padding_[3];
-		int		data;
-		float	_padding[3];
 		int		children;
+		float	_padding[3];
+		int		data;
 	};
 };
 
@@ -128,8 +128,8 @@ class	OrderedAabbTree
 		OrderedAabbTree();
 		~OrderedAabbTree();
 
-	void	construct_from(AabbTree const &);
-	void	construct_from(unsigned int const size, OrderedAabbTree const * const);
+		void	construct_from(AabbTree const &);
+		void	construct_from(unsigned int const size, OrderedAabbTree const * const);
 };
 
 ///////////////////////////////////////

@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include "array.hpp"
+#include "dynamic_array.hpp"
 #include "math/vec.hpp"
 
 #include <unordered_map>
@@ -110,9 +110,9 @@ public:
 
 	unsigned int	_mem_size = 0;
 
-	Array<unsigned int>									_texture_ids;
-	std::unordered_map<unsigned int, TextureLocation>	_texture_locations; //key = absolute texture id by hash
-	std::unordered_map<unsigned int, Array<Vertex>>		_vertices; //key = opengl texture_id
+	DynamicArray<unsigned int>								_texture_ids;
+	std::unordered_map<unsigned int, TextureLocation>		_texture_locations; //key = absolute texture id by hash
+	std::unordered_map<unsigned int, DynamicArray<Vertex>>	_vertices; //key = opengl texture_id
 
 	FlatRenderer();
 	~FlatRenderer();
@@ -139,7 +139,7 @@ public:
 	unsigned int	_glyphstexture = 0;
 	Glyph			_glyphs[128];
 
-	Array<Vertex>	_vertices;
+	DynamicArray<Vertex>	_vertices;
 
 
 	TextRenderer();

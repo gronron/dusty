@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?> 
+<?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
   <Type Name="Physicengine">
@@ -6,6 +6,24 @@
       <ArrayItems>
         <Size>_bdcount</Size>
         <ValuePointer>_bodies</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="Graphicengine">
+    <Expand>
+      <ArrayItems>
+        <Size>_materials_count</Size>
+        <ValuePointer>_materials</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="OrderedAabbTree">
+    <Expand>
+      <ArrayItems>
+        <Size>_count</Size>
+        <ValuePointer>_nodes</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
