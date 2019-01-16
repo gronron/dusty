@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, Body **bd) : Animation(g), running(true), body(bd), _prtclssize(0), _particles(0)
 {
-	Df_node const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, Df_node::BLOCK, 1);
+	DFNode const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, DFNode::BLOCK, 1);
 
-	material = *nd->safe_get("material", Df_node::INT, 1)->nbr;
-	scale = *nd->safe_get("scale", Df_node::FLOAT, 1)->flt;
-	_prtclssize = *nd->safe_get("number", Df_node::INT, 1)->nbr;
+	material = *nd->safe_get("material", DFNode::INT, 1)->nbr;
+	scale = *nd->safe_get("scale", DFNode::FLOAT, 1)->flt;
+	_prtclssize = *nd->safe_get("number", DFNode::INT, 1)->nbr;
 	_particles = new Particle[_prtclssize];
 	position = (*body)->position;
 
@@ -48,16 +48,16 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, Body *
 	for (unsigned int i = 0; i < _prtclssize; ++i)
 		_particles[i].active = false;
 
-	add_effects(nd->safe_get("effects", Df_node::BLOCK, 1));
+	add_effects(nd->safe_get("effects", DFNode::BLOCK, 1));
 }
 
 Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<float, 4> const &v) : Animation(g), running(true), body(0), _prtclssize(0), _particles(0)
 {
-	Df_node const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, Df_node::BLOCK, 1);
+	DFNode const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, DFNode::BLOCK, 1);
 
-	material = *nd->safe_get("material", Df_node::INT, 1)->nbr;
-	scale = *nd->safe_get("scale", Df_node::FLOAT, 1)->flt;
-	_prtclssize = *nd->safe_get("number", Df_node::INT, 1)->nbr;
+	material = *nd->safe_get("material", DFNode::INT, 1)->nbr;
+	scale = *nd->safe_get("scale", DFNode::FLOAT, 1)->flt;
+	_prtclssize = *nd->safe_get("number", DFNode::INT, 1)->nbr;
 	_particles = new Particle[_prtclssize];
 	position = v;
 
@@ -67,12 +67,12 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<fl
 	for (unsigned int i = 0; i < _prtclssize; ++i)
 		_particles[i].active = false;
 
-	add_effects(nd->safe_get("effects", Df_node::BLOCK, 1));
+	add_effects(nd->safe_get("effects", DFNode::BLOCK, 1));
 }
 
 Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<float, 4> const &v, unsigned int s, Particle *p) : Animation(g), running(true), position(v), body(0), material(0), scale(1.0f), _prtclssize(s), _particles(p)
 {
-	Df_node const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, Df_node::BLOCK, 1);
+	DFNode const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, DFNode::BLOCK, 1);
 
 	for (unsigned int i = 0; i < 8; ++i)
 		_effects[i].pe = 0;
@@ -80,7 +80,7 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<fl
 	for (unsigned int i = 0; i < _prtclssize; ++i)
 		_particles[i].active = false;
 
-	add_effects(nd->safe_get("effects", Df_node::BLOCK, 1));
+	add_effects(nd->safe_get("effects", DFNode::BLOCK, 1));
 }
 
 Particlesystem::~Particlesystem()
@@ -106,7 +106,7 @@ void	Particlesystem::detach()
 bool		Particlesystem::tick(float const delta)
 {
 	bool	alive = false;
-	
+
 	if (body)
 		position = (*body)->position;
 	for (unsigned int i = 0; i < 8; ++i)
@@ -132,13 +132,13 @@ bool		Particlesystem::tick(float const delta)
 			Aabb	aabb;
 			aabb.bottom = _particles[i].position;
 			aabb.top = aabb.bottom + _particles[i].size * scale;
-			graphic->aabbtree.add_transient_aabb(aabb, material);
+			graphic->add_dynamic_block(aabb, 1, 5);
 		}
 	}
 	return (alive);
 }
 
-void	Particlesystem::add_effects(Df_node const *nd)
+void	Particlesystem::add_effects(DFNode const *nd)
 {
 	for (unsigned int i = 0; i < nd->size; ++i)
 	{
@@ -147,10 +147,10 @@ void	Particlesystem::add_effects(Df_node const *nd)
 			if (!_effects[idx].pe)
 				break;
 
-		float const		timer = *nd->node[i]->safe_get("timer", Df_node::FLOAT, 1)->flt;
-		Df_node const	*data = nd->node[i]->get("data");
+		float const		timer = *nd->node[i]->safe_get("timer", DFNode::FLOAT, 1)->flt;
+		DFNode const	*data = nd->node[i]->get("data");
 
-		if (data->type == Df_node::REFERENCE)
+		if (data->type == DFNode::REFERENCE)
 			data = data->node[0];
 		_effects[idx].pe = Effectfactory::get_instance().create(crc32(nd->node[i]->name.c_str()), this, timer, data);
 		_effects[idx].next = data->get("effects");

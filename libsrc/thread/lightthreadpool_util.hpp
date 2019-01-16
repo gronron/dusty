@@ -84,6 +84,8 @@ struct	Caller_fpa
 	}
 };
 
+#ifdef truc_working
+
 template<class T, class U, class V>
 struct	Caller_m
 {
@@ -92,7 +94,7 @@ struct	Caller_m
 		LightThreadPool::Taskset<T, U, V>	*taskset = (LightThreadPool::Taskset<T, U, V> *)data;
 
 		for (unsigned int i = 0; i < taskset->size; ++i)
-			(taskset->data + i)->(taskset->function)();
+			((taskset->data + i)->(*taskset->function))();
 		return (0);
 	}
 };
@@ -135,3 +137,5 @@ struct	Caller_mpa
 		return (0);
 	}
 };
+
+#endif

@@ -32,12 +32,56 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include "df_node.hpp"
 
-Df_node::Df_node() : size(0), type(NONE), data_size(0), data_storage(0)
+DFRoot::DFRoot()
+	: _roots(8)
+	, _nodes(64)
+	, _data_size(0)
+	, _data_storage(nullptr)
 {
 
 }
 
-Df_node::~Df_node()
+DFRoot::~DFRoot()
+{
+	delete [] _data_storage;
+}
+
+DFNode const * const		DFRoot::get(std::string const & researched_name) const
+{
+	DFNode const * const	node = nullptr;
+
+	for (unsigned int i = 0; i < _roots.number; ++i)
+		if ((node = _roots[i]->get(researched_name)) != nullptr)
+			return (node);
+}
+
+DFNode const * const		DFRoot::get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size, void * const out) const;
+{
+	DFNode const * const	node = nullptr;
+
+	for (unsigned int i = 0; i < _roots.number; ++i)
+		if ((node = _roots[i]->get(researched_name, expected_size, expected_size, out)) != nullptr)
+			return (node);
+}
+
+DFNode const * const		DFRoot::safe_get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size) const;
+{
+	DFNode const * const	node = nullptr;
+
+	for (unsigned int i = 0; i < _roots.number; ++i)
+		if ((node = _roots[i]->get(researched_name, expected_type, expected_size)) != nullptr)
+			return (node);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DFNode::DFNode() : size(0), type(Type::NONE)
+{
+	//user_type[0] = '\0';
+	//name[0] = '\0';
+}
+
+DFNode::~DFNode()
 {
 	if (type == BLOCK)
 	{
@@ -45,7 +89,7 @@ Df_node::~Df_node()
 			delete node[i];
 		delete [] node;
 	}
-	else if (type ==  STRING)
+	else if (type == STRING)
 	{
 		for (unsigned int i = 0; i < size; ++i)
 			delete [] cstr[i];
@@ -54,7 +98,7 @@ Df_node::~Df_node()
 		free(data_storage);
 }
 
-Df_node const	*Df_node::get(std::string const &researched_nane) const
+DFNode const	*DFNode::get(std::string const &researched_nane) const
 {
 	size_t		a;
 	std::string	prefix;
@@ -77,9 +121,9 @@ Df_node const	*Df_node::get(std::string const &researched_nane) const
 	return (0);
 }
 
-Df_node const		*Df_node::get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const
+DFNode const		*DFNode::get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const
 {
-	Df_node const	*rnode;
+	DFNode const	*rnode;
 
 	if (!(rnode = get(researched_name)) || rnode->type != expected_type || rnode->size < expected_size)
 		return (0);
@@ -91,29 +135,29 @@ Df_node const		*Df_node::get(std::string const &researched_name, Type expected_t
 	}
 }
 
-Df_node const		*Df_node::safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const
+DFNode const		*DFNode::safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const
 {
-	Df_node const	*rnode;
+	DFNode const	*rnode;
 
 	if (!(rnode = get(researched_name)))
 	{
-		std::cerr << "error! Df_node::safe_get() fails to find: " << researched_name << std::endl;
+		std::cerr << "error! DFNode::safe_get() fails to find: " << researched_name << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	else if (rnode->type != expected_type)
 	{
-		std::cerr << "error! Df_node::safe_get() type doesn't match for " << researched_name << ": expected type " << expected_type << " actual type " << rnode->type << std::endl;
+		std::cerr << "error! DFNode::safe_get() type doesn't match for " << researched_name << ": expected type " << expected_type << " actual type " << rnode->type << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	else if (rnode->size < expected_size)
 	{
-		std::cerr << "error! Df_node::safe_get() size is too low for " << researched_name << ": expected size " << expected_size << " actual size " << rnode->size << std::endl;
+		std::cerr << "error! DFNode::safe_get() size is too low for " << researched_name << ": expected size " << expected_size << " actual size " << rnode->size << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	return (rnode);
 }
 
-void	Df_node::print() const
+void	DFNode::print() const
 {
 	std::cout << name << ' ' << type << std::endl;
 	if (type == BLOCK)

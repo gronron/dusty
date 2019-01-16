@@ -31,10 +31,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <string>
+#include "../dynamic_array.hpp"
 
-class			Df_node
+class	DFRoot
 {
 public:
+
+	DynamicArray<DFNode *>	_roots;
+	DynamicArray<DFNode>	_nodes;
+
+	unsigned int			_data_size = 0;
+	char *					_data_storage = nullptr;
+
+	DFRoot();
+	~DFRoot();
+
+	DFNode const * const	get(std::string const & researched_name) const;
+	DFNode const * const	get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size, void * const out) const;
+	DFNode const * const	safe_get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size) const;
+};
+
+class	DFNode
+{
+public:
+
+	static constexpr unsigned int const		NAMESIZE = 128;
 
 	enum	Type
 	{
@@ -50,11 +71,12 @@ public:
 
 	unsigned int	size;
 	Type			type;
+	std::string		user_type;
 	std::string		name;
 
 	union
 	{
-		Df_node		**node;
+		DFNode		**node;
 		void		*data;
 		int			idx;
 		int 		*nbr;
@@ -63,16 +85,76 @@ public:
 		char		**cstr;
 	};
 
-	unsigned int	data_size;
-	char			*data_storage;	// allocated with malloc
 
+	DFNode();
+	~DFNode();
 
-	Df_node();
-	~Df_node();
-
-	Df_node const	*get(std::string const &researched_name) const;
-	Df_node	const	*get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const;
-	Df_node const	*safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const;
+	DFNode const * const	get(std::string const & researched_name) const;
+	DFNode const * const	get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size, void * const out) const;
+	DFNode const * const	safe_get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size) const;
 
 	void			print() const;
+};
+
+class	DFUserType
+{
+public:
+
+	explicit DFUserType() {}
+	virtual ~DFUserType() {}
+
+	virtual bool	check() = 0;
+};
+
+template<class T>
+T	*create(DFNode const * const node)
+{
+	T * const	instance = new T();
+	instance.load(node);
+	return (instance);
+}
+
+#define FACTORYREG(name) Factoryregister<name> const	reg_##name(CRC32(#name))
+
+
+
+class	DFUserTypeManager
+{
+	public:
+
+		using CreatePtr = void *(*)(DFNode const * const);
+
+		struct	Class
+		{
+			unsigned int	hash;
+			CF				cf;
+		};
+
+
+		static Factory	&get_instance();
+
+
+		unsigned int	_classcount;
+		unsigned int	_classsize;
+		Class			*_classes;
+
+
+		Factory();
+		~Factory();
+
+		void		register_class(unsigned int const, CF);
+
+		Entity		*create(Gameengine *, Replication *) const;
+		Entity		*create(Gameengine *, Replication *, int const, unsigned int const, Entity const *) const;
+};
+
+
+
+template<class T>
+struct	Factoryregister
+{
+	Factoryregister(unsigned int const hash)
+	{
+		Factory::get_instance().register_class(hash, &create<T>);
+	}
 };

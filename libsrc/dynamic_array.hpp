@@ -37,6 +37,8 @@ class	DynamicArray
 {
 	public:
 
+		static constexpr unsigned int const default_size = 16;
+
 		unsigned int	number;
 		unsigned int	size;
 		T *				data;
@@ -52,12 +54,14 @@ class	DynamicArray
 		DynamicArray	&operator=(DynamicArray const &);
 		DynamicArray	&operator=(DynamicArray &&);
 
+		T &			operator[](unsigned int const);
+		T const &	operator[](unsigned int const) const;
+
 		void	reset(unsigned int const);
 		void	reset(unsigned int const, unsigned int const, T const * const);
 		void	reset();
 
-		T &			operator[](unsigned int const);
-		T const &	operator[](unsigned int const) const;
+		void	grow();
 
 		T &		allocate();
 		void	free(unsigned int const);
@@ -126,6 +130,18 @@ inline DynamicArray<T> &	DynamicArray<T>::operator=(DynamicArray &&x)
 }
 
 template<class T>
+inline T &	DynamicArray<T>::operator[](unsigned int const x)
+{
+	return (data[x]);
+}
+
+template<class T>
+inline T const &	DynamicArray<T>::operator[](unsigned int const x) const
+{
+	return (data[x]);
+}
+
+template<class T>
 void	DynamicArray<T>::reset(unsigned int const s)
 {
 	number = 0;
@@ -153,28 +169,23 @@ void	DynamicArray<T>::reset()
 }
 
 template<class T>
-inline T &	DynamicArray<T>::operator[](unsigned int const x)
+void	DynamicArray<T>::grow()
 {
-	return (data[x]);
-}
-
-template<class T>
-inline T const &	DynamicArray<T>::operator[](unsigned int const x) const
-{
-	return (data[x]);
+	if (size == 0)
+		size = default_size;
+	else
+		size <<= 1;
+	T * const new_data = new T[size];
+	memcpy(new_data, data, number * sizeof(T));
+	delete [] data;
+	data = new_data;
 }
 
 template<class T>
 inline T &	DynamicArray<T>::allocate()
 {
 	if (number >= size)
-	{
-		size <<= 1;
-		T * const new_data = new T[size];
-		memcpy(new_data, data, number * sizeof(T));
-		delete [] data;
-		data = new_data;
-	}
+		grow();
 	return (data[number++]);
 }
 

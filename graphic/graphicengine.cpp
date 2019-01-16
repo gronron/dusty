@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Graphicengine::Graphicengine()
 	: _renderer(1440, 900, false)
 	, _matrices(1024)
+	, _rotated_aabbs_infos(4096)
 {
 	camera.position = 0.0f;
 	camera.direction = 0.0f;
@@ -136,6 +137,8 @@ void	Graphicengine::tick(float const delta)
 
 	_renderer.render(this);
 	aabbtree.delete_transient_tree();
+
+	_rotated_aabbs_infos.clear();
 }
 
 void	Graphicengine::add_animation(Animation *animation)
@@ -174,16 +177,19 @@ unsigned int	Graphicengine::add_rotation(Quatermion<float> const & quatermion)
 
 void			Graphicengine::add_dynamic_block(Aabb const & aabb, unsigned int const rotation, unsigned int const material)
 {
+	vec<float, 4> const &	center = (aabb.bottom + aabb.top) * 0.5f;
+	Aabb const &			centered_aabb = { aabb.bottom - center, aabb.top - center };
+
 	vec<vec<float, 4>, 8>	rotated_points =
 	{
-		aabb.bottom[0]	, aabb.bottom[1]	, aabb.bottom[2]	, 0.0f ,
-		aabb.bottom[0]	, aabb.bottom[1]	, aabb.top[2]		, 0.0f ,
-		aabb.bottom[0]	, aabb.top[1]		, aabb.bottom[2]	, 0.0f ,
-		aabb.bottom[0]	, aabb.top[1]		, aabb.top[2]		, 0.0f ,
-		aabb.top[0]		, aabb.bottom[1]	, aabb.bottom[2]	, 0.0f ,
-		aabb.top[0]		, aabb.bottom[1]	, aabb.top[2]		, 0.0f ,
-		aabb.top[0]		, aabb.top[1]		, aabb.bottom[2]	, 0.0f ,
-		aabb.top[0]		, aabb.top[1]		, aabb.top[2]		, 0.0f
+		centered_aabb.bottom[0]		, centered_aabb.bottom[1]	, centered_aabb.bottom[2]	, 0.0f ,
+		centered_aabb.bottom[0]		, centered_aabb.bottom[1]	, centered_aabb.top[2]		, 0.0f ,
+		centered_aabb.bottom[0]		, centered_aabb.top[1]		, centered_aabb.bottom[2]	, 0.0f ,
+		centered_aabb.bottom[0]		, centered_aabb.top[1]		, centered_aabb.top[2]		, 0.0f ,
+		centered_aabb.top[0]		, centered_aabb.bottom[1]	, centered_aabb.bottom[2]	, 0.0f ,
+		centered_aabb.top[0]		, centered_aabb.bottom[1]	, centered_aabb.top[2]		, 0.0f ,
+		centered_aabb.top[0]		, centered_aabb.top[1]		, centered_aabb.bottom[2]	, 0.0f ,
+		centered_aabb.top[0]		, centered_aabb.top[1]		, centered_aabb.top[2]		, 0.0f
 	};
 
 	rotated_points[0] = _matrices[rotation] * rotated_points[0];
@@ -214,6 +220,9 @@ void			Graphicengine::add_dynamic_block(Aabb const & aabb, unsigned int const ro
 							vmax(rotated_points[5],
 							vmax(rotated_points[6],
 							rotated_points[7])))))));
+
+	rotated_aabb.bottom += center;
+	rotated_aabb.top += center;
 
 	int const	infos_index = -(int)_rotated_aabbs_infos.number;
 	_rotated_aabbs_infos.allocate() = { aabb, rotation, material };
@@ -249,7 +258,7 @@ void	Graphicengine::delete_light(Light *light)
 
 void				Graphicengine::_load_materials(char const *filename)
 {
-	Df_node const	*nd = Configmanager::get_instance().get(filename);
+	DFNode const	*nd = Configmanager::get_instance().get(filename);
 
 	unsigned int const	size = nd->data_size / sizeof(Material);
 	_materials.reset(size, size, (Material const * const)nd->data_storage);

@@ -28,10 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#include <list>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <iostream>
+#include <list>
 #include "../file/file.hpp"
 #include "df_parser.hpp"
 
@@ -41,45 +42,51 @@ struct				Reference
 	char			name[64];
 };
 
-struct	Parser_state
+struct						ParserState
 {
-	char const				*s;	//string
+	DFRoot *				root;
+	char const *			s;	//string
 	unsigned int			i;	//iterator
-	std::list<Df_node *>	ndlist;
+	std::list<DFNode *>		ndlist;
 	std::list<Reference>	reflist;
-	unsigned int			size;
-	char					*data;
 	bool					error;
 };
 
 ///////////////////////////////////////
 
-static void	_add_name(std::list<Df_node *> &ndlist, std::string const &name)
+static void	_add_name(ParserState & ps, std::string const & name)
 {
-	Df_node	*node = new Df_node();
+	DFNode	*node = ps.root->_nodes.allocate();
 
 	node->name = name;
-	ndlist.push_back(node);
+	ps.ndlist.push_back(node);
 }
 
-static void	_add_reference(Parser_state &ps, std::string const &reference)
+static void _add_user_type(ParserState & ps, std::string const & user_type)
 {
-	Df_node			*node;
+	DFNode * const	node = ps.ndlist.back();
 
-	ps.size += ps.size % sizeof(void *) ? sizeof(void *) + sizeof(void *) - ps.size % sizeof(void *) : sizeof(void *);
-	ps.data = (char *)realloc(ps.data, ps.size);
-	node = ps.ndlist.back();
-	if (node->type == Df_node::NONE)
+	node->user_type = user_type;
+}
+
+static void			_add_reference(ParserState & ps, std::string const & reference)
+{
+	DFNode * const node = ps.ndlist.back();
+
+	ps.root->_data_size += ps.root->_data_size % sizeof(void *) ? sizeof(void *) + sizeof(void *) - ps.root->_data_size % sizeof(void *) : sizeof(void *);
+	ps.root->_data_storage = (char *)realloc(ps.root->_data_storage, ps.root->_data_size);
+
+	if (node->type == DFNode::NONE)
 	{
-		node->type = Df_node::REFERENCE;
+		node->type = DFNode::REFERENCE;
 		node->size = 1;
 		node->idx = ps.size - sizeof(void *);
 	}
-	else if (node->type != Df_node::REFERENCE)
+	else if (node->type != DFNode::REFERENCE)
 	{
-		node = new Df_node();
+		node = ps.root->_nodes.allocate();
 		node->size = 1;
-		node->type = Df_node::REFERENCE;
+		node->type = DFNode::REFERENCE;
 		node->idx = ps.size - sizeof(void *);
 		ps.ndlist.push_back(node);
 	}
@@ -92,14 +99,14 @@ static void	_add_reference(Parser_state &ps, std::string const &reference)
 	ps.reflist.push_back(ref);
 }
 
-static void			_add_data(Parser_state &ps, Df_node::Type const type, unsigned int const size, void const *data)
+static void			_add_data(ParserState & ps, DFNode::Type const type, unsigned int const size, void const * const data)
 {
-	Df_node			*node;
+	DFNode * const	node = ps.ndlist.back();
 
-	ps.size += ps.size % size ? size + size - ps.size % size : size;
-	ps.data = (char *)realloc(ps.data, ps.size);
-	node = ps.ndlist.back();
-	if (node->type == Df_node::NONE)
+	ps.root->_data_size += ps.root->_data_size % size ? size + size - ps.root->_data_size % size : size;
+	ps.root->_data_storage = (char *)realloc(ps.root->_data_storage, ps.root->_data_size);
+
+	if (node->type == DFNode::NONE)
 	{
 		node->type = type;
 		node->size = 1;
@@ -108,7 +115,7 @@ static void			_add_data(Parser_state &ps, Df_node::Type const type, unsigned int
 	}
 	else if (node->type != type)
 	{
-		node = new Df_node();
+		node = ps.root->_nodes.allocate();
 		node->size = 1;
 		node->type = type;
 		node->idx = ps.size - size;
@@ -119,27 +126,26 @@ static void			_add_data(Parser_state &ps, Df_node::Type const type, unsigned int
 		memcpy(ps.data + (node->idx + node->size++ * size), data, size);
 }
 
-static void	_begin_block(std::list<Df_node *> &ndlist)
+static void		_begin_block(std::list<DFNode *> & ndlist)
 {
-	Df_node	*node;
+	DFNode *	node = ndlist.back();
 
-	node = ndlist.back();
-	if (node->type != Df_node::NONE)
+	if (node->type != DFNode::NONE)
 	{
-		node = new Df_node();
+		node = ps.root->_nodes.allocate();
 		ndlist.push_back(node);
 	}
-	node->type = Df_node::BLOCK;
+	node->type = DFNode::BLOCK;
 }
 
-static void			_end_block(std::list<Df_node *> &ndlist)
+static void			_end_block(std::list<DFNode *> & ndlist)
 {
-	Df_node			*node = 0;
+	DFNode *		node = nullptr;
 	unsigned int	size = 0;
 
-	for (std::list<Df_node *>::reverse_iterator i = ndlist.rbegin(); i != ndlist.rend(); ++i)
+	for (std::list<DFNode *>::reverse_iterator i = ndlist.rbegin(); i != ndlist.rend(); ++i)
 	{
-		if ((*i)->type == Df_node::BLOCK && (*i)->size == 0)
+		if ((*i)->type == DFNode::BLOCK && (*i)->size == 0)
 		{
 			node = *i;
 			break;
@@ -148,9 +154,9 @@ static void			_end_block(std::list<Df_node *> &ndlist)
 	}
 	if (size > 1 || (size == 1 && ndlist.back()->name != ""))
 	{
-		node->type = Df_node::BLOCK;
+		node->type = DFNode::BLOCK;
 		node->size = size;
-		node->node = new Df_node*[size];
+		node->node = new DFNode*[size];
 		for (unsigned int i = size; i > 0;)
 		{
 			node->node[--i] = ndlist.back();
@@ -159,7 +165,7 @@ static void			_end_block(std::list<Df_node *> &ndlist)
 	}
 	else if (size)
 	{
-		Df_node	*a = ndlist.back();
+		DFNode * const a = ndlist.back();
 
 		ndlist.pop_back();
 		node->type = a->type;
@@ -169,21 +175,20 @@ static void			_end_block(std::list<Df_node *> &ndlist)
 	}
 }
 
-static void	_set_ref(Parser_state &ps, Df_node *root)
+static void	_set_ref(ParserState & ps, DFNode * const node)
 {
 	while (!ps.reflist.empty())
 	{
-		Reference	ref;
+		Reference	ref = ps.reflist.front();
 
-		ref = ps.reflist.front();
 		ps.reflist.pop_front();
-		*(Df_node const **)((char *)ps.data + ref.idx) = root->get(ref.name);
+		*(DFNode const **)((char *)ps.data + ref.idx) = node->get(ref.name);
 	}
 }
 
-static void	_set_ptr(Df_node *node, void *data)
+static void	_set_ptr(DFNode * const node, void * data)
 {
-	if (node->type == Df_node::BLOCK)
+	if (node->type == DFNode::BLOCK)
 	{
 		for (unsigned int i = 0; i < node->size; ++i)
 			_set_ptr(node->node[i], data);
@@ -194,13 +199,13 @@ static void	_set_ptr(Df_node *node, void *data)
 
 ///////////////////////////////////////
 
-static void	_skip_space(Parser_state &ps)
+static void	_skip_space(ParserState & ps)
 {
 	while (ps.s[ps.i] == ' ' || ps.s[ps.i] == '\t' || ps.s[ps.i] == '\n' || ps.s[ps.i] == '\r')
 		++ps.i;
 }
 
-static bool		_read_symbol(Parser_state &ps)
+static bool		_read_symbol(ParserState &ps)
 {
 	std::string	str;
 
@@ -211,17 +216,46 @@ static bool		_read_symbol(Parser_state &ps)
 		while ((ps.s[ps.i] >= 'A' && ps.s[ps.i] <= 'Z') || (ps.s[ps.i] >= 'a' && ps.s[ps.i] <= 'z') || ps.s[ps.i] == '_' || (ps.s[ps.i] >= '0' && ps.s[ps.i] <= '9'))
 			str += ps.s[ps.i++];
 
-		_add_name(ps.ndlist, str);
+		_add_name(ps, str);
 		return (true);
 	}
 	else
 		return (false);
 }
 
-static bool		_read_reference(Parser_state &ps)
+static bool		_try_read_user_type(ParserState & ps)
 {
 	std::string	str;
-	
+
+	_skip_space(ps);
+	if (ps.s[ps.i] == ':')
+	{
+		++ps.i;
+		_skip_space(ps);
+
+		if ((ps.s[ps.i] >= 'A' && ps.s[ps.i] <= 'Z') || (ps.s[ps.i] >= 'a' && ps.s[ps.i] <= 'z') || ps.s[ps.i] == '_')
+		{
+			str += ps.s[ps.i++];
+			while ((ps.s[ps.i] >= 'A' && ps.s[ps.i] <= 'Z') || (ps.s[ps.i] >= 'a' && ps.s[ps.i] <= 'z') || ps.s[ps.i] == '_' || (ps.s[ps.i] >= '0' && ps.s[ps.i] <= '9'))
+				str += ps.s[ps.i++];
+
+			_add_user_type(ps.ndlist, str);
+			return (true);
+		}
+		else
+		{
+			ps.error = true;
+			return (false);
+		}
+	}
+	else
+		return (true);
+}
+
+static bool		_read_reference(ParserState & ps)
+{
+	std::string	str;
+
 	_skip_space(ps);
 	if (ps.s[ps.i] == '@')
 	{
@@ -245,7 +279,7 @@ static bool		_read_reference(Parser_state &ps)
 		return (false);
 }
 
-static bool	_read_nbr(Parser_state &ps, std::string &str)
+static bool	_read_nbr(ParserState & ps, std::string & str)
 {
 	if (ps.s[ps.i] < '0' || ps.s[ps.i] > '9')
 		return (false);
@@ -255,7 +289,7 @@ static bool	_read_nbr(Parser_state &ps, std::string &str)
 	return (true);
 }
 
-static bool		_read_number(Parser_state &ps)
+static bool		_read_number(ParserState & ps)
 {
 	std::string	str;
 
@@ -273,20 +307,20 @@ static bool		_read_number(Parser_state &ps)
 			{
 				++ps.i;
 				float	f = (float)atof(str.c_str());
-				_add_data(ps, Df_node::FLOAT, sizeof(float), &f);
+				_add_data(ps, DFNode::FLOAT, sizeof(float), &f);
 				return (true);
 			}
 			else
 			{
 				double	d = atof(str.c_str());
-				_add_data(ps, Df_node::DOUBLE, sizeof(double), &d);
+				_add_data(ps, DFNode::DOUBLE, sizeof(double), &d);
 				return (true);
 			}
 		}
 		else
 		{
 			int	i = atoi(str.c_str());
-			_add_data(ps, Df_node::INT, sizeof(int), &i);
+			_add_data(ps, DFNode::INT, sizeof(int), &i);
 			return (true);
 		}
 	}
@@ -306,10 +340,10 @@ static char				_to_c_char(char const c)
 	return (c);
 }
 
-static bool		_read_string(Parser_state &ps)
+static bool		_read_string(ParserState & ps)
 {
 	std::string	str;
-	
+
 	_skip_space(ps);
 	if (ps.s[ps.i] == '"')
 	{
@@ -329,14 +363,14 @@ static bool		_read_string(Parser_state &ps)
 				str += ps.s[ps.i++];
 		}
 
-		char	*ptr = _strdup(str.c_str()); //TODO
-		_add_data(ps, Df_node::STRING, sizeof(char *), &ptr);
+		char *	ptr = _strdup(str.c_str()); //TODO
+		_add_data(ps, DFNode::STRING, sizeof(char *), &ptr);
 		return (true);
 	}
 	return (false);
 }
 
-static bool	_read_open_bracket(Parser_state &ps)
+static bool	_read_open_bracket(ParserState & ps)
 {
 	_skip_space(ps);
 	if (ps.s[ps.i] == '{')
@@ -349,7 +383,7 @@ static bool	_read_open_bracket(Parser_state &ps)
 		return (false);
 }
 
-static bool	_read_close_bracket(Parser_state &ps)
+static bool	_read_close_bracket(ParserState & ps)
 {
 	_skip_space(ps);
 	if (ps.s[ps.i] == '}')
@@ -362,11 +396,23 @@ static bool	_read_close_bracket(Parser_state &ps)
 		return (false);
 }
 
+static bool	_read_colon(ParserState & ps)
+{
+	_skip_space(ps);
+	if (ps.s[ps.i] == ':')
+	{
+		++ps.i;
+		return (true);
+	}
+	else
+		return (false);
+}
+
 ///////////////////////////////////////
 
-static bool	_read_data(Parser_state &ps);
+static bool	_read_data(ParserState & ps);
 
-static bool	_read_xdata(Parser_state &ps)
+static bool	_read_xdata(ParserState & ps)
 {
 	if (!_read_data(ps))
 		return (false);
@@ -375,7 +421,7 @@ static bool	_read_xdata(Parser_state &ps)
 	return (true);
 }
 
-static bool	_read_data(Parser_state &ps)
+static bool	_read_data(ParserState & ps)
 {
 	if (_read_open_bracket(ps) && _read_xdata(ps) && _read_close_bracket(ps))
 		return (true);
@@ -389,9 +435,9 @@ static bool	_read_data(Parser_state &ps)
 		return (false);
 }
 
-static bool	_read_def(Parser_state &ps);
+static bool	_read_def(ParserState & ps);
 
-static bool	_read_xexpr(Parser_state &ps)
+static bool	_read_xexpr(ParserState & ps)
 {
 	if (!_read_def(ps))
 		return (false);
@@ -400,7 +446,7 @@ static bool	_read_xexpr(Parser_state &ps)
 	return (true);
 }
 
-static bool	_read_expr(Parser_state &ps)
+static bool	_read_expr(ParserState & ps)
 {
 	if (_read_open_bracket(ps))
 	{
@@ -420,9 +466,9 @@ static bool	_read_expr(Parser_state &ps)
 	}
 }
 
-static bool	_read_def(Parser_state &ps)
+static bool	_read_def(ParserState & ps)
 {
-	if (_read_symbol(ps) && _read_expr(ps))
+	if (_read_symbol(ps) && _try_read_user_type(ps) && _read_expr(ps))
 		return (true);
 	else
 		return (false);
@@ -430,52 +476,85 @@ static bool	_read_def(Parser_state &ps)
 
 ///////////////////////////////////////
 
-Df_node				*df_parse(const char *data)
+bool			df_parse(DFRoot & root, const char * const data)
 {
-	Df_node			*node;
-	Parser_state	ps;
+	DFNode *	node;
+	ParserState	ps;
 
 	node = 0;
+	ps.root = &root;
 	ps.s = data;
 	ps.i = 0;
-	ps.size = 0;
-	ps.data = 0;
 	ps.error = false;
+	ps.root = &root;
+
 	while (_read_def(ps));
+
 	if (ps.error)
 	{
 		std::cerr << "error! df_parse() fails to parse: synthax error" << std::endl;
 		free(ps.data);
+		return (false);
 	}
 	else
 	{
-		node = new Df_node;
+		DFNode * const node = root->_nodes.allocate();
 		node->size = (unsigned int)ps.ndlist.size();
-		node->type = Df_node::BLOCK;
+		node->type = DFNode::BLOCK;
 		node->name = "";
-		node->node = new Df_node*[node->size];
+		node->node = new DFNode*[node->size];
+
 		for (unsigned int i = 0; i < node->size; ++i)
 		{
 			node->node[i] = ps.ndlist.front();
 			ps.ndlist.pop_front();
 		}
-		node->data_size = ps.size;
-		node->data_storage = ps.data;
+
 		_set_ref(ps, node);
-		_set_ptr(node, ps.data);
+		_set_ptr(node, root._data_storage);
+
+		root._root.allocate() = node;
+
+		return (true);
 	}
-	return (node);
 }
 
-Df_node				*df_parse_file(char const *filename)
+DFRoot *	df_parse_file(DFRoot & root, char const * const file_name)
 {
-	char const	*str = read_file(filename, 0);
+	char const * const	str = read_file(file_name, 0);
 
 	if (str)
-		return (df_parse(str));
+	{
+		df_parse(root, str);
+		delete [] str;
+		return (root);
+	}
 	else
 	{
-		std::cerr << "error! df_parse_file() can't open file: " << filename << std::endl;
-		return (0);
+		std::cerr << "error! df_parse_file() can't open file: " << file_name << std::endl;
+		return (nullptr);
+	}
+}
+
+DFRoot *	df_parse_dir(DFRoot & root, char const * const dir_name)
+{
+	for (auto const & file : std::filesystem::directory_iterator(dir_name))
+	{
+		if (file.path().extension().string() == ".df")
+		{
+			char const * const	str = read_file(file.path().string().c_str(), 0);
+
+			if (str)
+			{
+				df_parse(root, str);
+				delete [] str;
+			}
+			else
+			{
+				std::cerr << "error! df_parse_file() can't open file: " << file_name << std::endl;
+				delete [] str;
+				return (nullptr);
+			}
+		}
 	}
 }

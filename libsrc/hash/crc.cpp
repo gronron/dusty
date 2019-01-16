@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "crc.hpp"
 
-unsigned int		crc32(const char *str)
+unsigned int		crc32(char const * str)
 {
 	unsigned int	crc = 0xFFFFFFFF;
 
@@ -39,14 +39,14 @@ unsigned int		crc32(const char *str)
 	return (crc ^ 0xFFFFFFFF);
 }
 
-unsigned int	crc32(unsigned int crc, const char *str)
+unsigned int	crc32(unsigned int crc, char const * str)
 {
 	while (*str)
 		crc = crc32_table[(crc ^ *str++) & 0x000000FF] ^ (crc >> 8);
 	return (crc ^ 0xFFFFFFFF);
 }
 
-unsigned long long int		crc64(const char *str)
+unsigned long long int		crc64(char const * str)
 {
 	unsigned long long int	crc = 0xFFFFFFFFFFFFFFFF;
 
@@ -55,7 +55,7 @@ unsigned long long int		crc64(const char *str)
 	return (crc ^ 0xFFFFFFFFFFFFFFFF);
 }
 
-unsigned long long int	crc64(unsigned long long int crc, const char *str)
+unsigned long long int	crc64(unsigned long long int crc, char const * str)
 {
 	while (*str)
 		crc = crc64_table[(crc ^ *str++) & 0x00000000000000FF] ^ (crc >> 8);
