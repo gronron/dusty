@@ -72,7 +72,7 @@ void	Effectfactory::register_class(unsigned int const hash, CF cf)
 	_pairs[i].cf = cf;
 }
 
-Particleeffect		*Effectfactory::create(unsigned int const hash, Particlesystem *p, float const t, Df_node const *d) const
+Particleeffect		*Effectfactory::create(unsigned int const hash, Particlesystem *p, float const t, DFNode const *d) const
 {
 	int				imin = 0;
 	int				imax = _prcount - 1;

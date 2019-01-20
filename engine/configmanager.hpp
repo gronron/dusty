@@ -39,17 +39,15 @@ class	Configmanager
 {
 	public:
 
-		static Configmanager	&get_instance();
+		static Configmanager &	get_instance();
 
-		std::string						configdir;
-		std::string						assetsdir;
-		std::map<std::string, Df_node*>	_nodemap;
+		DFRoot	_root;
 
 
 		Configmanager();
 		~Configmanager();
 
-		Df_node	*get(std::string const &);
+		DFNode const *	get(std::string const &);
 };
 
 #endif

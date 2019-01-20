@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define EFFECTFACTORYREG(name) Effectfactoryregister<name> const	registered_effect_##name(CRC32(#name))
 
-class	Df_node;
+class	DFNode;
 class	Particleeffect;
 class	Particlesystem;
 
@@ -43,7 +43,7 @@ class	Effectfactory
 {
 	public:
 
-		typedef Particleeffect *(*CF)(Particlesystem *, float const, Df_node const *);
+		typedef Particleeffect *(*CF)(Particlesystem *, float const, DFNode const *);
 
 		struct	Pair
 		{
@@ -64,11 +64,11 @@ class	Effectfactory
 		~Effectfactory();
 
 		void			register_class(unsigned int const, CF);
-		Particleeffect	*create(unsigned int const, Particlesystem *, float const, Df_node const *) const;
+		Particleeffect	*create(unsigned int const, Particlesystem *, float const, DFNode const *) const;
 };
 
 template<class T>
-Particleeffect	*create_effect(Particlesystem *p, float const t, Df_node const *d)
+Particleeffect	*create_effect(Particlesystem *p, float const t, DFNode const *d)
 {
 	return (new T(p, t, d));
 }

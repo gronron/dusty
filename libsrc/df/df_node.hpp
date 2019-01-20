@@ -33,6 +33,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include "../dynamic_array.hpp"
 
+class	DFNode
+{
+public:
+
+	static constexpr unsigned int const		NAMESIZE = 128;
+
+	enum	Type : unsigned char
+	{
+		NONE,
+		BLOCK,
+		REFERENCE,
+		INT,
+		FLOAT,
+		DOUBLE,
+		STRING
+	};
+
+
+	unsigned int	size = 0;
+	Type			type = NONE;
+	std::string		user_type;
+	std::string		name;
+
+	union
+	{
+		DFNode		**node = nullptr;
+		void		*data;
+		int			idx;
+		int 		*nbr;
+		float		*flt;
+		double		*dbl;
+		char		**cstr;
+	};
+
+
+	DFNode() {}
+	~DFNode();
+
+	DFNode const *	get(std::string const & researched_name) const;
+	DFNode const *	get(std::string const & researched_name, DFNode::Type const expected_type, unsigned int const expected_size, void * const out) const;
+	DFNode const *	safe_get(std::string const & researched_name, DFNode::Type const expected_type, unsigned int const expected_size) const;
+
+	void			print() const;
+};
+
 class	DFRoot
 {
 public:
@@ -46,54 +91,9 @@ public:
 	DFRoot();
 	~DFRoot();
 
-	DFNode const * const	get(std::string const & researched_name) const;
-	DFNode const * const	get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size, void * const out) const;
-	DFNode const * const	safe_get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size) const;
-};
-
-class	DFNode
-{
-public:
-
-	static constexpr unsigned int const		NAMESIZE = 128;
-
-	enum	Type
-	{
-		NONE,
-		BLOCK,
-		REFERENCE,
-		INT,
-		FLOAT,
-		DOUBLE,
-		STRING
-	};
-
-
-	unsigned int	size;
-	Type			type;
-	std::string		user_type;
-	std::string		name;
-
-	union
-	{
-		DFNode		**node;
-		void		*data;
-		int			idx;
-		int 		*nbr;
-		float		*flt;
-		double		*dbl;
-		char		**cstr;
-	};
-
-
-	DFNode();
-	~DFNode();
-
-	DFNode const * const	get(std::string const & researched_name) const;
-	DFNode const * const	get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size, void * const out) const;
-	DFNode const * const	safe_get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size) const;
-
-	void			print() const;
+	DFNode const *	get(std::string const & researched_name) const;
+	DFNode const *	get(std::string const & researched_name, DFNode::Type const expected_type, unsigned int const expected_size, void * const out) const;
+	DFNode const *	safe_get(std::string const & researched_name, DFNode::Type const expected_type, unsigned int const expected_size) const;
 };
 
 class	DFUserType
@@ -106,6 +106,7 @@ public:
 	virtual bool	check() = 0;
 };
 
+/*
 template<class T>
 T	*create(DFNode const * const node)
 {
@@ -148,8 +149,6 @@ class	DFUserTypeManager
 		Entity		*create(Gameengine *, Replication *, int const, unsigned int const, Entity const *) const;
 };
 
-
-
 template<class T>
 struct	Factoryregister
 {
@@ -158,3 +157,4 @@ struct	Factoryregister
 		Factory::get_instance().register_class(hash, &create<T>);
 	}
 };
+*/

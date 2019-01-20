@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "particlesystem.hpp"
 #include "particleeffect.hpp"
 
-Particleeffect::Particleeffect(Particlesystem *p, float const t, Df_node const *) : ps(p), timer(t)
+Particleeffect::Particleeffect(Particlesystem *p, float const t, DFNode const *) : ps(p), timer(t)
 {
 	
 }

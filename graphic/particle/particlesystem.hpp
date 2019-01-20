@@ -56,7 +56,7 @@ class	Particlesystem : public Animation
 		struct	Effect
 		{
 			Particleeffect	*pe;
-			Df_node	const	*next;
+			DFNode	const	*next;
 		};
 
 
@@ -83,7 +83,7 @@ class	Particlesystem : public Animation
 
 		bool	tick(float const);
 
-		void	add_effects(Df_node const *);
+		void	add_effects(DFNode const *);
 		void	remove_effect();
 };
 

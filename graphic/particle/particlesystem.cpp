@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, Body **bd) : Animation(g), running(true), body(bd), _prtclssize(0), _particles(0)
 {
-	DFNode const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, DFNode::BLOCK, 1);
+	DFNode const	*nd = Configmanager::get_instance().get("particle")->safe_get(name, DFNode::BLOCK, 1);
 
 	material = *nd->safe_get("material", DFNode::INT, 1)->nbr;
 	scale = *nd->safe_get("scale", DFNode::FLOAT, 1)->flt;
@@ -53,7 +53,7 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, Body *
 
 Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<float, 4> const &v) : Animation(g), running(true), body(0), _prtclssize(0), _particles(0)
 {
-	DFNode const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, DFNode::BLOCK, 1);
+	DFNode const	*nd = Configmanager::get_instance().get("particle")->safe_get(name, DFNode::BLOCK, 1);
 
 	material = *nd->safe_get("material", DFNode::INT, 1)->nbr;
 	scale = *nd->safe_get("scale", DFNode::FLOAT, 1)->flt;
@@ -72,7 +72,7 @@ Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<fl
 
 Particlesystem::Particlesystem(Graphicengine *g, std::string const &name, vec<float, 4> const &v, unsigned int s, Particle *p) : Animation(g), running(true), position(v), body(0), material(0), scale(1.0f), _prtclssize(s), _particles(p)
 {
-	DFNode const	*nd = Configmanager::get_instance().get("particle.df")->safe_get(name, DFNode::BLOCK, 1);
+	DFNode const	*nd = Configmanager::get_instance().get("particle")->safe_get(name, DFNode::BLOCK, 1);
 
 	for (unsigned int i = 0; i < 8; ++i)
 		_effects[i].pe = 0;

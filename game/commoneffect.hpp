@@ -40,7 +40,7 @@ class	Expulsor : public Particleeffect
 		vec<float, 2>	velocity;
 
 
-		Expulsor(Particlesystem *, float const, Df_node const *);
+		Expulsor(Particlesystem *, float const, DFNode const *);
 		virtual ~Expulsor();
 
 		virtual void	tick(float const);
@@ -53,7 +53,7 @@ class	Attractor : public Particleeffect
 		vec<float, 2>	velocity;
 
 
-		Attractor(Particlesystem *, float const, Df_node const *);
+		Attractor(Particlesystem *, float const, DFNode const *);
 		virtual ~Attractor();
 
 		virtual void	tick(float const);
@@ -66,7 +66,7 @@ class	Appear : public Particleeffect
 		vec<float, 2>	fade_rate;
 	
 
-		Appear(Particlesystem *, float const, Df_node const *);
+		Appear(Particlesystem *, float const, DFNode const *);
 		virtual ~Appear();
 
 		virtual void	tick(float const);
@@ -79,7 +79,7 @@ class	Disappear : public Particleeffect
 		vec<float, 2>	fade_rate;
 
 
-		Disappear(Particlesystem *, float const, Df_node const *);
+		Disappear(Particlesystem *, float const, DFNode const *);
 		virtual ~Disappear();
 
 		virtual void	tick(float const);

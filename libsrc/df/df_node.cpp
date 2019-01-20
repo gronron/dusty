@@ -46,59 +46,52 @@ DFRoot::~DFRoot()
 	delete [] _data_storage;
 }
 
-DFNode const * const		DFRoot::get(std::string const & researched_name) const
+DFNode const *		DFRoot::get(std::string const & researched_name) const
 {
-	DFNode const * const	node = nullptr;
+	DFNode const *	node = nullptr;
 
 	for (unsigned int i = 0; i < _roots.number; ++i)
 		if ((node = _roots[i]->get(researched_name)) != nullptr)
 			return (node);
+	return (nullptr);
 }
 
-DFNode const * const		DFRoot::get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size, void * const out) const;
+DFNode const *		DFRoot::get(std::string const & researched_name, DFNode::Type const expected_type, unsigned int const expected_size, void * const out) const
 {
-	DFNode const * const	node = nullptr;
+	DFNode const *	node = nullptr;
 
 	for (unsigned int i = 0; i < _roots.number; ++i)
-		if ((node = _roots[i]->get(researched_name, expected_size, expected_size, out)) != nullptr)
+		if ((node = _roots[i]->get(researched_name, expected_type, expected_size, out)) != nullptr)
 			return (node);
+	return (nullptr);
 }
 
-DFNode const * const		DFRoot::safe_get(std::string const & researched_name, Type const expected_type, unsigned int const expected_size) const;
+DFNode const *		DFRoot::safe_get(std::string const & researched_name, DFNode::Type const expected_type, unsigned int const expected_size) const
 {
-	DFNode const * const	node = nullptr;
+	DFNode const *	node = nullptr;
 
 	for (unsigned int i = 0; i < _roots.number; ++i)
-		if ((node = _roots[i]->get(researched_name, expected_type, expected_size)) != nullptr)
+		if ((node = _roots[i]->safe_get(researched_name, expected_type, expected_size)) != nullptr)
 			return (node);
+	return (nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-DFNode::DFNode() : size(0), type(Type::NONE)
-{
-	//user_type[0] = '\0';
-	//name[0] = '\0';
-}
 
 DFNode::~DFNode()
 {
 	if (type == BLOCK)
 	{
-		for (unsigned int i = 0; i < size; ++i)
-			delete node[i];
 		delete [] node;
 	}
 	else if (type == STRING)
 	{
 		for (unsigned int i = 0; i < size; ++i)
-			delete [] cstr[i];
+			free(cstr[i]);
 	}
-	if (data_storage)
-		free(data_storage);
 }
 
-DFNode const	*DFNode::get(std::string const &researched_nane) const
+DFNode const *	DFNode::get(std::string const &researched_nane) const
 {
 	size_t		a;
 	std::string	prefix;
@@ -121,9 +114,9 @@ DFNode const	*DFNode::get(std::string const &researched_nane) const
 	return (0);
 }
 
-DFNode const		*DFNode::get(std::string const &researched_name, Type expected_type, unsigned int expected_size, void *out) const
+DFNode const *		DFNode::get(std::string const &researched_name, DFNode::Type expected_type, unsigned int expected_size, void *out) const
 {
-	DFNode const	*rnode;
+	DFNode const *	rnode;
 
 	if (!(rnode = get(researched_name)) || rnode->type != expected_type || rnode->size < expected_size)
 		return (0);
@@ -135,9 +128,9 @@ DFNode const		*DFNode::get(std::string const &researched_name, Type expected_typ
 	}
 }
 
-DFNode const		*DFNode::safe_get(std::string const &researched_name, Type expected_type, unsigned int expected_size) const
+DFNode const *		DFNode::safe_get(std::string const &researched_name, DFNode::Type expected_type, unsigned int expected_size) const
 {
-	DFNode const	*rnode;
+	DFNode const *	rnode;
 
 	if (!(rnode = get(researched_name)))
 	{

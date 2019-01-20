@@ -59,7 +59,7 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), root
 		network->connect(opt.ip, opt.port);
 	}
 
-	Df_node	*nd = Configmanager::get_instance().get("game.df");
+	DFNode const * const	nd = Configmanager::get_instance().get("game");
 
 	if (opt.graphic)
 	{
@@ -68,7 +68,7 @@ Gameengine::Gameengine(Gameengine::Option const &opt) : master(opt.master), root
 		graphic = new Graphicengine();
 	}
 
-	controllerclass = nd->safe_get("controller", Df_node::STRING, 1)->cstr[0];
+	controllerclass = nd->safe_get("controller", DFNode::STRING, 1)->cstr[0];
 
 	if (master)
 		rootid = create(CRC32("World"), 0, true)->id;

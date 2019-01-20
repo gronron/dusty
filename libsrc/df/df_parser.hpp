@@ -32,5 +32,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "df_node.hpp"
 
-Df_node	*df_parse(char const *data);
-Df_node	*df_parse_file(char const *filename);
+bool	df_parse_file(DFRoot & root, char const * const file_name);
+bool	df_parse_dir(DFRoot & root, char const * const dir_name);

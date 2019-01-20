@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PARTICLEEFFECT_H_
 #define PARTICLEEFFECT_H_
 
-class	Df_node;
+class	DFNode;
 class	Particlesystem;
 
 class	Particleeffect
@@ -42,7 +42,7 @@ class	Particleeffect
 		float			timer;
 
 	
-		Particleeffect(Particlesystem *, float const, Df_node const *);
+		Particleeffect(Particlesystem *, float const, DFNode const *);
 		virtual ~Particleeffect();
 		
 		virtual void	tick(float const) = 0;

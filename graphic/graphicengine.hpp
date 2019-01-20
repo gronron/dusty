@@ -124,7 +124,7 @@ public:
 	void			draw_text(unsigned int const, char const *, vec<float, 2> const &, vec<float, 2> const &, vec<float, 4> const &);
 	unsigned int	cut_line(char const *, vec<float, 2> const &, float const) const;
 
-	void	_load_materials(char const *filename);
+	void	_load_materials();
 };
 
 inline void	Graphicengine::draw_text(char const *text, vec<float, 2> const &position, vec<float, 2> const &scale, vec<float, 4> const &color)

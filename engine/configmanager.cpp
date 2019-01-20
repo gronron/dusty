@@ -41,34 +41,15 @@ Configmanager				&Configmanager::get_instance()
 
 Configmanager::Configmanager()
 {
-	assetsdir = get("config.df")->safe_get("assetsdir", Df_node::STRING, 1)->cstr[0];
+	if (!df_parse_dir(_root, "./assets"))
+		exit(EXIT_FAILURE);
 }
 
 Configmanager::~Configmanager()
 {
-	for (std::map<std::string, Df_node*>::iterator i = _nodemap.begin(); i != _nodemap.end(); ++i)
-		delete i->second;
 }
 
-Df_node											*Configmanager::get(std::string const &name)
+DFNode const *	Configmanager::get(std::string const &name)
 {
-	std::map<std::string, Df_node*>::iterator	i;
-
-	if ((i = _nodemap.find(name)) != _nodemap.end())
-		return (i->second);
-	else
-	{
-		std::string	temp = configdir + name;
-
-		Df_node	*node = df_parse_file(temp.c_str());
-
-		if (node)
-		{
-			//node->print();
-			_nodemap[name] = node;
-		}
-		else
-			exit(EXIT_FAILURE);
-		return (node);
-	}
+	return (_root.get(name));
 }

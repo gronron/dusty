@@ -50,7 +50,7 @@ Graphicengine::Graphicengine()
 	_lights = new Light[_lights_size];
 	_lights_links = new Light**[_lights_size];
 
-	_load_materials("materials.df");
+	_load_materials();
 
 	_matrices.number = 2;
 	for (unsigned int i = 0; i < _matrices.size; ++i)
@@ -256,10 +256,10 @@ void	Graphicengine::delete_light(Light *light)
 	*_lights_links[index] = _lights + index;
 }
 
-void				Graphicengine::_load_materials(char const *filename)
+void				Graphicengine::_load_materials()
 {
-	DFNode const	*nd = Configmanager::get_instance().get(filename);
+	DFNode const	*nd = Configmanager::get_instance().get("materials");
 
-	unsigned int const	size = nd->data_size / sizeof(Material);
-	_materials.reset(size, size, (Material const * const)nd->data_storage);
+	unsigned int const	size = nd->size;
+	_materials.reset(size, size, (Material const * const)nd->flt);
 }

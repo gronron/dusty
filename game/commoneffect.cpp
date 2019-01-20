@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 EFFECTFACTORYREG(Expulsor);
 
-Expulsor::Expulsor(Particlesystem *p, float const t, Df_node const *d) : Particleeffect(p, t, d)
+Expulsor::Expulsor(Particlesystem *p, float const t, DFNode const *d) : Particleeffect(p, t, d)
 {
-	velocity = *(vec<float, 2> *)d->safe_get("velocity", Df_node::FLOAT, 2)->flt;
+	velocity = *(vec<float, 2> *)d->safe_get("velocity", DFNode::FLOAT, 2)->flt;
 }
 
 Expulsor::~Expulsor()
@@ -67,9 +67,9 @@ void	Expulsor::tick(float const delta)
 
 EFFECTFACTORYREG(Attractor);
 
-Attractor::Attractor(Particlesystem *p, float const t, Df_node const *d) : Particleeffect(p, t, d)
+Attractor::Attractor(Particlesystem *p, float const t, DFNode const *d) : Particleeffect(p, t, d)
 {
-	velocity = *(vec<float, 2> *)d->safe_get("velocity", Df_node::FLOAT, 2)->flt;
+	velocity = *(vec<float, 2> *)d->safe_get("velocity", DFNode::FLOAT, 2)->flt;
 }
 
 Attractor::~Attractor()
@@ -99,10 +99,10 @@ void	Attractor::tick(float const delta)
 
 EFFECTFACTORYREG(Appear);
 
-Appear::Appear(Particlesystem *p, float const t, Df_node const *d) : Particleeffect(p, t, d)
+Appear::Appear(Particlesystem *p, float const t, DFNode const *d) : Particleeffect(p, t, d)
 {
 	if (t <= 0.0f)
-		fade_rate = *(vec<float, 2> *)d->safe_get("rate", Df_node::FLOAT, 2)->flt;
+		fade_rate = *(vec<float, 2> *)d->safe_get("rate", DFNode::FLOAT, 2)->flt;
 	else
 		fade_rate = { 1.0f / t, 1.0f / t };
 	
@@ -141,10 +141,10 @@ void	Appear::tick(float const delta)
 
 EFFECTFACTORYREG(Disappear);
 
-Disappear::Disappear(Particlesystem *p, float const t, Df_node const *d) : Particleeffect(p, t, d)
+Disappear::Disappear(Particlesystem *p, float const t, DFNode const *d) : Particleeffect(p, t, d)
 {
 	if (t <= 0.0f)
-		fade_rate = *(vec<float, 2> *)d->safe_get("rate", Df_node::FLOAT, 2)->flt;
+		fade_rate = *(vec<float, 2> *)d->safe_get("rate", DFNode::FLOAT, 2)->flt;
 	else
 		fade_rate = { 1.0f / t, 1.0f / t };
 
