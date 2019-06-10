@@ -1,6 +1,10 @@
 
-using Components = std::tuple
-	< int
-    , float
-	, bool
+struct Position;
+struct Speed;
+struct Acceleration;
+
+using Components = ComponentsList
+	< Position
+    , Speed
+	, Acceleration
 	>;

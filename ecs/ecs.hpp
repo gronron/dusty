@@ -4,20 +4,58 @@
 #include <functional>
 #include <type_traits>
 #include <vector>
-#include "pdqsort.h"
+#include "pdqsort.hpp"
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename...>
-struct ComponentsList final
+template<typename...>
+struct  ComponentsList final
 {
+};
+
+template<typename, typename>
+struct  ConcatComponentsList final
+{
+};
+
+template<typename... Types1, typename... Types2>
+struct  ConcatComponentsList<ComponentsList<Types1...>, ComponentsList<Types2...>> final
+{
+    using type = ComponentsList<Types1..., Types2...>;
+};
+
+template<typename, typename...>
+struct  ComponentsListHasType final
+{
+    static constexpr bool VALUE = false;
+};
+
+template<typename T, typename... Types>
+struct  ComponentsListHasType<T, ComponentsList<Types...>> final
+{
+    static constexpr bool VALUE = ((std::is_same_v<T, Types> || std::is_same_v<std::remove_const_t<T>, Types>) || ...);
+};
+
+template <typename, typename>
+struct ComponentIndex;
+
+template <typename T, typename... Types>
+struct ComponentIndex<T, ComponentsList<T, Types...>>
+{
+    static constexpr uint64_t INDEX = 0;
+};
+
+template <typename T, typename U, typename... Types>
+struct ComponentIndex<T, ComponentsList<U, Types...>>
+{
+    static constexpr uint64_t INDEX = ComponentIndex<T, ComponentsList<Types...>>::INDEX + 1;
 };
 
 #include "components.inl"
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Entity final
+class   Entity final
 {
     union
     {
@@ -66,19 +104,16 @@ public:
     bool	has() const;
 
     template <typename T>
-    T &		get() const;
-
-    template <typename T>
     void	add() const;
 
     template <typename T>
     void	remove() const;
 };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-class MemoryPool final
+template<typename T>
+class   MemoryPool final
 {
     size_t	_size;
     union
@@ -114,19 +149,19 @@ public:
     T const &	operator[](size_t const index) const { return _data[index]; }
 };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntitiesRegistry;
+class   EntitiesRegistry;
 
-template <bool, typename>
-struct ForEach;
+template<bool, typename>
+struct  ForEach;
 
-template <typename T>
-class ComponentsRegistry final
+template<typename T>
+class   ComponentsRegistry final
 {
     friend class EntityRegistry;
 
-    template <bool, typename>
+    template<bool, typename>
     friend struct ForEach;
 
     friend Entity;
@@ -256,7 +291,7 @@ class ComponentsRegistry final
     }
 };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class   System
 {
@@ -264,20 +299,20 @@ public:
     virtual void    creation_callback(Entity const creator, Entity const created) { }
 };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class   EntitiesRegistry final
 {
     template<typename>
     friend class ComponentsRegistry;
 
-    template <bool, typename>
+    template<bool, typename>
     friend struct ForEach;
 
-    template <typename>
+    template<typename>
     struct ForEachComponent;
 
-    template <typename... Types>
+    template<typename... Types>
     struct ForEachComponent<ComponentsList<Types...>> final
     {
         static void resize(size_t const new_size)
@@ -339,25 +374,25 @@ public:
             && entity.version() == _entities_version[entity.index()];
     }
 
-    template <typename... Types>
+    template<typename... Types>
 	static bool has(uint32_t const entity_index)
     {
         return (ComponentsRegistry<Types>::has(entity_index) & ...);
     }
 
-    template <typename... Types>
+    template<typename... Types>
     static bool has(Entity const entity)
     {
         return has<Types...>(entity.index());
     }
 
-    template <typename T>
+    template<typename T>
     static void add(Entity const entity)
     {
         ComponentsRegistry<T>::create(entity);
     }
 
-    template <typename T>
+    template<typename T>
     static void remove(Entity const entity)
     {
         ComponentsRegistry<T>::destroy(entity);
@@ -414,60 +449,139 @@ public:
     }
 };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 inline bool	Entity::is_valid() const
 {
     return EntitiesRegistry::is_valid(*this);
 }
 
-template <typename... Types>
+template<typename... Types>
 inline bool Entity::has() const
 {
     return EntitiesRegistry::has<Types...>(*this);
 }
 
-template <typename T>
-inline T &	Entity::get() const
-{
-    return ComponentsRegistry<T>::get(*this);
-}
-
-template <typename T>
+template<typename T>
 inline void Entity::add() const
 {
     ComponentsRegistry<T>::create(this->index());
 }
 
-template <typename T>
+template<typename T>
 inline void Entity::remove() const
 {
     ComponentsRegistry<T>::destroy(this->index());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-struct FunctionTraits : public FunctionTraits<decltype(&T::operator())>
+template<typename... Types>
+class   Accessor final
+{
+    using Dependencies = ComponentsList<Types...>;
+
+    template<bool, typename>
+    friend ForEach;
+
+    Accessor();
+    ~Accessor();
+
+    Accessor(Accessor const &) = delete;
+    Accessor(Accessor &&) = delete;
+
+    Accessor &operator=(Accessor const &) = delete;
+    Accessor &operator=(Accessor &&) = delete;
+
+public:
+
+    template<typename T>
+    T * get(Entity const & entity)
+    {
+        static_assert(ComponentsListHasType<T, Dependencies>::VALUE);
+        return ComponentsRegistry<typename std::remove_const<T>::type>::get(entity);
+    }
+
+    template<typename T>
+    T const * get(Entity const & entity) const
+    {
+        static_assert(ComponentsListHasType<T, Dependencies>::VALUE);
+        return ComponentsRegistry<typename std::remove_const<T>::type>::get(entity);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename... Types>
+class   DependenciesRegisterer final
+{
+public:
+
+    DependenciesRegisterer()
+    {
+        constexpr int dependencies[] = { ComponentIndex<Types, Components>::INDEX, ... };
+
+        DependenciesSolver::register_dependencies(dependencies);
+    }
+
+    DependenciesRegisterer(DependenciesRegisterer const &) = delete;
+    DependenciesRegisterer(DependenciesRegisterer &&) = delete;
+
+    DependenciesRegisterer &operator=(DependenciesRegisterer const &) = delete;
+    DependenciesRegisterer &operator=(DependenciesRegisterer &&) = delete;
+};
+
+class   DependenciesSolver final
+{
+    inline static std::vector<std::pair<int, std::vector<int>>> _dependencies;
+
+    static void register_dependencies()
+    {
+
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename T>
+struct  FunctionTraits : public FunctionTraits<decltype(&T::operator())>
 {
 };
 
-template <typename T, typename... Types>
-struct FunctionTraits<void (T::*)(Entity const, Types...) const>
+template<typename T, typename... Types>
+struct  FunctionTraits<void (T::*)(Types...) const>
 {
-    using COMPONENTSLIST =	ComponentsList<typename std::decay<Types>::type...>;
+    using DEPENDENCIES = ComponentsList<std::remove_reference_t<Types>...>;
+    using COMPONENTSLIST = ComponentsList<std::decay_t<Types>::type...>;
+    static constexpr bool   HAS_ENTITY_AS_PARAM = false;
+};
+
+template<typename T, typename... Types>
+struct  FunctionTraits<void (T::*)(Entity const, Types...) const>
+{
+    using DEPENDENCIES = ComponentsList<std::remove_reference_t<Types>...>;
+    using COMPONENTSLIST = ComponentsList<std::decay_t<Types>...>;
     static constexpr bool	HAS_ENTITY_AS_PARAM = true;
 };
 
-template <typename T, typename... Types>
-struct FunctionTraits<void (T::*)(Types...) const>
+template<typename T, typename... Types>
+struct  FunctionTraits<void (T::*)(Accessor<Types2...> const, Types...) const>
 {
-    using COMPONENTSLIST =	ComponentsList<typename std::decay<Types>::type...>;
+    using DEPENDENCIES = ConcatComponentsList<>;
+    using COMPONENTSLIST = ComponentsList<std::decay_t<Types>::type...>;
     static constexpr bool	HAS_ENTITY_AS_PARAM = false;
 };
 
-template <bool HAS_ENTITY_AS_PARAM, typename... Types>
-struct ForEach<HAS_ENTITY_AS_PARAM, ComponentsList<Types...>>
+template<typename T, typename... Types>
+struct  FunctionTraits<void (T::*)(Accessor<Types2...> const, Entity const, Types...) const>
+{
+    using DEPENDENCIES = ComponentsList<std::remove_reference_t<Types>...>;
+    using COMPONENTSLIST = ComponentsList<std::decay_t<Types>...>;
+    static constexpr bool	HAS_ENTITY_AS_PARAM = true;
+};
+
+template<bool HAS_ENTITY_AS_PARAM, typename... Types>
+struct  ForEach<HAS_ENTITY_AS_PARAM, ComponentsList<Types...>>
 {
     template <typename T>
 	static void run(T && lambda)
@@ -502,10 +616,10 @@ struct ForEach<HAS_ENTITY_AS_PARAM, ComponentsList<Types...>>
     }
 };
 
-template <typename T>
+template<typename T>
 inline void for_each(T && lambda)
 {
     ForEach<FunctionTraits<T>::HAS_ENTITY_AS_PARAM, typename FunctionTraits<T>::COMPONENTSLIST>::run(std::forward<T>(lambda));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
