@@ -512,17 +512,41 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+struct Dependency final
+{
+    bool        _is_for_writting : 1;
+    uint32_t    _components_index : 31;
+};
+
+
+
 template<typename... Types>
 class   DependenciesRegisterer final
 {
+    class   Oui final
+    {
+    public:
+
+        Oui()
+        {
+            constexpr Dependency dependencies[] = { { std::is_const_v<Types>, ComponentIndex<Types, Components>::INDEX }, ... };
+            constexpr size_t size = sizeof(dependencies) / sizeof(int);
+
+            DependenciesSolver::register_dependencies(size, dependencies);
+        }
+
+        Oui(Oui const &) = delete;
+        Oui(Oui &&) = delete;
+
+        Oui &operator=(Oui const &) = delete;
+        Oui &operator=(Oui &&) = delete;
+    };
+
+    static inline Oui;
+
 public:
 
-    DependenciesRegisterer()
-    {
-        constexpr int dependencies[] = { ComponentIndex<Types, Components>::INDEX, ... };
-
-        DependenciesSolver::register_dependencies(dependencies);
-    }
+    DependenciesRegisterer() = default;
 
     DependenciesRegisterer(DependenciesRegisterer const &) = delete;
     DependenciesRegisterer(DependenciesRegisterer &&) = delete;
@@ -533,9 +557,40 @@ public:
 
 class   DependenciesSolver final
 {
-    inline static std::vector<std::pair<int, std::vector<int>>> _dependencies;
+    struct  Dependencies final
+    {
+        int                     _system_index;
+        std::vector<Dependency> _components;
+    };
 
-    static void register_dependencies()
+    inline static std::vector<Dependencies> _dependencies;
+
+    static void register_dependencies(size_t const size, Dependency const * const dependencies)
+    {
+        for (size_t i = 0; i < size; ++i)
+        {
+
+        }
+    }
+
+    static bool    are_independent(Dependencies const & x, Dependencies const & y)
+    {
+        size_t const size_x =  x._components.size();
+        size_t const size_y =  y._components.size();
+
+        for (size_t j = 0; j < size_y; ++j)
+        {
+            for (size_t i = 0; i < size_x; ++i)
+            {
+                if (x._component[i]._components_index == y._component[j]._components_index
+                    && (x._component[i]._is_for_writting || y._component[j]._is_for_writting))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    void    print_dependencies() const
     {
 
     }
@@ -619,7 +674,11 @@ struct  ForEach<HAS_ENTITY_AS_PARAM, ComponentsList<Types...>>
 template<typename T>
 inline void for_each(T && lambda)
 {
-    ForEach<FunctionTraits<T>::HAS_ENTITY_AS_PARAM, typename FunctionTraits<T>::COMPONENTSLIST>::run(std::forward<T>(lambda));
+    using TRAITS = FunctionTraits<T>;
+
+    DependenciesRegisterer<TRAITS::DEPENDENCIES> dr;
+
+    ForEach<TRAITS::HAS_ENTITY_AS_PARAM, typename TRAITS::COMPONENTSLIST>::run(std::forward<T>(lambda));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
